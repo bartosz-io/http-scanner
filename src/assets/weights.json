@@ -1,0 +1,13 @@
+{
+    "Content-Security-Policy": 20,
+    "Strict-Transport-Security": 15,
+    "Cross-Origin-Embedder-Policy": 10,
+    "Cross-Origin-Opener-Policy": 10,
+    "Cross-Origin-Resource-Policy": 7,
+    "X-Content-Type-Options": 8,
+    "X-Frame-Options": 8,
+    "Referrer-Policy": 7,
+    "Permissions-Policy": 7,
+    "Clear-Site-Data": 5,
+    "X-DNS-Prefetch-Control": 3
+  }
