@@ -1,0 +1,8 @@
+{
+    "headers": [
+      { "name": "content-security-policy", "value": "default-src 'self';", "present": true,  "weight": 5,  "leaking": false },
+      { "name": "x-content-type-options",  "present": false, "weight": 5,  "leaking": false },
+      { "name": "x-frame-options",         "present": false, "weight": 5,  "leaking": false },
+      { "name": "server",                  "value": "apache", "present": true, "weight": 1, "leaking": true }
+    ]
+  }
