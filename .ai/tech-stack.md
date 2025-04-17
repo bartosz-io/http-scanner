@@ -1,45 +1,45 @@
-# Tech‑stack – HTTPScanner.com (Cloudflare‑native)
+# Tech stack – HTTPScanner.com (Cloudflare‑native)
 
 ## Front‑end
-- Cloudflare Pages – statyczny hosting SPA na edge global CDN  
-- Vite + React 19 + TypeScript 5 – szybki bundling i silne typowanie  
-- Tailwind CSS 4 + shadcn/ui – utility‑first styling & gotowe komponenty UI  
-- Hash routing (`/#/report/<id>`) – brak serwerowego SSR, prostszy deploy  
+- Cloudflare Pages – static SPA hosting on the global edge CDN  
+- Vite + React 19 + TypeScript 5 – fast bundling and strong typing  
+- Tailwind CSS 4 + shadcn/ui – utility‑first styling and ready‑made UI components  
+- Hash routing (`/#/report/<id>`) – no server‑side SSR, simpler deployment  
 
 ## Edge / Back‑end
 - Cloudflare Workers (JavaScript/TypeScript, wrangler v3)  
-  - analiza nagłówków (HEAD → GET fallback, 3 próby × 15 s)  
-  - scoring 0–100 z `weights.json`, obsługa `headers‑leak.json`  
-  - endpointy POST `/api/scan`, `/api/report/delete`  
-- Security & Rate‑limit: Cloudflare WAF (1 SCAN/domain/ h, 5 DELETE/IP/ h)
+  - header analysis (HEAD → GET fallback, 3 attempts × 15 s)  
+  - 0–100 scoring via `weights.json`, handling `headers‑leak.json`  
+  - POST endpoints `/api/scan`, `/api/report/delete`  
+- Security & rate limiting: Cloudflare WAF (1 SCAN/domain/h, 5 DELETE/IP/h)
 
-## Persistencja
+## Persistence
 - Cloudflare D1 (serverless SQLite)  
-  - tabela `reports` (hash, deleteToken, url, score, headers, leaking, timestamps)  
-- Cloudflare KV (lub R2)  
-  - przechowywanie wygenerowanych grafik share PNG (cache‑control 30 dni)
+  - `reports` table (hash, deleteToken, url, score, headers, leaking, timestamps)  
+- Cloudflare KV (or R2)  
+  - storage of generated share PNG graphics (cache‑control 30 days)
 
 ## DevOps / CI · CD
 - GitHub Actions  
-  - lint → testy jednostkowe → Playwright e2e → wrangler publish  
-  - automatyczne „Pages Preview” dla każdego PR  
-- Jedno repo, jeden ekosystem Cloudflare Pages + Workers + D1/KV
+  - lint → unit tests → Playwright e2e → wrangler publish  
+  - automatic “Pages Preview” for every PR  
+- Single repository, single Cloudflare ecosystem (Pages + Workers + D1/KV)
 
 ## Monitoring & Admin
-- Dashboard statyczny `/admin` (Cloudflare Pages), chroniony Cloudflare Access  
-  - metryki z D1 (skany, median TTS, DELETE), lista timeoutów  
-- Logi Workers + Logpush → Logflare (retencja 30 dni)
+- Static dashboard `/admin` (Cloudflare Pages) protected by Cloudflare Access  
+  - metrics from D1 (scans, median TTS, DELETEs), timeout list  
+- Worker logs + Logpush → Logflare (30‑day retention)
 
-## Bezpieczeństwo
-- Własne nagłówki:  
-  - Content‑Security‑Policy: `default-src 'self'`  
-  - Referrer‑Policy: `same-origin`  
-  - Permissions‑Policy: restrykcyjna (np. `geolocation=()`, `camera=()`)  
-  - Strict‑Transport‑Security: 2 lata, preload  
-- Endpoint opt‑out `.well‑known/httpscanner-ignore`  
-- Token DELETE 32‑hex weryfikowany w WAF (exact length, hex‑only)
+## Security
+- Custom headers:  
+  - Content‑Security‑Policy: `default-src 'self'`  
+  - Referrer‑Policy: `same-origin`  
+  - Permissions‑Policy: restrictive (e.g., `geolocation=()`, `camera=()`)  
+  - Strict‑Transport‑Security: 2 years, preload  
+- Opt‑out endpoint `.well‑known/httpscanner-ignore`  
+- 32‑hex DELETE token validated by WAF (exact length, hex‑only)
 
-## Szacunkowe koszty (MVP)
+## Estimated Costs (MVP)
 - Cloudflare Pages free tier  
-- Workers Paid plan (5 USD/mc) – wydłużony CPU + D1 (5 USD/mc po darmowym limicie)  
-- KV/R2 storage: poniżej 1 USD/mc przy ≤ 1 GB grafik
+- Workers Paid plan (USD 5/mo) – extended CPU; D1 (USD 5/mo after free quota)  
+- KV/R2 storage: under USD 1/mo for ≤ 1 GB of graphics

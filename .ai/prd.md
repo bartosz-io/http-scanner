@@ -1,80 +1,80 @@
-# Dokument wymagań produktu (PRD) – HTTPScanner.com (MVP)
+# Product Requirements Document (PRD) – HTTPScanner.com (MVP)
 
-## 1. Przegląd produktu
-HTTPScanner.com to aplikacja webowa typu “scan‑and‑share”, która automatycznie analizuje publiczne witryny pod kątem obecności i jakości nagłówków bezpieczeństwa (Security Headers) zgodnych z rekomendacjami OWASP Secure Headers Project. Rezultatem skanu jest szczegółowy raport (HTML/JSON) zawierający:
-* zbiorczy wynik 0–100 wyliczony z ważonych reguł,
-* lista znalezionych/brakujących nagłówków,
-* wskazanie nagłówków ujawniających szczegóły infrastruktury (leaking headers),
-* krótkie wyjaśnienia z linkiem do materiałów edukacyjnych Dev‑Academy,
-* unikalny hash‑URL pozwalający publicznie udostępniać raport,
-* wygenerowana grafika share (PNG 1200 × 630) z brandingiem „Web Security Dev Academy”.
+## 1. Product Overview
+HTTPScanner.com is a “scan‑and‑share” web application that automatically analyzes public websites for the presence and quality of security headers, following the OWASP Secure Headers Project recommendations. Each scan produces a detailed report (HTML/JSON) containing:
+* an aggregate score from 0 to 100 calculated from weighted rules,
+* a list of detected and missing headers,
+* identification of headers that leak infrastructure details (leaking headers),
+* short explanations with links to Dev‑Academy educational materials,
+* a unique hash‑based URL that can be publicly shared,
+* an automatically generated share graphic (PNG 1200 × 630) branded “Web Security Dev Academy”.
 
-Aplikacja składa się z dwóch głównych komponentów:  
-1. Front‑end hostowany na Netlify (statyczny SPA + serverless routy),  
-2. Silnik skanowania jako Cloudflare Worker (server‑side, HTTP/1.1, IPv4), który realizuje skan w ≤ 15 s (maks. 3 próby × 15 s, zatrzymanie po sukcesie).
+The application consists of two main components:  
+1. A front‑end hosted on Netlify (static SPA with serverless routes),  
+2. A scanning engine running as a Cloudflare Worker (server side, HTTP/1.1, IPv4) that completes a scan in ≤ 15 s (max 3 retries × 15 s, stops on first success).
 
-## 2. Problem użytkownika
-Web‑developerzy na wszystkich poziomach doświadczenia:
-* nie wiedzą, które nagłówki bezpieczeństwa są niezbędne,
-* nie umieją poprawnie wdrażać polityk takich jak CSP, HSTS,
-* nie posiadają prostego sposobu pomiaru i porównania poziomu bezpieczeństwa,
-* nie zdają sobie sprawy, że nagłówki typu *Server* czy *X‑Powered‑By* przeciekają wrażliwe informacje.
+## 2. User Problem
+Web developers at all experience levels:
+* do not know which security headers are essential,
+* do not know how to correctly implement policies such as CSP and HSTS,
+* lack an easy way to measure and compare security posture,
+* are unaware that headers like *Server* or *X‑Powered‑By* leak sensitive information.
 
-HTTPScanner.com pozwala w minutę:
-* ocenić konfigurację nagłówków,
-* otrzymać jasne wskazówki poprawy,
-* chwalić się wynikiem, co motywuje do dalszej edukacji.
+HTTPScanner.com enables them, in under a minute, to:
+* assess their header configuration,
+* receive clear remediation guidance,
+* showcase their score, motivating further learning.
 
-## 3. Wymagania funkcjonalne
-| ID | Wymaganie |
-|----|-----------|
-| FR‑01 | Użytkownik może podać publiczny URL do zeskanowania. |
-| FR‑02 | Silnik skanera wykonuje zapytanie HEAD (fallback GET) w trybie follow redirect 301/302 i analizuje tylko finalną odpowiedź. |
-| FR‑03 | System oblicza wynik 0–100 na podstawie wag dodatnich/ujemnych z pliku `weights.json`, normalizując do zakresu. |
-| FR‑04 | Każdy nagłówek z listy `headers‑leak.json` odejmuje 1 pkt i pojawia się w sekcji “Fingerprinting headers to remove”. |
-| FR‑05 | Raport (HTML + równoważny JSON) zostaje zapisany w bazie wraz z hash‑ID i deleteToken (32 znaki hex). |
-| FR‑06 | Hash‑URL raportu jest publiczny; front generuje grafiki share z wynikiem i brandingiem, dodaje meta OpenGraph/Twitter. |
-| FR‑07 | Rate‑limit: 1 skan na domenę (subdomeny osobno) na godzinę; 5 żądań DELETE na IP/h – egzekwowane w Cloudflare WAF. |
-| FR‑08 | Endpoint `POST /api/report/delete` usuwa raport po poprawnym `hash` i `deleteToken`, zwraca 204 No Content. |
-| FR‑09 | Front‑end wyświetla modal Delete/Cancel, obsługuje komunikaty sukces/błąd uniwersalnym toastem. |
-| FR‑10 | Dashboard admina (basic‑auth) prezentuje: liczbę skanów/dzień, median time‑to‑scan, liczbę i skuteczność DELETE, błędy timeout. |
-| FR‑11 | Aplikacja ustawia własne nagłówki CSP (`default‑src 'self'`), Referrer‑Policy (`same‑origin`), restrykcyjną Permissions‑Policy i HSTS. |
-| FR‑12 | CI/CD w GitHub Actions: lint → testy jednostkowe → Playwright e2e → deploy preview → deploy produkcyjny. |
-| FR‑13 | Użytkownik może udostępnić raport w mediach społecznościowych za pomocą przycisku “Share on LinkedIn/Twitter”. |
-| FR‑14 | Endpoint `.well‑known/httpscanner-ignore` (200 OK) pozwala właścicielowi serwera zrezygnować z automatycznych skanów. |
+## 3. Functional Requirements
+| ID | Requirement |
+|----|-------------|
+| FR‑01 | The user can enter a public URL to be scanned. |
+| FR‑02 | The scanner performs a HEAD request (fallback to GET) with 301/302 follow‑redirect and analyzes only the final response. |
+| FR‑03 | The system calculates a 0–100 score based on positive/negative weights from `weights.json`, normalised to the range. |
+| FR‑04 | Each header in `headers‑leak.json` subtracts 1 point and appears in the “Fingerprinting headers to remove” section. |
+| FR‑05 | The report (HTML + equivalent JSON) is stored in the database with hash‑ID and a 32‑char hexadecimal deleteToken. |
+| FR‑06 | The report’s hash URL is public; the front‑end generates share graphics with score and branding, and adds OpenGraph/Twitter meta. |
+| FR‑07 | Rate limit: 1 scan per domain (sub‑domains counted separately) per hour; 5 DELETE requests per IP/hour – enforced in Cloudflare WAF. |
+| FR‑08 | `POST /api/report/delete` deletes a report given a valid `hash` and `deleteToken`, returning 204 No Content. |
+| FR‑09 | The front‑end shows a Delete/Cancel modal and handles success/error via a unified toast message. |
+| FR‑10 | The admin dashboard (basic‑auth) shows: scans per day, median time‑to‑scan, number and success rate of DELETE, timeout errors. |
+| FR‑11 | The application sets its own CSP (`default‑src 'self'`), Referrer‑Policy (`same‑origin`), a restrictive Permissions‑Policy, and HSTS. |
+| FR‑12 | CI/CD in GitHub Actions: lint → unit tests → Playwright e2e → deploy preview → production deploy. |
+| FR‑13 | The user can share the report on social media via “Share on LinkedIn/Twitter” button. |
+| FR‑14 | The `.well‑known/httpscanner-ignore` endpoint (200 OK) lets a site owner opt out of automatic scans. |
 
-## 4. Granice produktu
-* Brak kont użytkowników, rejestracji i uwierzytelniania poza basic‑auth dla dashboardu administracyjnego.  
-* Brak eksportu raportów (PDF/HTML), brak API publicznego w MVP.  
-* Nie oceniamy poprawności detali polityki CSP (tylko jej obecność).  
-* Tylko IPv4, HTTP/1.1; brak wsparcia HTTP/2 i QUIC.  
-* Brak wersjonowania raportów; ponowny skan możliwy po 1 h.  
-* Mobile‑app poza zakresem; front responsywny.  
-* Storage grafik share i backup DB > 60 dni – do ustalenia (TBD).  
-* Mixed‑content w artykułach Dev‑Academy nieobsługiwany – link otwierany w nowej karcie przeglądarki.
+## 4. Product Boundaries
+* No user accounts, registration, or authentication except basic‑auth for the admin dashboard.  
+* No report export (PDF/HTML) and no public API in the MVP.  
+* CSP details are not evaluated (only presence).  
+* IPv4 and HTTP/1.1 only; no HTTP/2 or QUIC support.  
+* No report versioning; re‑scan available after 1 h.  
+* Mobile app out of scope; front‑end is responsive.  
+* Storage of share graphics and DB backup beyond 60 days is TBD.  
+* Mixed‑content in Dev‑Academy articles is not handled – links open in a new browser tab.
 
-## 5. Historyjki użytkowników
-| ID | Tytuł | Opis | Kryteria akceptacji |
-|----|-------|------|---------------------|
-| US‑001 | Skanowanie witryny | Jako developer chcę podać URL, aby sprawdzić moje nagłówki bezpieczeństwa. | a) Po wprowadzeniu prawidłowego URL i kliknięciu “Scan” otrzymuję wynik w ≤ 15 s. b) W raporcie widzę listę obecnych/brakujących nagłówków, wynik liczbowy i sekcję edukacyjną. |
-| US‑002 | Ograniczenie częstotliwości | Jako developer otrzymuję informację, że domena została niedawno zeskanowana, aby uniknąć nadużyć. | a) Jeśli skanuję tę samą domenę przed upływem 1 h, aplikacja wyświetla komunikat o limicie i nie wykonuje skanu. |
-| US‑003 | Obsługa przekierowań | Jako developer chcę, aby skaner podążał za redirectami, abym dostał wynik dla finalnego URL. | a) Raport pokazuje tylko nagłówki z odpowiedzi finalnej. b) Scoring bazuje wyłącznie na tych nagłówkach. |
-| US‑004 | Informacja o leaking headers | Jako developer chcę wiedzieć, które nagłówki wyciekają dane, abym mógł je usunąć. | a) Raport zawiera listę nazw „leaking headers” oraz zalecenie ich usunięcia. b) Każdy z nich zmniejsza wynik o 1 pkt. |
-| US‑005 | Udostępnienie wyniku | Jako developer chcę pochwalić się wynikiem na LinkedIn, aby pokazać dbałość o bezpieczeństwo. | a) Kliknięcie “Share on LinkedIn” otwiera okno share z poprawnym tytułem, opisem i grafiką PNG 1200 × 630. |
-| US‑006 | Usunięcie raportu | Jako developer chcę usunąć raport, jeśli został wygenerowany omyłkowo. | a) Klikam „Delete”, wprowadzam deleteToken, otrzymuję toast “Report deleted”. b) Ponowne otwarcie hash‑URL zwraca 404. |
-| US‑007 | Błędny token | Jako developer chcę uzyskać informację o błędnym tokenie, aby móc spróbować ponownie. | a) Przy błędnym tokenie modal pokazuje komunikat “Invalid token”. b) Operacja DELETE nie usuwa raportu. |
-| US‑008 | Timeout skanu | Jako developer chcę otrzymać komunikat, gdy skan się nie powiedzie z powodu timeoutu. | a) Po 3 próbach bez odpowiedzi raport zwraca status “Scan timeout” bez obniżania wyniku. |
-| US‑009 | Monitoring administratora | Jako administrator chcę widzieć statystyki skanów, aby mierzyć użycie systemu. | a) Po zalogowaniu przez basic‑auth oglądam dashboard z wykresami skanów/dzień, medianą czasu skanu, liczbą DELETE. |
-| US‑010 | Opt‑out właściciela serwera | Jako właściciel strony chcę zablokować skaner, aby nie skanował mojej domeny. | a) Jeśli endpoint `/.well‑known/httpscanner-ignore` zwraca 200, każda próba skanu kończy się komunikatem “Scan disabled by site owner”. |
-| US‑011 | Bezpieczne nagłówki serwisu | Jako użytkownik chcę mieć pewność, że sam serwis HTTPScanner.com stosuje rekomendowane nagłówki. | a) Analiza dev‑tools pokazuje obecność CSP, Referrer‑Policy, Permissions‑Policy i HSTS ustawionych zgodnie ze specyfikacją. |
-| US‑012 | Testowanie E2E | Jako inżynier QA chcę automatycznie testować krytyczne ścieżki, aby zapewnić stabilność release. | a) W GitHub Actions testy Playwright przechodzą dla scenariuszy: scan success, timeout, invalid hash, delete success. |
+## 5. User Stories
+| ID | Title | Description | Acceptance Criteria |
+|----|-------|-------------|---------------------|
+| US‑001 | Site scan | As a developer, I want to enter a URL to check my security headers. | a) After entering a valid URL and clicking “Scan”, I receive results in ≤ 15 s. b) The report shows detected/missing headers, numeric score, and an educational section. |
+| US‑002 | Rate limiting notice | As a developer, I want to know if a domain was recently scanned to avoid abuse. | a) If I scan the same domain within 1 h, the app displays a limit message and skips the scan. |
+| US‑003 | Redirect handling | As a developer, I want the scanner to follow redirects so I get the final URL’s result. | a) Report shows only headers from the final response. b) Scoring uses those headers only. |
+| US‑004 | Leaking headers information | As a developer, I want to know which headers leak data so I can remove them. | a) Report lists “leaking headers” with a removal recommendation. b) Each lowers the score by 1 point. |
+| US‑005 | Share score | As a developer, I want to share my score on LinkedIn to show my security focus. | a) Clicking “Share on LinkedIn” opens a share window with correct title, description, and PNG 1200 × 630. |
+| US‑006 | Delete report | As a developer, I want to delete a report generated by mistake. | a) I click “Delete”, enter deleteToken, receive “Report deleted” toast. b) Re‑opening the hash URL returns 404. |
+| US‑007 | Invalid token feedback | As a developer, I want feedback on an invalid token to try again. | a) Invalid token shows “Invalid token” modal message. b) DELETE does not remove the report. |
+| US‑008 | Scan timeout notice | As a developer, I want a message when a scan fails due to timeout. | a) After 3 attempts without response, the report status is “Scan timeout” without reducing the score. |
+| US‑009 | Admin monitoring | As an admin, I want to view scan statistics to measure system usage. | a) After basic‑auth login, I see a dashboard with scans/day, median scan time, DELETE count. |
+| US‑010 | Server opt‑out | As a site owner, I want to block the scanner from my domain. | a) If `.well‑known/httpscanner-ignore` returns 200, any scan attempt ends with “Scan disabled by site owner”. |
+| US‑011 | Service’s own headers | As a user, I want to be sure HTTPScanner.com itself uses recommended headers. | a) Dev‑tools inspection shows CSP, Referrer‑Policy, Permissions‑Policy, and HSTS as specified. |
+| US‑012 | E2E testing | As a QA engineer, I want automated tests of critical paths to ensure release stability. | a) GitHub Actions Playwright tests pass for: scan success, timeout, invalid hash, delete success. |
 
-## 6. Metryki sukcesu
-| Metryka | Cel MVP | Narzędzie pomiaru |
-|---------|--------|-------------------|
-| Liczba unikalnych raportów / dzień | ≥ 10 | Dashboard admina |
-| Średni czas skanu | ≤ 15 s | Logi skanera / dashboard |
-| Współczynnik skutecznych DELETE | ≥ 95 % | Logi DELETE vs błędne tokeny |
-| Udział share‑linków w ruchu | do ustalenia (poziom X) | UTM + analytics |
-| Liczba błędów timeout / dzień | ≤ 5 % skanów | Dashboard admina |
-| Dostępność usługi | ≥ 99.5 % miesięcznie | Uptimerobot / Cloudflare |
+## 6. Success Metrics
+| Metric | MVP Target | Measurement Tool |
+|--------|-----------|------------------|
+| Unique reports per day | ≥ 10 | Admin dashboard |
+| Average scan time | ≤ 15 s | Scanner logs / dashboard |
+| Successful DELETE rate | ≥ 95 % | DELETE logs vs invalid tokens |
+| Share‑link traffic share | to be determined (level X) | UTM + analytics |
+| Timeout errors per day | ≤ 5 % of scans | Admin dashboard |
+| Service availability | ≥ 99.5 % monthly | Uptimerobot / Cloudflare |
