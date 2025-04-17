@@ -10,7 +10,7 @@ HTTPScanner.com is a “scan‑and‑share” web application that automatically
 * an automatically generated share graphic (PNG 1200 × 630) branded “Web Security Dev Academy”.
 
 The application consists of two main components:  
-1. A front‑end hosted on Netlify (static SPA with serverless routes),  
+1. A front‑end hosted on Cloudflare Pages (static SPA with serverless routes),  
 2. A scanning engine running as a Cloudflare Worker (server side, HTTP/1.1, IPv4) that completes a scan in ≤ 15 s (max 3 retries × 15 s, stops on first success).
 
 ## 2. User Problem
