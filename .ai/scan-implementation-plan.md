@@ -77,10 +77,10 @@ interface ScanResult {
   }
   ```
 
-- **429 Too Many Requests**: Zbyt wiele skanowań tej samej domeny w ciągu ostatniej godziny
+- **429 Too Many Requests**: Zbyt wiele skanowań tej samej domeny w ciągu ostatniej minuty
   ```json
   { 
-    "error": "Rate limit exceeded: This domain was scanned in the last hour",
+    "error": "Rate limit exceeded: This domain was scanned in the last minute",
     "code": "RATE_LIMIT_EXCEEDED" 
   }
   ```
