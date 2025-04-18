@@ -8,7 +8,7 @@
 	"main": "worker/index.ts",
 	"compatibility_date": "2025-04-17",
 	"assets": {
-		"not_found_handling": "single-page-application"
+		// "not_found_handling": "single-page-application"
 	},
 	"observability": {
 		"enabled": true
@@ -21,7 +21,16 @@
 			"migrations_table": "d1_migrations",
 			"migrations_dir": "sql/migrations"
 		}
-	]
+	],
+	"r2_buckets": [
+		{
+			"binding": "IMAGES",
+			"bucket_name": "http-scanner-images"
+		}
+	],
+	"vars": {
+		"CDN_DOMAIN": "http-scanner.dev-academy.workers.dev"
+	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
