@@ -82,4 +82,74 @@ export class D1ReportRepository implements ReportRepository {
       share_image_key: result.share_image_key
     });
   }
+  
+  async deleteByHashAndToken(hash: string, deleteToken: string): Promise<boolean> {
+    // Validate hash format (32-character hex string)
+    if (!/^[0-9a-f]{32}$/i.test(hash)) {
+      throw new Error('INVALID_HASH_FORMAT');
+    }
+    
+    // Validate deleteToken format (32-character hex string)
+    if (!/^[0-9a-f]{32}$/i.test(deleteToken)) {
+      throw new Error('INVALID_TOKEN_FORMAT');
+    }
+    
+    // First, verify the report exists and the token matches
+    const report = await this.db.prepare(
+      `SELECT hash, deleteToken, share_image_key 
+       FROM reports 
+       WHERE hash = ?`
+    )
+    .bind(hash)
+    .first<{ hash: string; deleteToken: string; share_image_key: string | null }>();
+    
+    // If report not found, return false
+    if (!report) {
+      return false;
+    }
+    
+    // Use constant-time comparison to prevent timing attacks
+    // This is important for security when comparing tokens
+    if (!this.secureCompare(report.deleteToken, deleteToken)) {
+      return false;
+    }
+    
+    // At this point, the hash exists and the token matches, so delete the report
+    const result = await this.db.prepare(
+      `DELETE FROM reports WHERE hash = ?`
+    )
+    .bind(hash)
+    .run();
+    
+    // Return true if a row was affected (report was deleted)
+    return result.success && result.meta?.changes === 1;
+  }
+  
+  /**
+   * Performs a constant-time comparison of two strings to prevent timing attacks
+   * @param a First string to compare
+   * @param b Second string to compare
+   * @returns True if the strings are equal, false otherwise
+   */
+  private secureCompare(a: string, b: string): boolean {
+    // If lengths are different, strings are not equal
+    // But still continue with the comparison to maintain constant time
+    const equal = a.length === b.length;
+    
+    // XOR each character - if any character differs, result will be non-zero
+    let result = 0;
+    const len = Math.max(a.length, b.length);
+    
+    for (let i = 0; i < len; i++) {
+      // Use 0 if index is out of bounds
+      const charA = i < a.length ? a.charCodeAt(i) : 0;
+      const charB = i < b.length ? b.charCodeAt(i) : 0;
+      
+      // Bitwise XOR - if characters are different, bits will be set
+      result |= charA ^ charB;
+    }
+    
+    // Only return true if lengths are equal and no characters differ
+    return equal && result === 0;
+  }
 }
