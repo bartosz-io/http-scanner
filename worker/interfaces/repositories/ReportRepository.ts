@@ -28,4 +28,17 @@ export interface ReportRepository {
    * @throws Error with code 'INVALID_HASH_FORMAT' or 'INVALID_TOKEN_FORMAT' if formats are invalid
    */
   deleteByHashAndToken(hash: string, deleteToken: string): Promise<boolean>;
+  
+  /**
+   * Find a paginated list of reports
+   * @param limit Maximum number of reports to retrieve
+   * @param sortField Field to sort by
+   * @param sortDirection Sort direction
+   * @param cursor Optional pagination cursor
+   * @returns List of reports and cursor to next page (if exists)
+   */
+  findPaginated(limit: number, sortField: 'created_at' | 'score', sortDirection: 'asc' | 'desc', cursor?: string): Promise<{
+    reports: Report[];
+    nextCursor?: string;
+  }>;
 }

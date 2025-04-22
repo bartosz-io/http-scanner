@@ -126,6 +126,101 @@ export class D1ReportRepository implements ReportRepository {
   }
   
   /**
+   * Find a paginated list of reports
+   * @param limit Maximum number of reports to retrieve
+   * @param sortField Field to sort by
+   * @param sortDirection Sort direction
+   * @param cursor Optional pagination cursor
+   * @returns List of reports and cursor to next page (if exists)
+   */
+  async findPaginated(limit: number, sortField: 'created_at' | 'score', sortDirection: 'asc' | 'desc', cursor?: string): Promise<{
+    reports: Report[];
+    nextCursor?: string;
+  }> {
+    // Parameter validation
+    if (limit < 20 || limit > 100) {
+      limit = 20; // Default limit
+    }
+    
+    // Decode cursor (if exists)
+    let cursorValues: { field: string; value: number | string } | null = null;
+    if (cursor) {
+      try {
+        cursorValues = JSON.parse(atob(cursor));
+      } catch {
+        // Ignore invalid cursor and start from beginning
+      }
+    }
+    
+    // Build SQL query
+    let query = `
+      SELECT hash, url, created_at, score
+      FROM reports
+    `;
+    
+    const params: (string | number)[] = [];
+    
+    // Add WHERE condition for cursor
+    if (cursorValues) {
+      if (sortDirection === 'asc') {
+        query += ` WHERE ${sortField} > ?`;
+      } else {
+        query += ` WHERE ${sortField} < ?`;
+      }
+      params.push(cursorValues.value);
+    }
+    
+    // Add sorting
+    query += ` ORDER BY ${sortField} ${sortDirection === 'asc' ? 'ASC' : 'DESC'}`;
+    
+    // Add limit + 1 to check if next page exists
+    query += ` LIMIT ?`;
+    params.push(limit + 1);
+    
+    // Execute query
+    const results = await this.db.prepare(query)
+      .bind(...params)
+      .all<{ hash: string; url: string; created_at: number; score: number }>();
+    
+    if (!results.success) {
+      throw new Error('DATABASE_ERROR');
+    }
+    
+    // Check if next page exists
+    const hasNextPage = results.results.length > limit;
+    const reportRows = hasNextPage ? results.results.slice(0, limit) : results.results;
+    
+    // Map results to domain objects
+    const reports = reportRows.map(row => {
+      return Report.create({
+        hash: row.hash,
+        url: row.url,
+        created_at: row.created_at,
+        score: row.score,
+        headers: [], // Empty because we don't need full header data in the list
+        deleteToken: '', // Empty because we don't need this in the list
+        share_image_key: null // Empty because we don't need this in the list
+      });
+    });
+    
+    // Generate cursor for next page
+    let nextCursor: string | undefined;
+    if (hasNextPage && reportRows.length > 0) {
+      const lastItem = reportRows[reportRows.length - 1];
+      const cursorData = {
+        field: sortField,
+        value: lastItem[sortField]
+      };
+      nextCursor = btoa(JSON.stringify(cursorData));
+    }
+    
+    return {
+      reports,
+      nextCursor
+    };
+  }
+
+  /**
    * Performs a constant-time comparison of two strings to prevent timing attacks
    * @param a First string to compare
    * @param b Second string to compare

@@ -88,3 +88,25 @@ export interface AdminReportsResponseDTO {
   items: AdminReportListItemDTO[];
   next?: string;                 // opaque cursor for subsequent page
 }
+
+/* ---------- 6 /reports (public) -------------------*/
+
+/** Minimal report list item for public endpoint */
+export type ReportListItemDTO = Pick<
+  Report,
+  'hash' | 'url' | 'created_at' | 'score'
+>;
+
+/** GET /reports - paginated result set */
+export interface ReportsResponseDTO {
+  items: ReportListItemDTO[];
+  next?: string;  // opaque cursor for next page
+}
+
+/** Query model for fetching paginated reports */
+export interface FetchReportsQueryModel {
+  limit: number;
+  cursor?: string;
+  sortField: 'created_at' | 'score';
+  sortDirection: 'asc' | 'desc';
+}
