@@ -1,4 +1,4 @@
-import { ScanResponseDTO } from '../../../src/types';
+import { ScanResponseDTO, FetchReportResponseDTO } from '../../../src/types';
 import { Report } from '../../entities/Report';
 import { HeaderAnalysisResult } from '../../entities/HeaderAnalysisResult';
 
@@ -30,6 +30,18 @@ export class ReportMapper {
       headers: groupedHeaders as unknown as Report['headers'], // Type assertion with proper typing
       share_image_url: shareImageUrl
     };
+  }
+  
+  /**
+   * Maps a domain Report to a FetchReportResponseDTO
+   * This is used for the GET /report/{hash} endpoint
+   * @param report The domain Report to map
+   * @param cdnDomain The CDN domain for share images
+   */
+  static toFetchReportResponseDTO(report: Report, cdnDomain: string): FetchReportResponseDTO {
+    // Since FetchReportResponseDTO has the same structure as ScanResponseDTO,
+    // we can reuse the toScanResponseDTO method
+    return this.toScanResponseDTO(report, cdnDomain);
   }
 
   /**

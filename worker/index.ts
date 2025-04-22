@@ -1,7 +1,9 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { ScanController } from './impl/controllers/ScanController';
+import { ReportController } from './impl/controllers/ReportController';
 import { ScanUrlUseCase } from './usecases/ScanUrlUseCase';
+import { FetchReportUseCase } from './usecases/FetchReportUseCase';
 import { D1ReportRepository } from './impl/repositories/D1ReportRepository';
 import { FetchHttpService } from './impl/services/FetchHttpService';
 import { HeaderAnalyzerService } from './impl/services/HeaderAnalyzerService';
@@ -53,6 +55,25 @@ app.post('/scan', async (c) => {
   
   // Handle request
   return scanController.handleScan(c);
+});
+
+// Add endpoint to fetch a report by hash
+app.get('/report/:hash', async (c) => {
+  // Create dependencies
+  const db = c.env.DB;
+  const cdnDomain = c.env.CDN_DOMAIN;
+  
+  // Create repository
+  const reportRepository = new D1ReportRepository(db);
+  
+  // Create use case
+  const fetchReportUseCase = new FetchReportUseCase(reportRepository);
+  
+  // Create controller
+  const reportController = new ReportController(fetchReportUseCase, cdnDomain);
+  
+  // Handle request
+  return reportController.handleFetchReport(c);
 });
 
 // Add endpoint to serve images from R2

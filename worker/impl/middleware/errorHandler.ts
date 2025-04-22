@@ -10,6 +10,8 @@ export interface ErrorResponse {
  */
 export const ERROR_MAP: Record<string, { status: number; message: string }> = {
   INVALID_URL: { status: 400, message: 'Invalid URL format or protocol not supported' },
+  INVALID_HASH_FORMAT: { status: 400, message: 'Invalid hash format. Expected 32-character hexadecimal string' },
+  NOT_FOUND: { status: 404, message: 'Report not found or has been deleted' },
   RATE_LIMIT_EXCEEDED: { status: 429, message: 'Rate limit exceeded: This domain was scanned in the last minute' },
   SCAN_TIMEOUT: { status: 504, message: 'Scan timed out after 45 seconds' },
   INTERNAL_ERROR: { status: 500, message: 'An internal error occurred' }
