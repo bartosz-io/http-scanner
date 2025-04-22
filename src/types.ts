@@ -37,7 +37,10 @@ export type PublicReportDTO = Omit<Report, 'deleteToken' | 'share_image_key'> & 
 };
 
 /** POST /scan – server response (full report) */
-export type ScanResponseDTO = PublicReportDTO;
+export interface ScanResponseDTO extends PublicReportDTO {
+  /** Token required to delete this report (only returned once at creation) */
+  deleteToken: string;
+}
 
 /* ---------- 2 /report/{hash} -----------------------*/
 

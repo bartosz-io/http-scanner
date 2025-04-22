@@ -28,7 +28,8 @@ export class ReportMapper {
       created_at: report.created_at,
       score: report.score,
       headers: groupedHeaders as unknown as Report['headers'], // Type assertion with proper typing
-      share_image_url: shareImageUrl
+      share_image_url: shareImageUrl,
+      deleteToken: report.deleteToken // Include deleteToken for scan response
     };
   }
   
@@ -39,9 +40,28 @@ export class ReportMapper {
    * @param cdnDomain The CDN domain for share images
    */
   static toFetchReportResponseDTO(report: Report, cdnDomain: string): FetchReportResponseDTO {
-    // Since FetchReportResponseDTO has the same structure as ScanResponseDTO,
-    // we can reuse the toScanResponseDTO method
-    return this.toScanResponseDTO(report, cdnDomain);
+    // Group headers by type
+    const groupedHeaders = {
+      detected: report.headers.filter(h => h.present && !h.leaking),
+      missing: report.headers.filter(h => !h.present),
+      leaking: report.headers.filter(h => h.leaking)
+    };
+
+    // Generate share image URL if available
+    let shareImageUrl = null;
+    if (report.share_image_key) {  
+      shareImageUrl = `https://${cdnDomain}/images/${report.share_image_key}`;
+    }
+
+    // Create response without deleteToken for security
+    return {
+      hash: report.hash,
+      url: report.url,
+      created_at: report.created_at,
+      score: report.score,
+      headers: groupedHeaders as unknown as Report['headers'],
+      share_image_url: shareImageUrl
+    };
   }
 
   /**
