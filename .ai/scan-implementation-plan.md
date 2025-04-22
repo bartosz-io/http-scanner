@@ -1,33 +1,33 @@
 # API Endpoint Implementation Plan: POST /scan
 
-## 1. Przegląd punktu końcowego
+## 1. Endpoint Overview
 
-Punkt końcowy `/scan` umożliwia wykonanie pełnego skanowania publicznego adresu URL w celu sprawdzenia jego nagłówków bezpieczeństwa HTTP i zwraca kompletny raport w tej samej odpowiedzi. Skanowanie jest wykonywane synchronicznie, co oznacza, że klient otrzymuje gotowy raport natychmiast, bez konieczności odpytywania. Endpoint analizuje nagłówki HTTP, ocenia ich bezpieczeństwo i generuje wynik liczbowy (score) reprezentujący ogólny poziom zabezpieczeń strony.
+The `/scan` endpoint enables a complete scan of a public URL to check its HTTP security headers and returns a complete report in the same response. The scanning is performed synchronously, which means the client receives a ready report immediately, without the need for polling. The endpoint analyzes HTTP headers, evaluates their security, and generates a numerical score representing the overall security level of the site.
 
-## 2. Szczegóły żądania
+## 2. Request Details
 
-- **Metoda HTTP**: POST
-- **Struktura URL**: `/scan`
-- **Parametry**:
-  - **Wymagane**: Brak parametrów w URL
-  - **Opcjonalne**: Brak parametrów w URL
+- **HTTP Method**: POST
+- **URL Structure**: `/scan`
+- **Parameters**:
+  - **Required**: No URL parameters
+  - **Optional**: No URL parameters
 - **Request Body**:
   ```json
   {
     "url": "https://example.com"
   }
   ```
-  - `url` (string): Pełny adres URL HTTP/HTTPS (maksymalnie 2048 znaków)
+  - `url` (string): Full HTTP/HTTPS URL (maximum 2048 characters)
 
-## 3. Wykorzystywane typy
+## 3. Types Used
 
 ```typescript
-// Istniejące typy z src/types.ts
+// Existing types from src/types.ts
 import { ScanRequestDTO, ScanResponseDTO, PublicReportDTO, HeaderEntry, Report } from "../types";
 
-// Dodatkowe typy potrzebne do implementacji
+// Additional types needed for implementation
 interface ScanCommandModel {
-  url: string; // Znormalizowany URL
+  url: string; // Normalized URL
 }
 
 interface HeaderAnalysisResult {
@@ -48,28 +48,28 @@ interface ScanResult {
 }
 ```
 
-## 4. Szczegóły odpowiedzi
+## 4. Response Details
 
-### Poprawna odpowiedź (200 OK)
+### Successful Response (200 OK)
 
 ```json
 {
-  "hash": "ab12...ef", // 32-znakowy identyfikator heksadecymalny
-  "url": "https://example.com", // Znormalizowany URL
-  "created_at": 1713369600, // Unix epoch (sekundy)
-  "score": 87, // Wynik bezpieczeństwa (0-100)
+  "hash": "ab12...ef", // 32-character hexadecimal identifier
+  "url": "https://example.com", // Normalized URL
+  "created_at": 1713369600, // Unix epoch (seconds)
+  "score": 87, // Security score (0-100)
   "headers": {
-    "detected": [...], // Wykryte nagłówki
-    "missing": [...], // Brakujące nagłówki
-    "leaking": [...] // Nagłówki ujawniające informacje
+    "detected": [...], // Detected headers
+    "missing": [...], // Missing headers
+    "leaking": [...] // Headers revealing information
   },
-  "share_image_url": "https://cdn.cloudflare.r2/.../ab12ef.png" // URL do obrazka
+  "share_image_url": "https://cdn.cloudflare.r2/.../ab12ef.png" // URL to the image
 }
 ```
 
-### Błędy
+### Errors
 
-- **400 Bad Request**: Nieprawidłowy lub nieobsługiwany URL (non-HTTP/HTTPS)
+- **400 Bad Request**: Invalid or unsupported URL (non-HTTP/HTTPS)
   ```json
   { 
     "error": "Invalid URL format or protocol not supported",
@@ -77,7 +77,7 @@ interface ScanResult {
   }
   ```
 
-- **429 Too Many Requests**: Zbyt wiele skanowań tej samej domeny w ciągu ostatniej minuty
+- **429 Too Many Requests**: Too many scans of the same domain within the last minute
   ```json
   { 
     "error": "Rate limit exceeded: This domain was scanned in the last minute",
@@ -85,7 +85,7 @@ interface ScanResult {
   }
   ```
 
-- **504 Gateway Timeout**: Skanowanie przekroczyło czas 45 sekund (3 próby × 15 sekund)
+- **504 Gateway Timeout**: Scanning exceeded 45 seconds (3 attempts × 15 seconds)
   ```json
   { 
     "error": "Scan timed out after 45 seconds",
@@ -93,109 +93,109 @@ interface ScanResult {
   }
   ```
 
-## 5. Przepływ danych
+## 5. Data Flow
 
-1. **Walidacja wejściowa**: 
-   - Sprawdzenie czy URL jest poprawnym formatem HTTP/HTTPS i nie przekracza 2048 znaków
-   - Sprawdzenie czy domena nie została zeskanowana w ciągu ostatniej godziny (rate-limit)
+1. **Input Validation**: 
+   - Check if the URL is a valid HTTP/HTTPS format and does not exceed 2048 characters
+   - Check if the domain has not been scanned within the last hour (rate-limit)
 
-2. **Przetwarzanie**:
-   - Normalizacja URL (usunięcie parametrów śledzących, ujednolicenie formatu)
-   - Wykonanie żądań HTTP HEAD (z fallbackiem do GET) do podanego URL
-   - Analiza nagłówków odpowiedzi i ocena bezpieczeństwa
-   - Generowanie oceny (score) na podstawie pliku `weights.json`
-   - Identyfikacja wyciekających informacji na podstawie `headers-leak.json`
+2. **Processing**:
+   - URL normalization (removing tracking parameters, standardizing format)
+   - Performing HTTP HEAD requests (with fallback to GET) to the provided URL
+   - Analysis of response headers and security assessment
+   - Generating a score based on the `weights.json` file
+   - Identification of leaking information based on `headers-leak.json`
 
-3. **Generowanie raportu**:
-   - Generowanie unikalnego 32-znakowego identyfikatora heksadecymalnego (hash)
-   - Generowanie 32-znakowego tokena usuwania (deleteToken)
-   - Tworzenie obrazka do udostępniania (PNG) i zapisanie go w Cloudflare KV/R2
-   - Zapisanie wyników w tabeli `reports` w bazie danych D1
+3. **Report Generation**:
+   - Generating a unique 32-character hexadecimal identifier (hash)
+   - Generating a 32-character deletion token (deleteToken)
+   - Creating a shareable image (PNG) and saving it in Cloudflare KV/R2
+   - Saving the results in the `reports` table in the D1 database
 
-4. **Zwracanie odpowiedzi**:
-   - Przekształcenie danych raportu na format ScanResponseDTO
-   - Zwrócenie pełnego raportu w odpowiedzi HTTP
+4. **Returning the Response**:
+   - Transforming report data to the ScanResponseDTO format
+   - Returning the full report in the HTTP response
 
-## 6. Względy bezpieczeństwa
+## 6. Security Considerations
 
-1. **Walidacja danych wejściowych**:
-   - Strict validation URL przy użyciu regularnych wyrażeń i ograniczenie długości
-   - Odrzucanie niestandardowych protokołów (tylko HTTP i HTTPS)
-   - Blokowanie adresów URL prowadzących do sieci wewnętrznych (localhost, adresy prywatne)
+1. **Input Data Validation**:
+   - Strict URL validation using regular expressions and length limitation
+   - Rejecting non-standard protocols (only HTTP and HTTPS)
+   - Blocking URLs leading to internal networks (localhost, private addresses)
 
-2. **Ochrona przed atakami**:
-   - Wdrożenie limitowania przepustowości (1 skanowanie/domenę/godzinę) za pomocą Cloudflare WAF
-   - Ustawienie limitów czasu dla żądań HTTP (15 sekund × 3 próby) aby zapobiec wyczerpaniu zasobów
-   - Sanityzacja wszystkich danych wyjściowych przed umieszczeniem w odpowiedzi JSON
+2. **Protection Against Attacks**:
+   - Implementing rate limiting (1 scan/domain/hour) using Cloudflare WAF
+   - Setting timeouts for HTTP requests (15 seconds × 3 attempts) to prevent resource exhaustion
+   - Sanitizing all output data before placing it in the JSON response
 
-## 7. Obsługa błędów
+## 7. Error Handling
 
-1. **Nieprawidłowe dane wejściowe**:
-   - Kod: 400 Bad Request
-   - Przyczyny: Nieprawidłowy format URL, nieobsługiwany protokół, przekroczona maksymalna długość
+1. **Invalid Input Data**:
+   - Code: 400 Bad Request
+   - Causes: Invalid URL format, unsupported protocol, maximum length exceeded
 
-2. **Przekroczenie limitu skanowania**:
-   - Kod: 429 Too Many Requests
-   - Przyczyny: Ta sama domena została zeskanowana w ciągu ostatniej godziny
-   - Implementacja: Używanie mechanizmów Cloudflare do śledzenia i egzekwowania limitów
+2. **Scan Limit Exceeded**:
+   - Code: 429 Too Many Requests
+   - Causes: The same domain was scanned within the last hour
+   - Implementation: Using Cloudflare mechanisms to track and enforce limits
 
-3. **Timeout skanowania**:
-   - Kod: 504 Gateway Timeout
-   - Przyczyny: Skanowanie przekroczyło 45 sekund (3 próby × 15 sekund)
-   - Obsługa: Przerwanie skanowania po czasie i odpowiednie zakończenie procesu
+3. **Scan Timeout**:
+   - Code: 504 Gateway Timeout
+   - Causes: Scanning exceeded 45 seconds (3 attempts × 15 seconds)
+   - Handling: Interrupting the scan after the time limit and properly terminating the process
 
-4. **Błędy wewnętrzne**:
-   - Kod: 500 Internal Server Error
-   - Przyczyny: Problemy z bazą danych, błędy przy generowaniu obrazów, nieprzewidziane wyjątki
-   - Logowanie: Szczegółowe logowanie do Logflare poprzez Cloudflare Logpush
+4. **Internal Errors**:
+   - Code: 500 Internal Server Error
+   - Causes: Database problems, errors in image generation, unforeseen exceptions
+   - Logging: Detailed logging to Logflare through Cloudflare Logpush
 
-## 8. Rozważania dotyczące wydajności
+## 8. Performance Considerations
 
-1. **Optymalizacja HTTP**:
-   - Preferowanie żądań HEAD nad GET, gdy to możliwe
-   - Implementacja opóźnień (backoff) dla wielokrotnych prób
-   - Ustawienie agresywnego timeoutu (15 sekund) dla każdej próby
+1. **HTTP Optimization**:
+   - Preferring HEAD requests over GET when possible
+   - Implementing delays (backoff) for multiple attempts
+   - Setting an aggressive timeout (15 seconds) for each attempt
 
-2. **Równoległe przetwarzanie**:
-   - Równoległe generowanie obrazu do udostępniania podczas analizy nagłówków
-   - Zoptymalizowane zapisywanie do bazy danych D1, używające przygotowanych zapytań
+2. **Parallel Processing**:
+   - Parallel generation of the shareable image during header analysis
+   - Optimized saving to the D1 database, using prepared queries
 
 3. **Caching**:
-   - Implementacja pamięci podręcznej dla często używanych zasobów (weights.json, headers-leak.json)
-   - Ustawienie nagłówków cache-control dla obrazów (30 dni)
+   - Implementing a cache for frequently used resources (weights.json, headers-leak.json)
+   - Setting cache-control headers for images (30 days)
 
-## 9. Etapy wdrożenia
+## 9. Implementation Stages
 
-1. **Konfiguracja projektu i struktura**:
-   - Utworzenie struktury katalogów zgodnie z zasadami Clean Architecture
-   - Konfiguracja Cloudflare Worker z odpowiednimi bindingami do D1 i KV/R2
-   - Utworzenie warstw: entities, usecases, interfaces, frameworks/drivers
+1. **Project Configuration and Structure**:
+   - Creating a directory structure according to Clean Architecture principles
+   - Configuring Cloudflare Worker with appropriate bindings to D1 and KV/R2
+   - Creating layers: entities, usecases, interfaces, frameworks/drivers
 
-2. **Implementacja warstw domenowych**:
-   - Utworzenie interfejsów (portów) dla repozytoriów danych, usług skanowania i generowania obrazów
-   - Implementacja modeli domenowych i logiki biznesowej analizy nagłówków
-   - Implementacja obliczania wyniku (score) na podstawie wag
+2. **Domain Layer Implementation**:
+   - Creating interfaces (ports) for data repositories, scanning services, and image generation
+   - Implementing domain models and business logic for header analysis
+   - Implementing score calculation based on weights
 
-3. **Warstwa infrastruktury**:
-   - Implementacja adaptera bazy danych D1 dla operacji CRUD na raportach
-   - Implementacja usługi analizy nagłówków HTTP przy użyciu Fetch API
-   - Implementacja usługi KV/R2 do przechowywania i pobierania obrazów
+3. **Infrastructure Layer**:
+   - Implementing the D1 database adapter for CRUD operations on reports
+   - Implementing the HTTP header analysis service using Fetch API
+   - Implementing the KV/R2 service for storing and retrieving images
 
-4. **Implementacja kontrolera API**:
-   - Utworzenie endpointu `/scan` z obsługą żądań POST
-   - Implementacja walidacji danych wejściowych
-   - Integracja logiki biznesowej z warstwą infrastruktury
+4. **API Controller Implementation**:
+   - Creating the `/scan` endpoint with POST request handling
+   - Implementing input data validation
+   - Integrating business logic with the infrastructure layer
 
-5. **Obsługa błędów i monitorowanie**:
-   - Implementacja centralnej obsługi błędów z odpowiednim mapowaniem na kody statusu HTTP
-   - Konfiguracja logowania do Logflare z odpowiednimi poziomami detali
+5. **Error Handling and Monitoring**:
+   - Implementing central error handling with appropriate mapping to HTTP status codes
+   - Configuring logging to Logflare with appropriate detail levels
 
-6. **Testowanie**:
-   - Implementacja testów jednostkowych dla każdej warstwy
-   - Implementacja testów integracyjnych dla całego endpointu
-   - Testowanie wydajności i obciążenia dla określenia limitu czasu i przepustowości
+6. **Testing**:
+   - Implementing unit tests for each layer
+   - Implementing integration tests for the entire endpoint
+   - Performance and load testing to determine timeout limits and throughput
 
-7. **Wdrożenie**:
-   - Konfiguracja CI/CD w GitHub Actions z automatycznymi testami i wdrożeniem
-   - Stopniowe wdrażanie z monitorowaniem wydajności i błędów
-   - Finalne wdrożenie z konfiguracją Cloudflare WAF dla limitów przepustowości
+7. **Deployment**:
+   - Configuring CI/CD in GitHub Actions with automatic tests and deployment
+   - Gradual deployment with performance and error monitoring
+   - Final deployment with Cloudflare WAF configuration for rate limits
