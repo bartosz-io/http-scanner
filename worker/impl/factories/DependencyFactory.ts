@@ -1,4 +1,5 @@
 import { D1ReportRepository } from '../repositories/D1ReportRepository';
+import { R2ImageRepository } from '../repositories/R2ImageRepository';
 import { FetchHttpService } from '../services/FetchHttpService';
 import { HeaderAnalyzerService } from '../services/HeaderAnalyzerService';
 import { ScoreNormalizerService } from '../services/ScoreNormalizerService';
@@ -6,9 +7,12 @@ import { ImageService } from '../services/R2ImageService';
 import { FileConfigurationService } from '../services/FileConfigurationService';
 import { ScanController } from '../controllers/ScanController';
 import { ReportController } from '../controllers/ReportController';
+import { DeleteReportController } from '../controllers/DeleteReportController';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
+import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
+import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
 
 /**
  * Factory class for creating application dependencies
@@ -23,6 +27,15 @@ export class DependencyFactory {
    */
   static createReportRepository(db: D1Database): ReportRepository {
     return new D1ReportRepository(db);
+  }
+  
+  /**
+   * Create a repository for images
+   * @param r2Bucket The R2 bucket instance
+   * @returns An image repository implementation
+   */
+  static createImageRepository(r2Bucket: R2Bucket): ImageRepository {
+    return new R2ImageRepository(r2Bucket);
   }
 
   /**
@@ -72,5 +85,28 @@ export class DependencyFactory {
 
     // Create and return controller
     return new ReportController(fetchReportUseCase, env.CDN_DOMAIN);
+  }
+  
+  /**
+   * Create all dependencies needed for the delete report endpoint
+   * @param env The environment bindings
+   * @returns A configured DeleteReportController
+   */
+  static createDeleteReportController(env: {
+    DB: D1Database;
+    IMAGES: R2Bucket;
+  }): DeleteReportController {
+    // Create repositories
+    const reportRepository = this.createReportRepository(env.DB);
+    const imageRepository = this.createImageRepository(env.IMAGES);
+    
+    // Create use case
+    const deleteReportUseCase = new DeleteReportUseCase(
+      reportRepository,
+      imageRepository
+    );
+    
+    // Create and return controller
+    return new DeleteReportController(deleteReportUseCase);
   }
 }
