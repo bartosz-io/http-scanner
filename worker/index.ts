@@ -35,6 +35,15 @@ app.get('/report/:hash', async (c) => {
   return reportController.handleFetchReport(c);
 });
 
+// Add endpoint to fetch paginated reports
+app.get('/reports', async (c) => {
+  // Create controller using factory
+  const reportsController = DependencyFactory.createReportsController(c.env);
+  
+  // Handle request
+  return reportsController.handleFetchReports(c);
+});
+
 // Add endpoint to delete a report
 app.post('/report/delete', async (c) => {
   // Create controller using factory

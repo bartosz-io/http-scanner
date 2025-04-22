@@ -10,10 +10,12 @@ import { ScanController } from '../controllers/ScanController';
 import { ReportController } from '../controllers/ReportController';
 import { DeleteReportController } from '../controllers/DeleteReportController';
 import { AdminStatsController } from '../controllers/AdminStatsController';
+import { ReportsController } from '../controllers/ReportsController';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
 import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
 import { FetchStatsUseCase } from '../../usecases/FetchStatsUseCase';
+import { FetchReportsUseCase } from '../../usecases/FetchReportsUseCase';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
 import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
 import { StatsRepository } from '../../interfaces/repositories/StatsRepository';
@@ -139,5 +141,23 @@ export class DependencyFactory {
     
     // Create and return controller
     return new AdminStatsController(fetchStatsUseCase);
+  }
+
+  /**
+   * Create all dependencies needed for the paginated reports endpoint
+   * @param env The environment bindings
+   * @returns A configured ReportsController
+   */
+  static createReportsController(env: {
+    DB: D1Database;
+  }): ReportsController {
+    // Create repository
+    const reportRepository = this.createReportRepository(env.DB);
+    
+    // Create use case
+    const fetchReportsUseCase = new FetchReportsUseCase(reportRepository);
+    
+    // Create and return controller
+    return new ReportsController(fetchReportsUseCase);
   }
 }

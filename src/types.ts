@@ -75,21 +75,7 @@ export interface AdminStatsResponseDTO {
   timeout_errors: number;
 }
 
-/* ---------- 5 /admin/reports -----------------------*/
-
-/** Minimal representation in paginated admin list */
-export type AdminReportListItemDTO = Pick<
-  Report,
-  'hash' | 'url' | 'created_at' | 'score'
->;
-
-/** GET /admin/reports – paged result set */
-export interface AdminReportsResponseDTO {
-  items: AdminReportListItemDTO[];
-  next?: string;                 // opaque cursor for subsequent page
-}
-
-/* ---------- 6 /reports (public) -------------------*/
+/* ---------- 5 /reports (public) -------------------*/
 
 /** Minimal report list item for public endpoint */
 export type ReportListItemDTO = Pick<

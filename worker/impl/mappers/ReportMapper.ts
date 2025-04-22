@@ -1,4 +1,4 @@
-import { ScanResponseDTO, FetchReportResponseDTO } from '../../../src/types';
+import { ScanResponseDTO, FetchReportResponseDTO, ReportsResponseDTO } from '../../../src/types';
 import { Report } from '../../entities/Report';
 import { HeaderAnalysisResult } from '../../entities/HeaderAnalysisResult';
 
@@ -74,5 +74,23 @@ export class ReportMapper {
       ...result.missing,
       ...result.leaking
     ];
+  }
+
+  /**
+   * Maps a list of Report domain objects to ReportsResponseDTO
+   * @param reports List of Report domain objects
+   * @param nextCursor Cursor to next page (if exists)
+   * @returns Paginated reports response DTO
+   */
+  static toReportsResponseDTO(reports: Report[], nextCursor?: string): ReportsResponseDTO {
+    return {
+      items: reports.map(report => ({
+        hash: report.hash,
+        url: report.url,
+        created_at: report.created_at,
+        score: report.score
+      })),
+      next: nextCursor
+    };
   }
 }
