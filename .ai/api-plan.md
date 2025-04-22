@@ -56,7 +56,7 @@
 
 ---
 
-[TODO] ### 2.5 Paginated Reports *(public)*
+[DONE] ### 2.5 Paginated Reports *(public)*
 | Method / Path | **GET** `/reports` |
 | Query params | `limit` 20–100, `cursor`, `sort=created_at|score` (`-` for desc) |
 | Success 200 | `{ "items":[{ "hash":"ab12…","url":"https://…" }], "next":"cursor123" }` |
