@@ -7,6 +7,7 @@ import { FetchHttpService } from './impl/services/FetchHttpService';
 import { HeaderAnalyzerService } from './impl/services/HeaderAnalyzerService';
 import { ScoreNormalizerService } from './impl/services/ScoreNormalizerService';
 import { ImageService } from './impl/services/R2ImageService';
+import { FileConfigurationService } from './impl/services/FileConfigurationService';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
 
 // Define environment interface
@@ -33,7 +34,8 @@ app.post('/scan', async (c) => {
   const reportRepository = new D1ReportRepository(db);
   const httpService = new FetchHttpService();
   const scoreNormalizer = new ScoreNormalizerService();
-  const headerAnalyzerService = new HeaderAnalyzerService(scoreNormalizer);
+  const configService = new FileConfigurationService();
+  const headerAnalyzerService = new HeaderAnalyzerService(scoreNormalizer, configService);
   
   // Create ImageService with R2 bucket
   const imageService = new ImageService(imagesBucket);
