@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { DependencyFactory } from './impl/factories/DependencyFactory';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
+import { cloudflareAccessAuth } from './impl/middleware/cloudflareAccessAuth';
 
 // Define environment interface
 interface Env {
@@ -43,8 +44,15 @@ app.post('/report/delete', async (c) => {
   return deleteReportController.handleDeleteReport(c);
 });
 
-// Add admin stats endpoint
-app.get('/admin/stats', async (c) => {
+// Add admin stats endpoint with authentication middleware
+// In development, we can enable devMode for easier testing
+// For Cloudflare Workers, we can detect development mode based on hostname
+app.get('/admin/stats', (c, next) => {
+  // Check if running locally (localhost or 127.0.0.1)
+  const host = c.req.header('host') || '';
+  const isDevelopment = host.includes('localhost') || host.includes('127.0.0.1');
+  return cloudflareAccessAuth({ devMode: isDevelopment })(c, next);
+}, async (c) => {
   // Create controller using factory
   const adminStatsController = DependencyFactory.createAdminStatsController(c.env);
   

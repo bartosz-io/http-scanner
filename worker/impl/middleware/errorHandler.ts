@@ -14,7 +14,13 @@ export const ERROR_MAP: Record<string, { status: number; message: string }> = {
   NOT_FOUND: { status: 404, message: 'Report not found or has been deleted' },
   RATE_LIMIT_EXCEEDED: { status: 429, message: 'Rate limit exceeded: This domain was scanned in the last minute' },
   SCAN_TIMEOUT: { status: 504, message: 'Scan timed out after 45 seconds' },
-  INTERNAL_ERROR: { status: 500, message: 'An internal error occurred' }
+  INTERNAL_ERROR: { status: 500, message: 'An internal error occurred' },
+  // Admin stats specific error codes
+  UNAUTHORIZED: { status: 401, message: 'Authentication required to access this resource' },
+  INVALID_FROM_TIMESTAMP: { status: 400, message: 'Invalid from timestamp. Must be a positive integer' },
+  INVALID_TO_TIMESTAMP: { status: 400, message: 'Invalid to timestamp. Must be a positive integer' },
+  INVALID_TIME_RANGE: { status: 400, message: 'Invalid time range. From timestamp must be earlier than to timestamp' },
+  TIME_RANGE_TOO_LARGE: { status: 400, message: 'Time range too large. Maximum range is 1 year' }
 };
 
 /**
