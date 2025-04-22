@@ -43,6 +43,15 @@ app.post('/report/delete', async (c) => {
   return deleteReportController.handleDeleteReport(c);
 });
 
+// Add admin stats endpoint
+app.get('/admin/stats', async (c) => {
+  // Create controller using factory
+  const adminStatsController = DependencyFactory.createAdminStatsController(c.env);
+  
+  // Handle request
+  return adminStatsController.handleFetchStats(c);
+});
+
 // Add endpoint to serve images from R2
 app.get('/images/:key', async (c) => {
   const key = c.req.param('key');

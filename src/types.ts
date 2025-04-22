@@ -60,12 +60,18 @@ export type DeleteReportResponseDTO = void;
 
 /* ---------- 4 /admin/stats -------------------------*/
 
+/** Query model for fetching admin stats */
+export interface FetchStatsQueryModel {
+  /** Starting timestamp (optional) */
+  from?: number;
+  /** Ending timestamp (optional) */
+  to?: number;
+}
+
 /** GET /admin/stats – aggregated service metrics */
 export interface AdminStatsResponseDTO {
   total_scans: number;
   unique_domains: number;
-  median_time_to_scan: number;   // seconds
-  deletes: number;
   timeout_errors: number;
 }
 

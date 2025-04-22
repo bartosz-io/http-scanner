@@ -1,5 +1,6 @@
 import { D1ReportRepository } from '../repositories/D1ReportRepository';
 import { R2ImageRepository } from '../repositories/R2ImageRepository';
+import { D1StatsRepository } from '../repositories/D1StatsRepository';
 import { FetchHttpService } from '../services/FetchHttpService';
 import { HeaderAnalyzerService } from '../services/HeaderAnalyzerService';
 import { ScoreNormalizerService } from '../services/ScoreNormalizerService';
@@ -8,11 +9,14 @@ import { FileConfigurationService } from '../services/FileConfigurationService';
 import { ScanController } from '../controllers/ScanController';
 import { ReportController } from '../controllers/ReportController';
 import { DeleteReportController } from '../controllers/DeleteReportController';
+import { AdminStatsController } from '../controllers/AdminStatsController';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
 import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
+import { FetchStatsUseCase } from '../../usecases/FetchStatsUseCase';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
 import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
+import { StatsRepository } from '../../interfaces/repositories/StatsRepository';
 
 /**
  * Factory class for creating application dependencies
@@ -108,5 +112,32 @@ export class DependencyFactory {
     
     // Create and return controller
     return new DeleteReportController(deleteReportUseCase);
+  }
+
+  /**
+   * Create a repository for statistics
+   * @param db The D1 database instance
+   * @returns A stats repository implementation
+   */
+  static createStatsRepository(db: D1Database): StatsRepository {
+    return new D1StatsRepository(db);
+  }
+
+  /**
+   * Create all dependencies needed for the admin stats endpoint
+   * @param env The environment bindings
+   * @returns A configured AdminStatsController
+   */
+  static createAdminStatsController(env: {
+    DB: D1Database;
+  }): AdminStatsController {
+    // Create repository
+    const statsRepository = this.createStatsRepository(env.DB);
+    
+    // Create use case
+    const fetchStatsUseCase = new FetchStatsUseCase(statsRepository);
+    
+    // Create and return controller
+    return new AdminStatsController(fetchStatsUseCase);
   }
 }
