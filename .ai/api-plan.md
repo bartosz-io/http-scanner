@@ -11,7 +11,7 @@
 
 ## 2. Endpoints
 
-### 2.1 Run Scan (synchronous)
+[DONE] ### 2.1 Run Scan (synchronous)
 | Item | Value |
 |------|-------|
 | Method / Path | **POST** `/scan` |
@@ -25,7 +25,7 @@
 
 ---
 
-### 2.2 Fetch Existing Report
+[DONE] ### 2.2 Fetch Existing Report
 | Item | Value |
 |------|-------|
 | Method / Path | **GET** `/report/{hash}` |
@@ -35,7 +35,7 @@
 
 ---
 
-### 2.3 Delete Report
+[DONE] ### 2.3 Delete Report
 | Item | Value |
 |------|-------|
 | Method / Path | **POST** `/report/delete` |
@@ -46,20 +46,20 @@
 
 ---
 
-### 2.4 Admin – Summary Stats *(protected)*
+[DONE] ### 2.4 Admin – Summary Stats *(protected)*
 | Item | Value |
 |------|-------|
 | Method / Path | **GET** `/admin/stats` |
 | Query | `from`, `to` (epoch seconds, optional) |
-| Success 200 | `{ "total_scans":1234,"unique_domains":987,"median_time_to_scan":8.2,"deletes":42,"timeout_errors":5 }` |
+| Success 200 | `{ "total_scans":1234,"unique_domains":987,"timeout_errors":5 }` |
 | Error 401 | Not authenticated via Cloudflare Access |
 
 ---
 
-### 2.5 Admin – Paginated Reports *(optional)*
-| Method / Path | **GET** `/admin/reports` |
-| Query params | `limit` 20–100, `cursor`, `sort=created_at|score` (`-` for desc) |
-| Success 200 | `{ "items":[{ "hash":"ab12…","url":"https://…" }], "next":"cursor123" }` |
+[TODO] ### 2.5 Paginated Reports *(public)*
+| Method / Path | **GET** `/reports` |
+| Query params | `limit` 20–100, `cursor`, `sort=created_at|score` (`-` for desc) |
+| Success 200 | `{ "items":[{ "hash":"ab12…","url":"https://…" }], "next":"cursor123" }` |
 
 ---
 
