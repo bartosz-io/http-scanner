@@ -1,15 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { ScanController } from './impl/controllers/ScanController';
-import { ReportController } from './impl/controllers/ReportController';
-import { ScanUrlUseCase } from './usecases/ScanUrlUseCase';
-import { FetchReportUseCase } from './usecases/FetchReportUseCase';
-import { D1ReportRepository } from './impl/repositories/D1ReportRepository';
-import { FetchHttpService } from './impl/services/FetchHttpService';
-import { HeaderAnalyzerService } from './impl/services/HeaderAnalyzerService';
-import { ScoreNormalizerService } from './impl/services/ScoreNormalizerService';
-import { ImageService } from './impl/services/R2ImageService';
-import { FileConfigurationService } from './impl/services/FileConfigurationService';
+import { DependencyFactory } from './impl/factories/DependencyFactory';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
 
 // Define environment interface
@@ -27,31 +18,8 @@ app.use('*', cors());
 
 // Set up API routes
 app.post('/scan', async (c) => {
-  // Create dependencies
-  const db = c.env.DB;
-  const imagesBucket = c.env.IMAGES;
-  const cdnDomain = c.env.CDN_DOMAIN;
-  
-  // Create repositories and services
-  const reportRepository = new D1ReportRepository(db);
-  const httpService = new FetchHttpService();
-  const scoreNormalizer = new ScoreNormalizerService();
-  const configService = new FileConfigurationService();
-  const headerAnalyzerService = new HeaderAnalyzerService(scoreNormalizer, configService);
-  
-  // Create ImageService with R2 bucket
-  const imageService = new ImageService(imagesBucket);
-  
-  // Create use case
-  const scanUrlUseCase = new ScanUrlUseCase(
-    headerAnalyzerService,
-    httpService,
-    imageService,
-    reportRepository
-  );
-  
-  // Create controller
-  const scanController = new ScanController(scanUrlUseCase, cdnDomain);
+  // Create controller using factory
+  const scanController = DependencyFactory.createScanController(c.env);
   
   // Handle request
   return scanController.handleScan(c);
@@ -59,18 +27,8 @@ app.post('/scan', async (c) => {
 
 // Add endpoint to fetch a report by hash
 app.get('/report/:hash', async (c) => {
-  // Create dependencies
-  const db = c.env.DB;
-  const cdnDomain = c.env.CDN_DOMAIN;
-  
-  // Create repository
-  const reportRepository = new D1ReportRepository(db);
-  
-  // Create use case
-  const fetchReportUseCase = new FetchReportUseCase(reportRepository);
-  
-  // Create controller
-  const reportController = new ReportController(fetchReportUseCase, cdnDomain);
+  // Create controller using factory
+  const reportController = DependencyFactory.createReportController(c.env);
   
   // Handle request
   return reportController.handleFetchReport(c);
