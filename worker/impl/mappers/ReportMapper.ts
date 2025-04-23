@@ -22,6 +22,9 @@ export class ReportMapper {
       shareImageUrl = `https://${cdnDomain}/images/${report.share_image_key}`;
     }
 
+    // Generate report URL
+    const reportUrl = `https://${cdnDomain}/report/${report.hash}`;
+
     return {
       hash: report.hash,
       url: report.url,
@@ -29,6 +32,7 @@ export class ReportMapper {
       score: report.score,
       headers: groupedHeaders as unknown as Report['headers'], // Type assertion with proper typing
       share_image_url: shareImageUrl,
+      report_url: reportUrl,
       deleteToken: report.deleteToken // Include deleteToken for scan response
     };
   }
@@ -61,6 +65,7 @@ export class ReportMapper {
       score: report.score,
       headers: groupedHeaders as unknown as Report['headers'],
       share_image_url: shareImageUrl
+      // No report_url for single report endpoint
     };
   }
 
@@ -80,16 +85,20 @@ export class ReportMapper {
    * Maps a list of Report domain objects to ReportsResponseDTO
    * @param reports List of Report domain objects
    * @param nextCursor Cursor to next page (if exists)
+   * @param cdnDomain The CDN domain for report URLs
    * @returns Paginated reports response DTO
    */
-  static toReportsResponseDTO(reports: Report[], nextCursor?: string): ReportsResponseDTO {
+  static toReportsResponseDTO(reports: Report[], nextCursor?: string, cdnDomain?: string): ReportsResponseDTO {
     return {
-      items: reports.map(report => ({
-        hash: report.hash,
-        url: report.url,
-        created_at: report.created_at,
-        score: report.score
-      })),
+      items: reports.map(report => {
+        return {
+          hash: report.hash,
+          url: report.url,
+          created_at: report.created_at,
+          score: report.score,
+          report_url: `https://${cdnDomain}/report/${report.hash}`
+        };
+      }),
       next: nextCursor
     };
   }

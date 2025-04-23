@@ -34,6 +34,8 @@ export interface ScanRequestDTO {
 export type PublicReportDTO = Omit<Report, 'deleteToken' | 'share_image_key'> & {
   /** Public CDN URL for social-share PNG */
   share_image_url: string | null;
+  /** Public URL to view this report (only included in scan and reports endpoints) */
+  report_url?: string;
 };
 
 /** POST /scan – server response (full report) */
@@ -81,7 +83,10 @@ export interface AdminStatsResponseDTO {
 export type ReportListItemDTO = Pick<
   Report,
   'hash' | 'url' | 'created_at' | 'score'
->;
+> & {
+  /** Public URL to view this report */
+  report_url: string;
+};
 
 /** GET /reports - paginated result set */
 export interface ReportsResponseDTO {

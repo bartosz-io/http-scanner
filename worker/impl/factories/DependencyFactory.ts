@@ -150,6 +150,7 @@ export class DependencyFactory {
    */
   static createReportsController(env: {
     DB: D1Database;
+    CDN_DOMAIN: string;
   }): ReportsController {
     // Create repository
     const reportRepository = this.createReportRepository(env.DB);
@@ -158,6 +159,6 @@ export class DependencyFactory {
     const fetchReportsUseCase = new FetchReportsUseCase(reportRepository);
     
     // Create and return controller
-    return new ReportsController(fetchReportsUseCase);
+    return new ReportsController(fetchReportsUseCase, env.CDN_DOMAIN);
   }
 }

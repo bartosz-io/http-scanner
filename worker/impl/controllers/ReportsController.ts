@@ -9,7 +9,8 @@ import { ReportMapper } from '../mappers/ReportMapper';
  */
 export class ReportsController {
   constructor(
-    private readonly fetchReportsUseCase: FetchReportsUseCase
+    private readonly fetchReportsUseCase: FetchReportsUseCase,
+    private readonly cdnDomain: string
   ) {}
 
   /**
@@ -65,7 +66,7 @@ export class ReportsController {
       const { reports, nextCursor } = await this.fetchReportsUseCase.execute(queryModel);
       
       // Map results to DTO
-      const responseDTO = ReportMapper.toReportsResponseDTO(reports, nextCursor);
+      const responseDTO = ReportMapper.toReportsResponseDTO(reports, nextCursor, this.cdnDomain);
       
       // Return response
       return c.json<ReportsResponseDTO>(responseDTO, 200);
