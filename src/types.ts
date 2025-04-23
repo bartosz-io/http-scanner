@@ -101,3 +101,29 @@ export interface FetchReportsQueryModel {
   sortField: 'created_at' | 'score';
   sortDirection: 'asc' | 'desc';
 }
+
+/* ----------------------------------------------------
+   View Models for the Frontend Components
+   ---------------------------------------------------- */
+
+export interface ScanFormViewModel {
+  url: string;
+  isValid: boolean;
+  errorMessage?: string;
+  isSubmitting: boolean;
+  scanResponse?: ScanResponseDTO;
+  errorCode?: string;
+}
+
+export interface ScanFormFeedbackProps {
+  isSubmitting: boolean;
+  error?: string;
+  errorCode?: string; // e.g. "RATE_LIMIT_EXCEEDED", "INVALID_URL", "SCAN_TIMEOUT"
+}
+
+export interface RecentScansViewModel {
+  scans: ReportListItemDTO[];
+  isLoading: boolean;
+  error?: string;
+  next?: string;
+}
