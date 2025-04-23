@@ -17,9 +17,6 @@ HomePage
 │   │   │   ├── URLInput
 │   │   │   └── ScanButton
 │   │   └── ScanFormFeedback
-│   ├── HowItWorksSection
-│   │   ├── InfoGraphic
-│   │   └── StepsExplanation
 │   ├── StatisticsSection
 │   │   └── StatCard (multiple)
 │   └── RecentScansSection
@@ -33,7 +30,7 @@ HomePage
 
 ### HomePage
 - Component description: Main container for the home page organizing all sections
-- Main elements: Sections: ScanSection, HowItWorksSection, StatisticsSection, RecentScansSection
+- Main elements: Sections: ScanSection, StatisticsSection, RecentScansSection
 - Supported interactions: None direct (delegated to child components)
 - Supported validation: None direct (delegated to child components)
 - Types: No specific types
@@ -58,13 +55,7 @@ HomePage
 - Types: `ScanFormFeedbackProps`
 - Props: `isSubmitting: boolean, error?: string, errorCode?: string`
 
-### HowItWorksSection
-- Component description: Informational section explaining how the application works
-- Main elements: Infographic, text content with steps
-- Supported interactions: None
-- Supported validation: None
-- Types: No specific types
-- Props: None
+
 
 ### StatisticsSection
 - Component description: Section displaying system statistics
