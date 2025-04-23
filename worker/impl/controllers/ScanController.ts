@@ -2,6 +2,7 @@ import { Context } from 'hono';
 import { ScanRequestDTO, ScanResponseDTO } from '../../../src/types';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { UrlValidator } from '../utils/UrlValidator';
+import { UrlNormalizer } from '../utils/UrlNormalizer';
 import { ReportMapper } from '../mappers/ReportMapper';
 
 export class ScanController {
@@ -21,10 +22,13 @@ export class ScanController {
       throw new Error('INVALID_URL');
     }
     
-    // Validate and normalize URL
-    const normalizedUrl = UrlValidator.validate(body.url);
+    // First validate the URL (ensures it has correct format and protocol)
+    const validatedUrl = UrlValidator.validate(body.url);
     
-    // Execute use case
+    // Then normalize the URL (removes query parameters and fragments)
+    const normalizedUrl = UrlNormalizer.normalize(validatedUrl);
+    
+    // Execute use case with the normalized URL
     const report = await this.scanUrlUseCase.execute({
       url: normalizedUrl
     });

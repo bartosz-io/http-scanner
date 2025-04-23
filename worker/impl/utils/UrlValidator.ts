@@ -1,3 +1,7 @@
+/**
+ * Utility class for validating URLs
+ * Responsible for checking if URLs are valid and safe to scan
+ */
 export class UrlValidator {
   private static readonly MAX_URL_LENGTH = 2048;
   private static readonly VALID_PROTOCOLS = ['http:', 'https:'];
@@ -15,7 +19,7 @@ export class UrlValidator {
   /**
    * Validate a URL for scanning
    * @param url The URL to validate
-   * @returns The normalized URL if valid
+   * @returns The prepared URL with protocol if valid
    * @throws Error if the URL is invalid
    */
   static validate(url: string): string {
@@ -24,15 +28,24 @@ export class UrlValidator {
       throw new Error('INVALID_URL');
     }
 
+    // Prepare URL for validation
+    let urlToValidate = url.trim();
+    
+    // If URL doesn't have a protocol, add https:// as default
+    if (!urlToValidate.startsWith('http://') && !urlToValidate.startsWith('https://')) {
+      urlToValidate = 'https://' + urlToValidate;
+    }
+    
+    // Parse the URL to validate its format
     let parsedUrl: URL;
     try {
-      parsedUrl = new URL(url);
-    } catch (error) {
-      throw new Error('INVALID_URL');
-    }
-
-    // Check protocol
-    if (!this.VALID_PROTOCOLS.includes(parsedUrl.protocol)) {
+      parsedUrl = new URL(urlToValidate);
+      
+      // Check if protocol is valid
+      if (!this.VALID_PROTOCOLS.includes(parsedUrl.protocol)) {
+        throw new Error('INVALID_URL');
+      }
+    } catch {
       throw new Error('INVALID_URL');
     }
 
@@ -45,15 +58,54 @@ export class UrlValidator {
       throw new Error('INVALID_URL');
     }
 
-    // Normalize URL by removing tracking parameters and fragments
-    // This is a simplified version - in a real implementation, you might want to
-    // use a library or more comprehensive list of tracking parameters
-    const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'fbclid', 'gclid'];
+    // Return the validated URL (without normalization)
+    return parsedUrl.toString();
+  }
+  
+  /**
+   * Asynchronously check if a URL is accessible with the given protocol
+   * This would be used during the actual scanning process
+   * @param url The URL to check
+   * @returns Promise resolving to the accessible URL or null if not accessible
+   */
+  static async checkUrlAccessibility(url: string): Promise<string | null> {
+    // Extract the domain part without protocol if present
+    const trimmedUrl = url.trim();
     
-    const normalizedUrl = new URL(url);
-    trackingParams.forEach(param => normalizedUrl.searchParams.delete(param));
-    normalizedUrl.hash = '';
-
-    return normalizedUrl.toString();
+    // Extract domain part (without protocol)
+    let domainPart = trimmedUrl;
+    
+    // Remove protocol if present
+    if (trimmedUrl.startsWith('http://')) {
+      domainPart = trimmedUrl.substring(7);
+    } else if (trimmedUrl.startsWith('https://')) {
+      domainPart = trimmedUrl.substring(8);
+    }
+    
+    // First try with HTTPS protocol
+    const httpsUrl = 'https://' + domainPart;
+    try {
+      // Try to fetch the URL with a HEAD request to minimize data transfer
+      const response = await fetch(httpsUrl, { method: 'HEAD' });
+      if (response.ok) {
+        return httpsUrl;
+      }
+    } catch {
+      // HTTPS fetch failed, continue to HTTP fallback
+    }
+    
+    // If HTTPS failed, try with HTTP
+    const httpUrl = 'http://' + domainPart;
+    try {
+      const response = await fetch(httpUrl, { method: 'HEAD' });
+      if (response.ok) {
+        return httpUrl;
+      }
+    } catch {
+      // HTTP also failed
+    }
+    
+    // Both protocols failed
+    return null;
   }
 }
