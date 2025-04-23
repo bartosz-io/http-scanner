@@ -29,7 +29,7 @@ export class ReportsController {
       let limit = 20; // Default limit
       if (limitParam) {
         const parsedLimit = parseInt(limitParam, 10);
-        if (isNaN(parsedLimit) || parsedLimit < 20 || parsedLimit > 100) {
+        if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100) {
           return c.json({ error: 'Invalid limit parameter', code: 'INVALID_PARAMETERS' }, 400);
         }
         limit = parsedLimit;

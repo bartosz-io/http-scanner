@@ -67,7 +67,7 @@ export interface FetchReportsQueryModel {
 1. HTTP request arrives at the `/reports` endpoint
 2. Controller extracts query parameters (`limit`, `cursor`, `sort`)
 3. Controller validates query parameters:
-   - `limit` must be an integer between 20-100
+   - `limit` must be an integer between 1-100
    - `sort` must be one of the allowed fields with an optional `-` prefix
    - `cursor` is optional and will be verified by the repository
 4. Controller processes the `sort` parameter into `sortField` and `sortDirection`
