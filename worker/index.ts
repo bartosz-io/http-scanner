@@ -17,8 +17,11 @@ const app = new Hono<{ Bindings: Env }>();
 // Add CORS middleware
 app.use('*', cors());
 
+// Create API router for grouping routes under /api prefix
+const api = new Hono<{ Bindings: Env }>();
+
 // Set up API routes
-app.post('/scan', async (c) => {
+api.post('/scan', async (c) => {
   // Create controller using factory
   const scanController = DependencyFactory.createScanController(c.env);
   
@@ -27,7 +30,7 @@ app.post('/scan', async (c) => {
 });
 
 // Add endpoint to fetch a report by hash
-app.get('/report/:hash', async (c) => {
+api.get('/report/:hash', async (c) => {
   // Create controller using factory
   const reportController = DependencyFactory.createReportController(c.env);
   
@@ -36,7 +39,7 @@ app.get('/report/:hash', async (c) => {
 });
 
 // Add endpoint to fetch paginated reports
-app.get('/reports', async (c) => {
+api.get('/reports', async (c) => {
   // Create controller using factory
   const reportsController = DependencyFactory.createReportsController(c.env);
   
@@ -45,7 +48,7 @@ app.get('/reports', async (c) => {
 });
 
 // Add endpoint to delete a report
-app.post('/report/delete', async (c) => {
+api.post('/report/delete', async (c) => {
   // Create controller using factory
   const deleteReportController = DependencyFactory.createDeleteReportController(c.env);
   
@@ -56,7 +59,7 @@ app.post('/report/delete', async (c) => {
 // Add admin stats endpoint with authentication middleware
 // In development, we can enable devMode for easier testing
 // For Cloudflare Workers, we can detect development mode based on hostname
-app.get('/admin/stats', (c, next) => {
+api.get('/admin/stats', (c, next) => {
   // Check if running locally (localhost or 127.0.0.1)
   const host = c.req.header('host') || '';
   const isDevelopment = host.includes('localhost') || host.includes('127.0.0.1');
@@ -70,7 +73,7 @@ app.get('/admin/stats', (c, next) => {
 });
 
 // Add endpoint to serve images from R2
-app.get('/images/:key', async (c) => {
+api.get('/images/:key', async (c) => {
   const key = c.req.param('key');
   const imagesBucket = c.env.IMAGES;
     
@@ -126,6 +129,9 @@ app.onError((err, c) => {
   
   return c.json(response, errorInfo.status as 400 | 401 | 403 | 404 | 429 | 500 | 504);
 });
+
+// Add API routes to main app with /api prefix
+app.route('/api', api);
 
 // Export worker handler
 export default {
