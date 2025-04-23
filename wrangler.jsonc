@@ -29,7 +29,7 @@
 		}
 	],
 	"vars": {
-		"CDN_DOMAIN": "http-scanner.dev-academy.workers.dev"
+		"CDN_DOMAIN": "httpscanner.com"
 	}
 	/**
 	 * Smart Placement
