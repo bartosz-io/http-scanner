@@ -19,7 +19,7 @@
 | Request JSON | `{ "url": "https://example.com" }` |
 | Success 200 | ```{ "hash":"ab12…ef","url":"https://example.com","created_at":1713369600,"score":87,"headers":{"detected":[…],"missing":[…],"leaking":[…]},"share_image_url":"https://cdn.cloudflare.r2/…/ab12ef.png" }``` |
 | Error 400 | Invalid or non‑HTTP/HTTPS URL |
-| Error 429 | Rate‑limit: this domain was scanned in the last hour |
+| Error 429 | Rate‑limit: this domain was scanned in the last minute |
 | Error 504 | Scan exceeded 45 s (3 attempts × 15 s) |
 | Notes | Client receives the finished report immediately; no polling. |
 
