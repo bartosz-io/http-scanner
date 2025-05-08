@@ -56,13 +56,6 @@ export const RecentScansSection: React.FC = () => {
             </Button>
           </div>
         )}
-        
-        {!isLoading && recentScans.length === 0 && !error && (
-          <div className="py-12 text-center">
-            <p className="text-muted-foreground">No scan reports available yet.</p>
-            <p className="text-sm text-muted-foreground mt-1">Be the first to scan a website!</p>
-          </div>
-        )}
       </div>
     </section>
   );
