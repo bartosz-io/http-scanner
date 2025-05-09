@@ -18,11 +18,13 @@ export class ReportMapper {
 
     // Generate share image URL if available
     let shareImageUrl = null;
-    if (report.share_image_key) {  
-      shareImageUrl = `https://${cdnDomain}/images/${report.share_image_key}`;
+    if (report.share_image_key) {
+      // Always use relative URLs within the application for better consistency
+      // This works with the Vite proxy in development and with the same origin in production
+      shareImageUrl = `/images/${report.share_image_key}`;
     }
 
-    // Generate report URL
+    // Generate report URL - this still needs the full URL for sharing outside the application
     const reportUrl = `https://${cdnDomain}/report/${report.hash}`;
 
     return {
@@ -41,9 +43,8 @@ export class ReportMapper {
    * Maps a domain Report to a FetchReportResponseDTO
    * This is used for the GET /report/{hash} endpoint
    * @param report The domain Report to map
-   * @param cdnDomain The CDN domain for share images
    */
-  static toFetchReportResponseDTO(report: Report, cdnDomain: string): FetchReportResponseDTO {
+  static toFetchReportResponseDTO(report: Report): FetchReportResponseDTO {
     // Group headers by type
     const groupedHeaders = {
       detected: report.headers.filter(h => h.present && !h.leaking),
@@ -53,8 +54,10 @@ export class ReportMapper {
 
     // Generate share image URL if available
     let shareImageUrl = null;
-    if (report.share_image_key) {  
-      shareImageUrl = `https://${cdnDomain}/images/${report.share_image_key}`;
+    if (report.share_image_key) {
+      // Always use relative URLs within the application for better consistency
+      // This works with the Vite proxy in development and with the same origin in production
+      shareImageUrl = `/images/${report.share_image_key}`;
     }
 
     // Return public report data without security-sensitive fields

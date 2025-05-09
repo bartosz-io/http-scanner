@@ -36,7 +36,7 @@ export class ReportController {
     }
     
     // Map to response DTO
-    const responseDTO = ReportMapper.toFetchReportResponseDTO(report, this.cdnDomain);
+    const responseDTO = ReportMapper.toFetchReportResponseDTO(report);
     
     // Return response
     return c.json<FetchReportResponseDTO>(responseDTO, 200);
