@@ -16,11 +16,26 @@ interface ScanFormProps {
   onScanError: (error: Error & { cause?: { code?: string } }) => void;
 }
 
+// Function to ensure URL has HTTPS prefix
+const ensureHttpsPrefix = (url: string): string => {
+  if (!url) return url;
+  url = url.trim();
+  
+  // If URL already has a protocol, return as is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // Add https:// prefix
+  return `https://${url}`;
+};
+
 // Zod schema for form validation following clean architecture principles
 const formSchema = z.object({
   url: z.string()
     .min(1, { message: 'URL is required' })
     .max(2048, { message: 'URL is too long (max 2048 characters)' })
+    .transform(ensureHttpsPrefix) // Add HTTPS prefix if missing
     .refine(
       (value) => {
         try {
@@ -30,7 +45,7 @@ const formSchema = z.object({
           return false;
         }
       },
-      { message: 'Please enter a valid HTTP or HTTPS URL' }
+      { message: 'Please enter a valid URL' }
     ),
 });
 
@@ -56,7 +71,7 @@ export const ScanForm: React.FC<ScanFormProps> = ({
     onScanStart();
     
     try {
-      // Use the submitScan function from the hook with the form URL value
+      // URL already has HTTPS prefix added by the transform function in the schema
       const scanResponse = await submitScan(values.url);
       
       // Handle successful scan
@@ -85,7 +100,7 @@ export const ScanForm: React.FC<ScanFormProps> = ({
               <FormItem className="flex-1">
                 <FormControl>
                   <Input 
-                    placeholder="https://example.com" 
+                    placeholder="example.com" 
                     {...field} 
                     className="h-12 transition-all focus-visible:ring-primary"
                     aria-label="Enter website URL to scan"
