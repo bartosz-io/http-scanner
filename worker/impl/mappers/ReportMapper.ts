@@ -57,7 +57,7 @@ export class ReportMapper {
       shareImageUrl = `https://${cdnDomain}/images/${report.share_image_key}`;
     }
 
-    // Create response without deleteToken for security
+    // Return public report data without security-sensitive fields
     return {
       hash: report.hash,
       url: report.url,
@@ -65,7 +65,8 @@ export class ReportMapper {
       score: report.score,
       headers: groupedHeaders as unknown as Report['headers'],
       share_image_url: shareImageUrl
-      // No report_url for single report endpoint
+      // No report_url or deleteToken for single report endpoint - following clean architecture
+      // by separating the concerns between initial scan and report viewing
     };
   }
 

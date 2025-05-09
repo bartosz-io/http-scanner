@@ -51,8 +51,8 @@ export interface ScanResponseDTO extends PublicReportDTO {
 
 /* ---------- 2 /report/{hash} -----------------------*/
 
-/** GET /report/{hash} – same payload as ScanResponse */
-export type FetchReportResponseDTO = PublicReportDTO & ScanResponseDTO;
+/** GET /report/{hash} - only public data, no deleteToken */
+export type FetchReportResponseDTO = PublicReportDTO;
 
 /* ---------- 3 /report/delete -----------------------*/
 

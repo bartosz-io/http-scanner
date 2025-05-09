@@ -31,8 +31,22 @@ export const ReportView: React.FC = () => {
   const headerData = React.useMemo(() => {
     if (!report) return { detected: [], missing: [], leaking: [] };
 
-    // Just return the headers as they are already filtered
-    return report.headers;
+    // Headers in this application come in a grouped format
+    // Make sure we properly handle the structure
+    const headers = report.headers as unknown as {
+      detected: HeaderEntry[];
+      missing: HeaderEntry[];
+      leaking: HeaderEntry[];
+    };
+    
+    // Validate the structure to ensure it has the expected properties
+    if (headers && 'detected' in headers && 'missing' in headers && 'leaking' in headers) {
+      return headers;
+    }
+    
+    // If we get here, something is wrong with the data format
+    console.error('Unexpected headers format:', report.headers);
+    return { detected: [], missing: [], leaking: [] };
   }, [report]);
 
   // Render loading state
@@ -87,7 +101,7 @@ export const ReportView: React.FC = () => {
             <ReportHeader 
               url={report.url} 
               createdAt={report.created_at} 
-              deleteToken={report.deleteToken} 
+              /* deleteToken is only available during initial scan, not in fetch report */
             />
             
             {/* Score section with gauge */}
