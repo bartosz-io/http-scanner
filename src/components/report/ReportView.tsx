@@ -123,24 +123,35 @@ export const ReportView: React.FC = () => {
               /* deleteToken is only available during initial scan, not in fetch report */
             />
             
-            {/* Score section with gauge */}
-            <ScoreSection score={report.score} />
-            
             {/* Display token warning when URL has a token parameter */}
             {showTokenWarning && tokenParam && (
               <TokenWarningAlert deleteToken={tokenParam} />
             )}
+
+            {/* Two-column layout for score and sharing with equal heights */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left column: Score section with gauge */}
+              <div className="h-full flex">
+                <div className="flex-grow">
+                  <ScoreSection score={report.score} />
+                </div>
+              </div>
+              
+              {/* Right column: Sharing options */}
+              <div className="h-full flex">
+                <div className="flex-grow">
+                  <SharingSection 
+                    url={report.url} 
+                    score={report.score} 
+                    hash={report.hash} 
+                    shareImageUrl={report.share_image_url} 
+                  />
+                </div>
+              </div>
+            </div>
             
             {/* Headers section with tabs */}
             <HeadersSection headers={headerData} />
-            
-            {/* Sharing options */}
-            <SharingSection 
-              url={report.url} 
-              score={report.score} 
-              hash={report.hash} 
-              shareImageUrl={report.share_image_url} 
-            />
             
             {/* Delete report option */}
             <DeleteSection hash={report.hash} />

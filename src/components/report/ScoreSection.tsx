@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { ScoreSectionProps } from '../../types/reportTypes';
 import { ScoreGauge } from './ScoreGauge';
 
@@ -35,27 +34,31 @@ export const ScoreSection: React.FC<ScoreSectionProps> = ({ score }) => {
   const message = getMessage(score);
 
   return (
-    <Card>
-      <CardContent className="pt-6 pb-6">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          {/* Score gauge visualization */}
-          <div className="md:w-1/3">
-            <ScoreGauge score={score} />
-          </div>
-          
-          {/* Score description */}
-          <div className="md:w-2/3 space-y-4">
-            <h2 className="text-xl font-semibold">{message.title}</h2>
-            <p>{message.description}</p>
-            
-            {score < 70 && (
-              <div className="text-sm">
-                <p>Review the missing security headers below to improve your score. Each security header adds valuable protection to your website and users.</p>
-              </div>
-            )}
+    <div className="h-full">
+      <div className="border rounded-md h-full flex flex-col overflow-hidden">
+        <div className="bg-muted px-6 py-3">
+          <h2 className="text-xl font-semibold">Security Analysis</h2>
+        </div>
+        <div className="p-6 flex-grow flex flex-col justify-between">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Score gauge visualization */}
+            <div className="md:w-1/3">
+              <ScoreGauge score={score} />
+            </div>
+            {/* Score description */}
+            <div className="md:w-2/3 space-y-4">
+              <h2 className="text-xl font-semibold">{message.title}</h2>
+              <p>{message.description}</p>
+              
+              {score < 70 && (
+                <div className="text-sm">
+                  <p>Review the missing security headers below to improve your score. Each security header adds valuable protection to your website and users.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };

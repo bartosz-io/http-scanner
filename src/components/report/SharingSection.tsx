@@ -37,11 +37,13 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Share Your Results</h2>
-      <div className="border rounded-md">
-        <div className="p-6">
-          <div className="space-y-4">
+    <div className="h-full">
+      <div className="border rounded-md h-full flex flex-col overflow-hidden">
+        <div className="bg-muted px-6 py-3">
+          <h2 className="text-xl font-semibold">Share Your Results</h2>
+        </div>
+        <div className="p-6 flex-grow flex flex-col">
+          <div className="space-y-4 flex-grow flex flex-col">
             <p>Proud of your security score? Share it with others!</p>
             
             {shareImageUrl && (
@@ -54,7 +56,7 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
               </div>
             )}
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               <Button 
                 variant="outline" 
                 className="flex items-center gap-2" 
