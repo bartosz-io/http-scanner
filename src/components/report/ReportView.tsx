@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HeaderEntry } from '../../types';
@@ -11,6 +11,7 @@ import { ScoreSection } from './ScoreSection';
 import { HeadersSection } from './HeadersSection';
 import { SharingSection } from './SharingSection';
 import { DeleteSection } from './DeleteSection';
+import { TokenWarningAlert } from './TokenWarningAlert';
 
 /**
  * ReportView component displays the detailed scan results for a security header scan
@@ -18,6 +19,14 @@ import { DeleteSection } from './DeleteSection';
 export const ReportView: React.FC = () => {
   // Get the report hash from the URL parameters
   const { hash } = useParams<{ hash: string }>();
+  // Get query parameters to check for delete token
+  const [searchParams] = useSearchParams();
+  const tokenParam = searchParams.get('token');
+  
+  // Create a state to track whether we should show the token warning
+  const [showTokenWarning, setShowTokenWarning] = useState(false);
+  
+  // State is fully resolved
 
   // Use the custom hook to manage the report state and functionality
   const {
@@ -48,6 +57,16 @@ export const ReportView: React.FC = () => {
     console.error('Unexpected headers format:', report.headers);
     return { detected: [], missing: [], leaking: [] };
   }, [report]);
+
+  // Effect to check if we should display the token warning
+  // This runs when the report and tokenParam are available
+  useEffect(() => {
+    if (report && tokenParam) {
+      // Show token warning if there's a token in the URL
+      // This is simpler and works regardless of whether the backend included the deleteToken
+      setShowTokenWarning(true);
+    }
+  }, [report, tokenParam]);
 
   // Render loading state
   if (isLoading) {
@@ -106,6 +125,11 @@ export const ReportView: React.FC = () => {
             
             {/* Score section with gauge */}
             <ScoreSection score={report.score} />
+            
+            {/* Display token warning when URL has a token parameter */}
+            {showTokenWarning && tokenParam && (
+              <TokenWarningAlert deleteToken={tokenParam} />
+            )}
             
             {/* Headers section with tabs */}
             <HeadersSection headers={headerData} />
