@@ -39,6 +39,11 @@ export type PublicReportDTO = Omit<Report, 'deleteToken' | 'share_image_key'> & 
 };
 
 /** POST /scan – server response (full report) */
+/**
+ * Server response for POST /scan (full report)
+ * @extends PublicReportDTO
+ * @property {string} deleteToken - Token required to delete this report (only returned once at creation)
+ */
 export interface ScanResponseDTO extends PublicReportDTO {
   /** Token required to delete this report (only returned once at creation) */
   deleteToken: string;
@@ -47,7 +52,7 @@ export interface ScanResponseDTO extends PublicReportDTO {
 /* ---------- 2 /report/{hash} -----------------------*/
 
 /** GET /report/{hash} – same payload as ScanResponse */
-export type FetchReportResponseDTO = PublicReportDTO;
+export type FetchReportResponseDTO = PublicReportDTO & ScanResponseDTO;
 
 /* ---------- 3 /report/delete -----------------------*/
 
