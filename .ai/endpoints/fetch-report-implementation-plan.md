@@ -1,40 +1,40 @@
 # API Endpoint Implementation Plan: GET `/report/{hash}`
 
-## 1. Przegląd punktu końcowego
-Endpoint służy do pobierania wcześniej wygenerowanego raportu na podstawie jego unikalnego identyfikatora (hash). Jest to kluczowy element funkcjonalności udostępniania raportów, umożliwiający użytkownikom dostęp do wyników skanowania poprzez linki bezpośrednie.
+## 1. Endpoint Overview
+This endpoint serves to retrieve a previously generated report based on its unique identifier (hash). It is a key element of the report sharing functionality, allowing users to access scanning results through direct links.
 
-## 2. Szczegóły żądania
-- Metoda HTTP: **GET**
-- Struktura URL: `/report/{hash}`
-- Parametry:
-  - Wymagane: `hash` (32-znakowy identyfikator heksadecymalny raportu)
-  - Opcjonalne: brak
-- Request Body: brak (metoda GET)
+## 2. Request Details
+- HTTP Method: **GET**
+- URL Structure: `/report/{hash}`
+- Parameters:
+  - Required: `hash` (32-character hexadecimal report identifier)
+  - Optional: none
+- Request Body: none (GET method)
 
-## 3. Wykorzystywane typy
-- **FetchReportResponseDTO**: Typ odpowiedzi zawierający dane raportu (zdefiniowany w `src/types.ts`)
-- **Report**: Encja domeny reprezentująca raport (zdefiniowana w `worker/entities/Report.ts`)
-- **ReportRepository**: Interfejs repozytorium do operacji na raportach
-- **FetchReportUseCase**: Przypadek użycia do pobierania raportu
-- **ReportController**: Kontroler obsługujący żądania dotyczące raportów
+## 3. Types Used
+- **FetchReportResponseDTO**: Response type containing report data (defined in `src/types.ts`)
+- **Report**: Domain entity representing a report (defined in `worker/entities/Report.ts`)
+- **ReportRepository**: Repository interface for report operations
+- **FetchReportUseCase**: Use case for retrieving a report
+- **ReportController**: Controller handling report-related requests
 
-## 4. Szczegóły odpowiedzi
-- Sukces (200 OK):
+## 4. Response Details
+- Success (200 OK):
   ```json
   {
-    "hash": "32-znakowy identyfikator heksadecymalny",
-    "url": "znormalizowany URL, który został przeskanowany",
+    "hash": "32-character hexadecimal identifier",
+    "url": "normalized URL that was scanned",
     "created_at": 1650000000, // Unix timestamp
-    "score": 75, // Wynik bezpieczeństwa (0-100)
+    "score": 75, // Security score (0-100)
     "headers": {
-      "detected": [...], // Wykryte nagłówki bezpieczeństwa
-      "missing": [...], // Brakujące nagłówki bezpieczeństwa
-      "leaking": [...] // Nagłówki ujawniające informacje
+      "detected": [...], // Detected security headers
+      "missing": [...], // Missing security headers
+      "leaking": [...] // Headers revealing information
     },
-    "share_image_url": "https://cdn.httpscanner.com/images/abc123.png" // lub null
+    "share_image_url": "https://cdn.httpscanner.com/images/abc123.png" // or null
   }
   ```
-- Błąd (404 Not Found):
+- Error (404 Not Found):
   ```json
   {
     "error": "Report not found",
@@ -42,64 +42,64 @@ Endpoint służy do pobierania wcześniej wygenerowanego raportu na podstawie je
   }
   ```
 
-## 5. Przepływ danych
-1. Żądanie HTTP trafia do endpointu `/report/{hash}`
-2. Kontroler wyodrębnia parametr `hash` z URL
-3. Kontroler waliduje format parametru `hash`
-4. Kontroler przekazuje żądanie do przypadku użycia `FetchReportUseCase`
-5. Przypadek użycia wywołuje metodę `findByHash` z `ReportRepository`
-6. Repozytorium wykonuje zapytanie do bazy danych D1
-7. Repozytorium mapuje wynik zapytania na obiekt domeny `Report`
-8. Przypadek użycia zwraca obiekt `Report` do kontrolera
-9. Kontroler używa `ReportMapper` do przekształcenia obiektu `Report` na DTO
-10. Kontroler zwraca odpowiedź HTTP z odpowiednim statusem i danymi
+## 5. Data Flow
+1. HTTP request arrives at the `/report/{hash}` endpoint
+2. Controller extracts the `hash` parameter from the URL
+3. Controller validates the format of the `hash` parameter
+4. Controller passes the request to the `FetchReportUseCase`
+5. Use case calls the `findByHash` method from `ReportRepository`
+6. Repository executes a query to the D1 database
+7. Repository maps the query result to a `Report` domain object
+8. Use case returns the `Report` object to the controller
+9. Controller uses `ReportMapper` to transform the `Report` object into a DTO
+10. Controller returns an HTTP response with the appropriate status and data
 
-## 6. Względy bezpieczeństwa
-- Walidacja parametru `hash` - sprawdzenie czy jest to dokładnie 32-znakowy ciąg heksadecymalny
-- Brak ujawniania wrażliwych danych - `deleteToken` nie jest zwracany w odpowiedzi
-- Brak uwierzytelniania - endpoint jest publicznie dostępny, ale ujawnia tylko bezpieczne dane
-- Nagłówki CORS - zapewnienie, że odpowiedź może być odczytana przez przeglądarki z różnych domen
+## 6. Security Considerations
+- Validation of the `hash` parameter - checking if it is exactly a 32-character hexadecimal string
+- No disclosure of sensitive data - `deleteToken` is not returned in the response
+- No authentication - the endpoint is publicly accessible but only reveals safe data
+- CORS headers - ensuring the response can be read by browsers from different domains
 
-## 7. Obsługa błędów
-- **404 Not Found**: Gdy raport o podanym hashu nie istnieje lub został usunięty
-- **400 Bad Request**: Gdy format parametru `hash` jest nieprawidłowy
-- **500 Internal Server Error**: Gdy wystąpi nieoczekiwany błąd podczas przetwarzania żądania
+## 7. Error Handling
+- **404 Not Found**: When a report with the given hash does not exist or has been deleted
+- **400 Bad Request**: When the format of the `hash` parameter is invalid
+- **500 Internal Server Error**: When an unexpected error occurs during request processing
 
-## 8. Rozważania dotyczące wydajności
-- Indeksowanie kolumny `hash` w tabeli `reports` dla szybkiego wyszukiwania
-- Cachowanie odpowiedzi na poziomie Cloudflare Workers dla często odwiedzanych raportów
-- Minimalizacja rozmiaru odpowiedzi poprzez grupowanie nagłówków w kategorie
+## 8. Performance Considerations
+- Indexing the `hash` column in the `reports` table for fast lookups
+- Caching responses at the Cloudflare Workers level for frequently visited reports
+- Minimizing response size by grouping headers into categories
 
-## 9. Etapy wdrożenia
+## 9. Implementation Steps
 
-1. **Rozszerzenie interfejsu ReportRepository**
-   - Dodanie metody `findByHash(hash: string): Promise<Report | null>`
+1. **Extend the ReportRepository interface**
+   - Add method `findByHash(hash: string): Promise<Report | null>`
 
-2. **Implementacja metody findByHash w D1ReportRepository**
-   - Zapytanie SQL do bazy danych D1
-   - Mapowanie wyników na obiekt domeny Report
+2. **Implement findByHash method in D1ReportRepository**
+   - SQL query to the D1 database
+   - Mapping results to the Report domain object
 
-3. **Utworzenie nowego przypadku użycia FetchReportUseCase**
-   - Implementacja logiki pobierania raportu
-   - Obsługa przypadku, gdy raport nie istnieje
+3. **Create a new FetchReportUseCase**
+   - Implement report retrieval logic
+   - Handle the case when a report does not exist
 
-4. **Rozszerzenie ReportMapper**
-   - Dodanie metody `toFetchReportResponseDTO` (podobnej do istniejącej `toScanResponseDTO`)
+4. **Extend ReportMapper**
+   - Add `toFetchReportResponseDTO` method (similar to existing `toScanResponseDTO`)
 
-5. **Utworzenie ReportController**
-   - Implementacja metody `handleFetchReport`
-   - Walidacja parametru `hash`
-   - Mapowanie odpowiedzi
+5. **Create ReportController**
+   - Implement `handleFetchReport` method
+   - Validate `hash` parameter
+   - Map the response
 
-6. **Rejestracja nowego endpointu w głównym pliku worker/index.ts**
-   - Dodanie obsługi trasy GET `/report/:hash`
-   - Konfiguracja zależności
+6. **Register the new endpoint in the main worker/index.ts file**
+   - Add handler for GET `/report/:hash` route
+   - Configure dependencies
 
-7. **Testy**
-   - Testy jednostkowe dla nowych komponentów
-   - Testy integracyjne dla całego przepływu
-   - Testy wydajnościowe dla scenariuszy z dużym obciążeniem
+7. **Testing**
+   - Unit tests for new components
+   - Integration tests for the entire flow
+   - Performance tests for high-load scenarios
 
-8. **Dokumentacja**
-   - Aktualizacja dokumentacji API
-   - Dodanie przykładów użycia
+8. **Documentation**
+   - Update API documentation
+   - Add usage examples
