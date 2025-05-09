@@ -19,9 +19,9 @@ export class ReportMapper {
     // Generate share image URL if available
     let shareImageUrl = null;
     if (report.share_image_key) {
-      // Always use relative URLs within the application for better consistency
+      // Use URLs with /api prefix to match our backend structure
       // This works with the Vite proxy in development and with the same origin in production
-      shareImageUrl = `/images/${report.share_image_key}`;
+      shareImageUrl = `/api/images/${report.share_image_key}`;
     }
 
     // Generate report URL - this still needs the full URL for sharing outside the application
@@ -55,9 +55,9 @@ export class ReportMapper {
     // Generate share image URL if available
     let shareImageUrl = null;
     if (report.share_image_key) {
-      // Always use relative URLs within the application for better consistency
+      // Use URLs with /api prefix to match our backend structure
       // This works with the Vite proxy in development and with the same origin in production
-      shareImageUrl = `/images/${report.share_image_key}`;
+      shareImageUrl = `/api/images/${report.share_image_key}`;
     }
 
     // Return public report data without security-sensitive fields
