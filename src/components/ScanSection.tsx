@@ -18,7 +18,9 @@ export const ScanSection: React.FC = () => {
   const handleScanSuccess = (response: ScanResponseDTO) => {
     setScanResult(response);
     // Navigate to the report page after successful scan
-    navigate(`/report/${response.hash}`);
+    // Include the delete token as a query parameter for the initial view
+    // This ensures the user gets the delete token only on the first view after scanning
+    navigate(`/report/${response.hash}?token=${response.deleteToken}`);
   };
 
   const handleScanStart = () => {

@@ -34,8 +34,17 @@ export class ReportController {
       throw new Error('NOT_FOUND');
     }
     
-    // Map to response DTO
-    const responseDTO = ReportMapper.toFetchReportResponseDTO(report);
+    // Check if this is an initial view that should include delete token
+    // We use a secure, non-guessable token parameter for this purpose
+    const includeToken = c.req.query('token') === report.deleteToken;
+    
+    // Get the CDN domain from env for the scan response DTO
+    const cdnDomain = c.env.CDN_DOMAIN as string;
+    
+    // Map to response DTO - include delete token only for initial view
+    const responseDTO = includeToken
+      ? ReportMapper.toScanResponseDTO(report, cdnDomain)
+      : ReportMapper.toFetchReportResponseDTO(report);
     
     // Return response
     return c.json<FetchReportResponseDTO>(responseDTO, 200);
