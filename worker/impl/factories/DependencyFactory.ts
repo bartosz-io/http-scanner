@@ -90,7 +90,7 @@ export class DependencyFactory {
     const fetchReportUseCase = new FetchReportUseCase(reportRepository);
 
     // Create and return controller
-    return new ReportController(fetchReportUseCase, env.CDN_DOMAIN);
+    return new ReportController(fetchReportUseCase);
   }
   
   /**

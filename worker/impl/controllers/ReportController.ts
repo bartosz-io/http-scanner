@@ -10,7 +10,6 @@ import { ReportMapper } from '../mappers/ReportMapper';
 export class ReportController {
   constructor(
     private readonly fetchReportUseCase: FetchReportUseCase,
-    private readonly cdnDomain: string
   ) {}
 
   /**
