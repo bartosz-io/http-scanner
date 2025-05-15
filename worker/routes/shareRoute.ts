@@ -46,6 +46,7 @@ shareRoute.get('/:hash', async (c) => {
     
     // Extract the data needed for OG metadata
     const { url, score, share_image_url } = reportData;
+    const roundedScore = Math.round(score);
     
     // Generate OG metadata and HTML for social platforms
     const html = `
@@ -54,10 +55,10 @@ shareRoute.get('/:hash', async (c) => {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${url} scored ${score}/100 on HTTP Scanner</title>
+          <title>${url} scored ${roundedScore}/100 on HTTP Scanner</title>
           
           <!-- Essential Open Graph metadata -->
-          <meta property="og:title" content="${url} scored ${score}/100 on HTTP Scanner" />
+          <meta property="og:title" content="${url} scored ${roundedScore}/100 on HTTP Scanner" />
           <meta property="og:description" content="Check how your website performs on HTTP security headers with HTTP Scanner" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="${c.req.url}" />
@@ -65,7 +66,7 @@ shareRoute.get('/:hash', async (c) => {
           
           <!-- Twitter Card metadata -->
           <meta name="twitter:card" content="summary_large_image">
-          <meta name="twitter:title" content="${url} scored ${score}/100 on HTTP Scanner">
+          <meta name="twitter:title" content="${url} scored ${roundedScore}/100 on HTTP Scanner">
           <meta name="twitter:description" content="Check how your website performs on HTTP security headers with HTTP Scanner">
           ${share_image_url ? `<meta name="twitter:image" content="${share_image_url}" />` : ''}
           
@@ -110,7 +111,7 @@ shareRoute.get('/:hash', async (c) => {
         </head>
         <body>
           <div>
-            <h1>${url} scored ${score}/100 on HTTP Scanner</h1>
+            <h1>${url} scored ${roundedScore}/100 on HTTP Scanner</h1>
             <p>Redirecting to full report...</p>
             <p>If you are not redirected automatically, <a href="/#/report/${hash}">click here</a>.</p>
           </div>

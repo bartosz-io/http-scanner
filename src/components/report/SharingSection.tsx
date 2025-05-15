@@ -7,7 +7,8 @@ import { SharingSectionProps } from '../../types/reportTypes';
  */
 export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash, shareImageUrl }) => {
   // Generate share text
-  const shareText = `I scored ${score}/100 on security headers for ${url} with HTTP Scanner!`;
+  const roundedScore = Math.round(score);
+  const shareText = `I scored ${roundedScore}/100 on security headers for ${url} with HTTP Scanner!`;
   
   // Generate share URLs
   const getLinkedInShareUrl = () => {
@@ -57,7 +58,7 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
               <div className="mb-4">
                 <img 
                   src={shareImageUrl} 
-                  alt="Security Score Share Image" 
+                  alt={`Security Score: ${Math.round(score)}/100`}
                   className="w-full max-w-md mx-auto rounded-md border"
                 />
               </div>
