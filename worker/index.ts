@@ -3,6 +3,7 @@ import { cors } from 'hono/cors';
 import { DependencyFactory } from './impl/factories/DependencyFactory';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
 import { cloudflareAccessAuth } from './impl/middleware/cloudflareAccessAuth';
+import { shareRoute } from './routes/shareRoute';
 
 // Define environment interface
 interface Env {
@@ -16,6 +17,9 @@ const app = new Hono<{ Bindings: Env }>();
 
 // Add CORS middleware
 app.use('*', cors());
+
+// Add social sharing route
+app.route('/share', shareRoute);
 
 // Create API router for grouping routes under /api prefix
 const api = new Hono<{ Bindings: Env }>();

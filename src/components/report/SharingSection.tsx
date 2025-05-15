@@ -11,8 +11,12 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
   
   // Generate share URLs
   const getLinkedInShareUrl = () => {
+    // Use a dedicated social sharing URL that works with LinkedIn preview
+    // This URL will be handled server-side to provide proper OG metadata
+    const socialShareUrl = `${window.location.origin}/share/${hash}`;
+    
     const params = new URLSearchParams({
-      url: `${window.location.origin}/#/report/${hash}`,
+      url: socialShareUrl,
       title: 'HTTP Security Headers Check',
       summary: shareText,
       source: 'HTTP Scanner'
@@ -22,9 +26,12 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
   };
 
   const getTwitterShareUrl = () => {
+    // Use the same dedicated social sharing URL that works with social media previews
+    const socialShareUrl = `${window.location.origin}/share/${hash}`;
+    
     const params = new URLSearchParams({
       text: shareText,
-      url: `${window.location.origin}/#/report/${hash}`
+      url: socialShareUrl
     });
 
     return `https://twitter.com/intent/tweet?${params.toString()}`;
