@@ -5,10 +5,10 @@ import { SharingSectionProps } from '../../types/reportTypes';
 /**
  * SharingSection component for sharing the report on social media
  */
-export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash, shareImageUrl }) => {
+export const SharingSection: React.FC<SharingSectionProps> = ({ score, hash, shareImageUrl }) => {
   // Generate share text
   const roundedScore = Math.round(score);
-  const shareText = `I scored ${roundedScore}/100 on security headers for ${url} with HTTP Scanner!`;
+  const shareText = `I scored ${roundedScore}/100 on security headers with HTTP Scanner!`;
   
   // Generate share URLs
   const getLinkedInShareUrl = () => {
