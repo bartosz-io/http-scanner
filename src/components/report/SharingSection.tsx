@@ -16,14 +16,10 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ url, score, hash
     // This URL will be handled server-side to provide proper OG metadata
     const socialShareUrl = `${window.location.origin}/share/${hash}`;
     
-    const params = new URLSearchParams({
-      url: socialShareUrl,
-      title: 'HTTP Security Headers Check',
-      summary: shareText,
-      source: 'HTTP Scanner'
-    });
-
-    return `https://www.linkedin.com/shareArticle?mini=true&${params.toString()}`;
+    // LinkedIn's sharing API has changed and no longer fully supports pre-populating text
+    // We can only provide the URL and let LinkedIn pull Open Graph metadata
+    // The user will need to add their own comment in the LinkedIn sharing dialog
+    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(socialShareUrl)}`;
   };
 
   const getTwitterShareUrl = () => {
