@@ -94,13 +94,6 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                     {type === HeaderTabType.MISSING && (
                       <div className="space-y-2">
                         <p className="text-sm">This security header is missing from your site.</p>
-                        <a href={`https://dev-academy.com/security-headers#${header.name.toLowerCase()}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-primary hover:underline text-sm inline-block"
-                        >
-                          Learn how to implement {header.name}
-                        </a>
                       </div>
                     )}
                     {type === HeaderTabType.LEAKING && (
