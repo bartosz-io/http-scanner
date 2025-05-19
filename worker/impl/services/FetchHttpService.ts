@@ -5,6 +5,7 @@ export class FetchHttpService implements HttpService {
   private readonly TIMEOUT_MS = 5000;
 
   async fetchHeaders(url: string): Promise<Record<string, string>> {
+    console.log(`[FetchHttpService] Starting fetchHeaders for URL: ${url}`);
     let retries = 0;
     let lastError: Error | null = null;
 
@@ -13,6 +14,7 @@ export class FetchHttpService implements HttpService {
         // Use GET method directly
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
+        console.log(`[FetchHttpService] Setting up request with timeout: ${this.TIMEOUT_MS}ms`);
         
         const response = await fetch(url, {
           method: 'GET',
@@ -35,7 +37,30 @@ export class FetchHttpService implements HttpService {
         });
         
         clearTimeout(timeoutId);
-        return this.extractHeaders(response.headers);
+        console.log(`[FetchHttpService] Response received, status: ${response.status}, type: ${response.type}`);
+        console.log(`[FetchHttpService] Final URL after redirects: ${response.url}`);
+        
+        // Log if we're on HTTPS which is required for STS header
+        console.log(`[FetchHttpService] Protocol: ${new URL(response.url).protocol}`);
+        
+        // Log all headers as a complete object
+        const headersObj: Record<string, string> = {};
+        response.headers.forEach((value, key) => {
+          headersObj[key] = value;
+        });
+        console.log('[FetchHttpService] All response headers:', JSON.stringify(headersObj, null, 2));
+        
+        // Log specific security headers directly from response
+        console.log(`[FetchHttpService] Direct STS header check: ${response.headers.get('strict-transport-security')}`);
+        console.log(`[FetchHttpService] Direct CSP header check: ${response.headers.get('content-security-policy')}`);
+        
+        const extractedHeaders = this.extractHeaders(response.headers);
+        console.log('[FetchHttpService] Extracted headers:', JSON.stringify(extractedHeaders, null, 2));
+        
+        // Verify STS header in extracted result
+        console.log(`[FetchHttpService] STS in extracted headers: ${extractedHeaders['strict-transport-security']}`);
+        
+        return extractedHeaders;
       } catch (error) {
         lastError = error as Error;
         retries++;
@@ -55,15 +80,21 @@ export class FetchHttpService implements HttpService {
       throw lastError;
     }
     
+    console.log(`[FetchHttpService] Failed to fetch headers after ${this.MAX_RETRIES} attempts with no specific error`);
     throw new Error('Failed to fetch headers after multiple attempts');
   }
 
   private extractHeaders(headers: Headers): Record<string, string> {
+    console.log(`[FetchHttpService] Extracting headers from Headers object`);
     const result: Record<string, string> = {};
     
+    console.log(`[FetchHttpService] Headers entries:`);
     headers.forEach((value, key) => {
+      console.log(`[FetchHttpService]   - ${key}: ${value}`);
       result[key.toLowerCase()] = value;
     });
+
+    console.log(`[FetchHttpService] Final extracted headers count: ${Object.keys(result).length}`)
     
     return result;
   }
