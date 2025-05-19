@@ -94,43 +94,62 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
     const leaking: HeaderEntry[] = [];
     let score = this.BASE_SCORE; // Start with base score
     
-    // Check for security headers
-    for (const header of this.securityHeaders) {
-      const headerValue = headers[header.name];
-      const present = !!headerValue;
+    // Create a set of all security and leaking header names for quick lookup
+    const securityHeaderNames = new Set(this.securityHeaders.map(h => h.name));
+    const leakingHeaderNames = new Set(this.leakingHeaders.map(h => h.name));
+    
+    // First, add all headers from the response to detected list, regardless of configuration
+    for (const [headerName, headerValue] of Object.entries(headers)) {
+      const normalizedName = headerName.toLowerCase();
       
-      if (present) {
-        score += header.weight;
+      // Check if it's a security header
+      if (securityHeaderNames.has(normalizedName)) {
+        const headerConfig = this.securityHeaders.find(h => h.name === normalizedName);
+        if (headerConfig) {
+          score += headerConfig.weight;
+          detected.push(HeaderEntry.create({
+            name: normalizedName,
+            value: headerValue,
+            present: true,
+            weight: headerConfig.weight,
+            leaking: false
+          }));
+        }
+      }
+      // Check if it's a leaking header
+      else if (leakingHeaderNames.has(normalizedName)) {
+        const headerConfig = this.leakingHeaders.find(h => h.name === normalizedName);
+        if (headerConfig) {
+          score += headerConfig.weight; // Negative weight reduces score
+          leaking.push(HeaderEntry.create({
+            name: normalizedName,
+            value: headerValue,
+            present: true,
+            weight: headerConfig.weight,
+            leaking: true
+          }));
+        }
+      }
+      // It's a header that's not in our configuration
+      else {
         detected.push(HeaderEntry.create({
-          name: header.name,
+          name: normalizedName,
           value: headerValue,
           present: true,
-          weight: header.weight,
+          weight: 0, // No weight impact for headers not in configuration
           leaking: false
         }));
-      } else {
+      }
+    }
+    
+    // Add missing security headers
+    for (const header of this.securityHeaders) {
+      if (!headers[header.name]) {
         missing.push(HeaderEntry.create({
           name: header.name,
           present: false,
           weight: header.weight,
           leaking: false
-        }));
-      }
-    }
-
-    // Check for leaking headers
-    for (const header of this.leakingHeaders) {
-      const headerValue = headers[header.name];
-      const present = !!headerValue;
-      
-      if (present) {
-        score += header.weight; // Negative weight reduces score
-        leaking.push(HeaderEntry.create({
-          name: header.name,
-          value: headerValue,
-          present: true,
-          weight: header.weight,
-          leaking: true
         }));
       }
     }
