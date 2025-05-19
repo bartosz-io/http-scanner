@@ -26,6 +26,11 @@ export class FetchHttpService implements HttpService {
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'none',
             'Upgrade-Insecure-Requests': '1'
+          },
+          cf: {
+            cacheEverything: false,
+            scrapeShield: false,
+            resolveOverride: new URL(url).hostname
           }
         });
         
