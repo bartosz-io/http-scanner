@@ -18,11 +18,11 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
     );
   };
 
-  // Get color classes based on header type
-  const getHeaderTypeClasses = () => {
+  const getHeaderTypeClasses = (header: { weight?: number }) => {
     switch (type) {
       case HeaderTabType.DETECTED:
-        return 'border-l-4 border-l-green-500';
+        // Only show green for headers with non-zero weight (from configuration)
+        return header.weight !== 0 ? 'border-l-4 border-l-green-500' : '';
       case HeaderTabType.MISSING:
         return 'border-l-4 border-l-amber-500';
       case HeaderTabType.LEAKING:
@@ -43,13 +43,23 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
     );
   }
 
+  // Sort headers by weight in descending order (highest weight first)
+  const sortedHeaders = [...headers].sort((a, b) => {
+    // Handle undefined weights
+    const weightA = a.weight !== undefined ? a.weight : 0;
+    const weightB = b.weight !== undefined ? b.weight : 0;
+    
+    // Sort by absolute weight value (descending)
+    return Math.abs(weightB) - Math.abs(weightA);
+  });
+
   return (
     <div className="space-y-4">
-      {headers.map(header => {
+      {sortedHeaders.map(header => {
         const isExpanded = expandedHeaders.includes(header.name);
         
         return (
-          <Card key={header.name} className={`${getHeaderTypeClasses()}`}>
+          <Card key={header.name} className={`${getHeaderTypeClasses(header)}`}>
             <CardContent className="p-0">
               <Button 
                 variant="ghost" 
