@@ -3,6 +3,18 @@ import { HttpService } from '../../interfaces/services/HttpService';
 export class FetchHttpService implements HttpService {
   private readonly MAX_RETRIES = 3;
   private readonly TIMEOUT_MS = 5000;
+  private readonly CLOUDFLARE_ADDED_HEADERS = [
+    'cf-ray',
+    'cf-cache-status',
+    'cf-mitigated',
+    'cf-worker',
+    'cf-edge-cache',
+    'cf-connecting-ip',
+    'cf-bgj',
+    'cf-visitor',
+    'cf-apo-via',
+    'alt-svc'
+  ];
 
   async fetchHeaders(url: string): Promise<Record<string, string>> {
     console.log(`[FetchHttpService] Starting fetchHeaders for URL: ${url}`);
@@ -16,6 +28,9 @@ export class FetchHttpService implements HttpService {
         const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
         console.log(`[FetchHttpService] Setting up request with timeout: ${this.TIMEOUT_MS}ms`);
         
+        const hostname = new URL(url).hostname;
+        console.log(`[FetchHttpService] Extracted hostname for resolveOverride: ${hostname}`);
+        
         const response = await fetch(url, {
           method: 'GET',
           redirect: 'follow',
@@ -24,15 +39,28 @@ export class FetchHttpService implements HttpService {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
             'Accept-Language': 'en,pl-PL;q=0.9,pl;q=0.8,en-US;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Priority': 'u=0, i',
             'Upgrade-Insecure-Requests': '1'
           },
           cf: {
+            // Disable all Cloudflare features that might modify the response
             cacheEverything: false,
-            scrapeShield: false,
-            resolveOverride: new URL(url).hostname
+            scrapeShield: false,              // Disable email obfuscation, etc
+            minify: {
+              javascript: false,
+              css: false,
+              html: false
+            },                                // Disable HTML/CSS/JS minification
+            mirage: false,                    // Disable image optimization
+            apps: false,                      // Disable Cloudflare Apps
+            resolveOverride: hostname         // Connect directly to origin's IP
           }
         });
         
@@ -60,13 +88,16 @@ export class FetchHttpService implements HttpService {
         console.log(`[FetchHttpService] Direct STS header check: ${response.headers.get('strict-transport-security')}`);
         console.log(`[FetchHttpService] Direct CSP header check: ${response.headers.get('content-security-policy')}`);
         
+        // Extract and filter Cloudflare-added headers
         const extractedHeaders = this.extractHeaders(response.headers);
-        console.log('[FetchHttpService] Extracted headers:', JSON.stringify(extractedHeaders, null, 2));
+        const filteredHeaders = this.filterCloudflareHeaders(extractedHeaders);
+        
+        console.log('[FetchHttpService] Final headers after filtering:', JSON.stringify(filteredHeaders, null, 2));
         
         // Verify STS header in extracted result
-        console.log(`[FetchHttpService] STS in extracted headers: ${extractedHeaders['strict-transport-security']}`);
+        console.log(`[FetchHttpService] STS in extracted headers: ${filteredHeaders['strict-transport-security']}`);
         
-        return extractedHeaders;
+        return filteredHeaders;
       } catch (error) {
         lastError = error as Error;
         retries++;
@@ -100,8 +131,29 @@ export class FetchHttpService implements HttpService {
       result[key.toLowerCase()] = value;
     });
 
-    console.log(`[FetchHttpService] Final extracted headers count: ${Object.keys(result).length}`)
+    console.log(`[FetchHttpService] Final extracted headers count: ${Object.keys(result).length}`);
     
     return result;
+  }
+
+  private filterCloudflareHeaders(headers: Record<string, string>): Record<string, string> {
+    console.log(`[FetchHttpService] Filtering out Cloudflare-specific headers`);
+    const filteredHeaders: Record<string, string> = { ...headers };
+    
+    // Remove known Cloudflare headers
+    this.CLOUDFLARE_ADDED_HEADERS.forEach(header => {
+      if (filteredHeaders[header]) {
+        console.log(`[FetchHttpService] Removing Cloudflare header: ${header}`);
+        delete filteredHeaders[header];
+      }
+    });
+    
+    // Special case for server header with Cloudflare value
+    if (filteredHeaders['server']?.toLowerCase().includes('cloudflare')) {
+      console.log(`[FetchHttpService] Removing Cloudflare server header`);
+      delete filteredHeaders['server'];
+    }
+    
+    return filteredHeaders;
   }
 }
