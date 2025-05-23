@@ -89,46 +89,52 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                 {isExpanded && (
                   <tr>
                     <td colSpan={3} className="p-0 border-b">
-                      <div className="p-4 bg-muted/20">
-                        {header.value && (
-                          <div className="mb-3">
-                            <div className="text-sm font-medium mb-1">Value:</div>
-                            <div className="bg-muted rounded p-2 overflow-x-auto text-sm font-mono text-left">
-                              {header.value}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="mb-3">
-                          <div className="text-sm font-medium mb-1">Weight:</div>
-                          <div className="text-sm text-left">{header.weight} point{Math.abs(header.weight) !== 1 ? 's' : ''}</div>
-                        </div>
-                        
-                        <div>
-                          {type === HeaderTabType.DETECTED && (
-                            <p className="text-sm">This security header is properly configured on your site.</p>
-                          )}
-                          {type === HeaderTabType.MISSING && (
-                            <div className="space-y-2">
-                              <p className="text-sm">This security header is missing from your site.</p>
-                            </div>
-                          )}
-                          {type === HeaderTabType.LEAKING && (
-                            <div className="space-y-2">
-                              <p className="text-sm">
-                                This header may leak sensitive information about your infrastructure.
-                                Consider removing it to improve security.
-                              </p>
-                              <a href="https://dev-academy.com/security-headers#leaking-headers" 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-primary hover:underline text-sm inline-block"
-                              >
-                                Learn about leaking headers
-                              </a>
-                            </div>
-                          )}
-                        </div>
+                      <div className="p-0">
+                        <table className="w-full border-t">
+                          <colgroup>
+                            <col style={{ width: '40%' }} />
+                            <col style={{ width: '40%' }} />
+                            <col style={{ width: '20%' }} />
+                          </colgroup>
+                          <tbody>
+                            <tr>
+                              <td className="p-4 align-top">
+                                <div className="text-sm font-medium mb-1">What this header means:</div>
+                                <div className="text-sm text-muted-foreground">
+                                  {/* Placeholder for future detailed explanation */}
+                                  <p>Additional explanation about this header will be provided here.</p>
+                                </div>
+                              </td>
+                              
+                              <td className="p-4 align-top">
+                                <div className="text-sm font-medium mb-1">Value:</div>
+                                {header.value ? (
+                                  <div className="bg-muted rounded p-2 overflow-x-auto text-sm font-mono text-left">
+                                    {header.value}
+                                  </div>
+                                ) : (
+                                  <div className="bg-muted rounded p-2 text-sm italic text-muted-foreground">
+                                    Not present
+                                  </div>
+                                )}
+                              </td>
+                              
+                              <td className="p-4 align-top">
+                                <div className="text-sm font-medium mb-1">Weight:</div>
+                                <div className="text-sm">
+                                  {header.weight} point{Math.abs(header.weight) !== 1 ? 's' : ''}
+                                </div>
+                                
+                                {/* Status message */}
+                                <div className="mt-3">
+                                  {type === HeaderTabType.MISSING && (
+                                    <p className="text-sm">This security header is missing from your site.</p>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </td>
                   </tr>
