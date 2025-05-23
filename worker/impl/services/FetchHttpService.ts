@@ -40,6 +40,12 @@ export class FetchHttpService implements HttpService {
         console.log(`[FetchHttpService] Response received, status: ${response.status}, type: ${response.type}`);
         console.log(`[FetchHttpService] Final URL after redirects: ${response.url}`);
         
+        // Check if the response status is not in the successful range (200-299)
+        if (response.status < 200 || response.status >= 300) {
+          console.log(`[FetchHttpService] Received non-successful status code: ${response.status}`);
+          throw new Error(`URL returned status code ${response.status}`);
+        }
+        
         // Log if we're on HTTPS which is required for STS header
         console.log(`[FetchHttpService] Protocol: ${new URL(response.url).protocol}`);
         
