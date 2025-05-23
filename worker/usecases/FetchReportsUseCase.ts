@@ -21,7 +21,7 @@ export class FetchReportsUseCase {
     nextCursor?: string;
   }> {
     // Validate query parameters
-    const limit = Math.min(Math.max(queryModel.limit, 20), 100);
+    const limit = Math.min(Math.max(queryModel.limit, 10), 100);
     
     // Execute query to repository
     return await this.reportRepository.findPaginated(

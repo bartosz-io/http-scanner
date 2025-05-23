@@ -138,8 +138,8 @@ export class D1ReportRepository implements ReportRepository {
     nextCursor?: string;
   }> {
     // Parameter validation
-    if (limit < 20 || limit > 100) {
-      limit = 20; // Default limit
+    if (limit < 10 || limit > 100) {
+      limit = 10; // Default limit
     }
     
     // Decode cursor (if exists)
