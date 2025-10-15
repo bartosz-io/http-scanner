@@ -1,13 +1,15 @@
 {
-  "content-security-policy": 20,
-  "strict-transport-security": 15,
-  "cross-origin-embedder-policy": 10,
-  "cross-origin-opener-policy": 10,
-  "cross-origin-resource-policy": 7,
-  "x-content-type-options": 8,
-  "x-frame-options": 8,
-  "referrer-policy": 7,
-  "permissions-policy": 7,
-  "clear-site-data": 5,
-  "x-dns-prefetch-control": 3
+  "content-security-policy": 22,
+  "strict-transport-security": 18,
+  "permissions-policy": 8,
+  "referrer-policy": 6,
+  "x-content-type-options": 6,
+  "cross-origin-opener-policy": 5,
+  "cross-origin-embedder-policy": 4,
+  "cross-origin-resource-policy": 4,
+  "x-frame-options": 4,
+  "clear-site-data": 3,
+  "origin-agent-cluster": 3,
+  "x-permitted-cross-domain-policies": 2,
+  "x-dns-prefetch-control": 2
 }
