@@ -2,6 +2,28 @@ import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { HeaderListProps, HeaderTabType } from '../../types/reportTypes';
 
+const statusConfig: Record<
+  NonNullable<HeaderListProps['headers'][number]['status']> | 'unknown',
+  { label: string; className: string }
+> = {
+  pass: { label: 'Pass', className: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  partial: { label: 'Needs review', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
+  fail: { label: 'Action required', className: 'bg-rose-50 text-rose-700 border border-rose-200' },
+  missing: { label: 'Missing', className: 'bg-slate-100 text-slate-700 border border-slate-200' },
+  unknown: { label: 'Not evaluated', className: 'bg-slate-100 text-slate-700 border border-slate-200' },
+};
+
+const renderStatusBadge = (status?: HeaderListProps['headers'][number]['status']) => {
+  const key = status ?? 'unknown';
+  const config = statusConfig[key] ?? statusConfig.unknown;
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config.className}`}>
+      {config.label}
+    </span>
+  );
+};
+
 /**
  * HeaderList component for displaying a list of headers in a table-like format with expandable details
  */
@@ -74,12 +96,15 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                     {header.name}
                   </td>
                   <td className="p-3 text-left text-muted-foreground border-b truncate">
-                    {header.value 
-                      ? (header.value.length > 100 
-                          ? `${header.value.substring(0, 100)}...` 
-                          : header.value)
-                      : <span className="italic text-muted-foreground">Not present</span>
-                    }
+                    <div className="flex flex-col gap-1">
+                      {header.value 
+                        ? (header.value.length > 100 
+                            ? `${header.value.substring(0, 100)}...` 
+                            : header.value)
+                        : <span className="italic text-muted-foreground">Not present</span>
+                      }
+                      <span>{renderStatusBadge(header.status)}</span>
+                    </div>
                   </td>
                   <td className="p-3 text-center border-b">
                     {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -100,9 +125,16 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                             <tr>
                               <td className="p-4 align-top">
                                 <div className="text-sm font-medium mb-1">What this header means:</div>
-                                <div className="text-sm text-muted-foreground">
-                                  {/* Placeholder for future detailed explanation */}
-                                  <p>Additional explanation about this header will be provided here.</p>
+                                <div className="text-sm text-muted-foreground space-y-2">
+                                  {header.notes && header.notes.length > 0 ? (
+                                    <ul className="list-disc pl-4 space-y-1">
+                                      {header.notes.map(note => (
+                                        <li key={note}>{note}</li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="italic">No analyzer notes available yet.</p>
+                                  )}
                                 </div>
                               </td>
                               
@@ -124,11 +156,14 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                                 <div className="text-sm">
                                   {header.weight} point{Math.abs(header.weight) !== 1 ? 's' : ''}
                                 </div>
-                                
-                                {/* Status message */}
-                                <div className="mt-3">
+
+                                <div className="mt-4 space-y-2">
+                                  <div className="text-sm font-medium">Status</div>
+                                  {renderStatusBadge(header.status)}
                                   {type === HeaderTabType.MISSING && (
-                                    <p className="text-sm">This security header is missing from your site.</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      This security header is missing from your site.
+                                    </p>
                                   )}
                                 </div>
                               </td>

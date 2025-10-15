@@ -134,6 +134,8 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: true,
             weight: header.weight,
             leaking: false,
+            status: evaluation.status,
+            notes: evaluation.notes,
           }),
         );
       } else {
@@ -143,6 +145,8 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: false,
             weight: header.weight,
             leaking: false,
+            status: evaluation.status,
+            notes: evaluation.notes,
           }),
         );
       }
@@ -162,6 +166,10 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: true,
             weight: header.weight,
             leaking: true,
+            status: 'fail',
+            notes: [
+              'Leaking header reveals infrastructure details; remove or rewrite before sharing scans.',
+            ],
           }),
         );
       }
@@ -180,6 +188,7 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
           present: true,
           weight: 0,
           leaking: false,
+          status: 'unknown',
         }),
       );
     }

@@ -6,7 +6,9 @@ export class HeaderEntry implements HeaderEntryType {
     public value: string | undefined,
     public present: boolean,
     public weight: number,
-    public leaking: boolean
+    public leaking: boolean,
+    public status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown',
+    public notes?: string[]
   ) {}
 
   static create(params: {
@@ -15,13 +17,17 @@ export class HeaderEntry implements HeaderEntryType {
     present: boolean;
     weight: number;
     leaking: boolean;
+    status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown';
+    notes?: string[];
   }): HeaderEntry {
     return new HeaderEntry(
       params.name,
       params.value,
       params.present,
       params.weight,
-      params.leaking
+      params.leaking,
+      params.status,
+      params.notes
     );
   }
 }

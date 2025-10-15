@@ -6,6 +6,8 @@ export interface HeaderEntry {
   present: boolean;
   weight: number;
   leaking: boolean;
+  status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown';
+  notes?: string[];
 }
 
 export interface Report {
