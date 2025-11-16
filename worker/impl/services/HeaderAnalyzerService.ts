@@ -134,6 +134,7 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: true,
             weight: header.weight,
             leaking: false,
+            awardedScore: evaluation.scoreDelta,
             status: evaluation.status,
             notes: evaluation.notes,
           }),
@@ -145,6 +146,7 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: false,
             weight: header.weight,
             leaking: false,
+            awardedScore: evaluation.scoreDelta,
             status: evaluation.status,
             notes: evaluation.notes,
           }),
@@ -166,6 +168,7 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
             present: true,
             weight: header.weight,
             leaking: true,
+            awardedScore: header.weight,
             status: 'fail',
             notes: [
               'Leaking header reveals infrastructure details; remove or rewrite before sharing scans.',
@@ -181,16 +184,17 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
         continue;
       }
 
-      detected.push(
-        HeaderEntry.create({
-          name: headerName,
-          value: headerValue,
-          present: true,
-          weight: 0,
-          leaking: false,
-          status: 'unknown',
-        }),
-      );
+        detected.push(
+          HeaderEntry.create({
+            name: headerName,
+            value: headerValue,
+            present: true,
+            weight: 0,
+            leaking: false,
+            awardedScore: 0,
+            status: 'unknown',
+          }),
+        );
     }
 
     // Log raw score before normalization

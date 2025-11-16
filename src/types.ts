@@ -6,6 +6,7 @@ export interface HeaderEntry {
   present: boolean;
   weight: number;
   leaking: boolean;
+  awardedScore?: number;
   status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown';
   notes?: string[];
 }

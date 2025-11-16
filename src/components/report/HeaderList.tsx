@@ -2,10 +2,9 @@ import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { HeaderListProps, HeaderTabType } from '../../types/reportTypes';
 
-const statusConfig: Record<
-  NonNullable<HeaderListProps['headers'][number]['status']> | 'unknown',
-  { label: string; className: string }
-> = {
+type HeaderItem = HeaderListProps['headers'][number];
+
+const statusConfig: Record<NonNullable<HeaderItem['status']> | 'unknown', { label: string; className: string }> = {
   pass: { label: 'Pass', className: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
   partial: { label: 'Needs review', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
   fail: { label: 'Action required', className: 'bg-rose-50 text-rose-700 border border-rose-200' },
@@ -13,7 +12,7 @@ const statusConfig: Record<
   unknown: { label: 'Not evaluated', className: 'bg-slate-100 text-slate-700 border border-slate-200' },
 };
 
-const renderStatusBadge = (status?: HeaderListProps['headers'][number]['status']) => {
+const renderStatusBadge = (status?: HeaderItem['status']) => {
   const key = status ?? 'unknown';
   const config = statusConfig[key] ?? statusConfig.unknown;
 
@@ -22,6 +21,54 @@ const renderStatusBadge = (status?: HeaderListProps['headers'][number]['status']
       {config.label}
     </span>
   );
+};
+
+const formatPoints = (value: number): string => {
+  const rounded = Math.round(value * 10) / 10;
+  if (Number.isInteger(rounded)) {
+    return rounded.toString();
+  }
+  return rounded.toFixed(1).replace(/\.0$/, '');
+};
+
+const resolveAwardedScore = (header: HeaderItem): number => {
+  if (typeof header.awardedScore === 'number') {
+    return header.awardedScore;
+  }
+
+  const weight = header.weight ?? 0;
+
+  if (header.leaking && weight < 0 && header.present) {
+    return weight;
+  }
+
+  if (header.present) {
+    return weight;
+  }
+
+  return 0;
+};
+
+const buildScoreSummary = (header: HeaderItem, options?: { verbose?: boolean }): string => {
+  const verbose = options?.verbose ?? false;
+  const weight = header.weight ?? 0;
+  const awardedRaw = resolveAwardedScore(header);
+
+  if (weight > 0) {
+    const awarded = Math.min(Math.max(awardedRaw, 0), weight);
+    const summary = `${formatPoints(awarded)} / ${formatPoints(weight)} pts`;
+    return verbose ? `${summary} earned` : summary;
+  }
+
+  if (weight < 0) {
+    const maxPenalty = Math.abs(weight);
+    const appliedPenalty = Math.abs(Math.min(awardedRaw, 0));
+    const summary = `${formatPoints(appliedPenalty)} / ${formatPoints(maxPenalty)} pts penalty`;
+    return verbose ? `${summary} applied` : summary;
+  }
+
+  const summary = `${formatPoints(awardedRaw)} pts`;
+  return verbose ? `${summary} (informational)` : summary;
 };
 
 /**
@@ -104,6 +151,9 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                         : <span className="italic text-muted-foreground">Not present</span>
                       }
                       <span>{renderStatusBadge(header.status)}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {buildScoreSummary(header)}
+                      </span>
                     </div>
                   </td>
                   <td className="p-3 text-center border-b">
@@ -152,9 +202,11 @@ export const HeaderList: React.FC<HeaderListProps> = ({ headers, type }) => {
                               </td>
                               
                               <td className="p-4 align-top">
-                                <div className="text-sm font-medium mb-1">Weight:</div>
+                                <div className="text-sm font-medium mb-1">
+                                  {header.weight < 0 ? 'Penalty impact' : 'Score impact'}
+                                </div>
                                 <div className="text-sm">
-                                  {header.weight} point{Math.abs(header.weight) !== 1 ? 's' : ''}
+                                  {buildScoreSummary(header, { verbose: true })}
                                 </div>
 
                                 <div className="mt-4 space-y-2">

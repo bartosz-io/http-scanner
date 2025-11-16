@@ -7,6 +7,7 @@ export class HeaderEntry implements HeaderEntryType {
     public present: boolean,
     public weight: number,
     public leaking: boolean,
+    public awardedScore: number,
     public status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown',
     public notes?: string[]
   ) {}
@@ -17,6 +18,7 @@ export class HeaderEntry implements HeaderEntryType {
     present: boolean;
     weight: number;
     leaking: boolean;
+    awardedScore?: number;
     status?: 'pass' | 'partial' | 'fail' | 'missing' | 'unknown';
     notes?: string[];
   }): HeaderEntry {
@@ -26,6 +28,7 @@ export class HeaderEntry implements HeaderEntryType {
       params.present,
       params.weight,
       params.leaking,
+      params.awardedScore ?? 0,
       params.status,
       params.notes
     );
