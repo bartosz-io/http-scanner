@@ -197,7 +197,9 @@ export class HeaderAnalyzerService implements HeaderAnalyzerServiceInterface {
     console.log('Score before normalization:', score);
 
     // Extract weights from header definitions for normalization
-    const positiveWeights = this.securityHeaders.map(header => header.weight);
+    const positiveWeights = this.securityHeaders
+      .filter(header => header.weight > 0)
+      .map(header => header.weight);
     const negativeWeights = this.leakingHeaders.map(header => header.weight);
 
     // Use the score normalizer service to normalize the score

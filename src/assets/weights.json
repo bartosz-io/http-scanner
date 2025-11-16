@@ -9,7 +9,7 @@
   "cross-origin-resource-policy": 4,
   "x-frame-options": 4,
   "clear-site-data": 3,
-  "origin-agent-cluster": 3,
-  "x-permitted-cross-domain-policies": 2,
-  "x-dns-prefetch-control": 2
+  "origin-agent-cluster": 0,
+  "x-permitted-cross-domain-policies": 0,
+  "x-dns-prefetch-control": 0
 }
