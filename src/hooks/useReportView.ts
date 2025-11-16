@@ -2,6 +2,23 @@ import { useState, useEffect, useCallback } from 'react';
 import { FetchReportResponseDTO } from '../types';
 import { HeaderTabType } from '../types/reportTypes';
 
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return 'An error occurred';
+};
+
+const getErrorCode = (error: unknown) => {
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    const codeValue = (error as { code?: unknown }).code;
+    if (typeof codeValue === 'string') {
+      return codeValue;
+    }
+  }
+  return 'UNKNOWN_ERROR';
+};
+
 /**
  * Custom hook for managing the Report View state and functionality
  * @param hash The report hash identifier
@@ -46,9 +63,9 @@ export function useReportView(hash: string) {
       
       const data = await response.json();
       setReport(data);
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
-      setErrorCode(err.code || 'UNKNOWN_ERROR');
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
+      setErrorCode(getErrorCode(err));
     } finally {
       setIsLoading(false);
     }
@@ -79,8 +96,8 @@ export function useReportView(hash: string) {
       
       // Success - redirect to home
       window.location.href = '/#/';
-    } catch (err: any) {
-      setDeleteError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setDeleteError(getErrorMessage(err));
     } finally {
       setIsDeleting(false);
     }
