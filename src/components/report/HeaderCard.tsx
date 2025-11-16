@@ -174,9 +174,11 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
       <Card className="border border-dashed border-slate-200 bg-slate-50/60 text-left">
         <CardHeader className="space-y-3">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <Info className="h-4 w-4 text-slate-500" />
-              <CardTitle className="text-base">{friendlyName}</CardTitle>
+            <div className="flex items-center gap-3 text-slate-900">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200/80">
+                <Info className="h-5 w-5 text-slate-600" />
+              </div>
+              <CardTitle className="text-lg font-semibold tracking-tight">{friendlyName}</CardTitle>
             </div>
             <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
               Not evaluated
@@ -214,11 +216,13 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
       )}
     >
       <CardHeader className="pb-2">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-              <StatusIcon className={cn('h-4 w-4', statusVisual.color)} />
-              <CardTitle className="text-lg">{friendlyName}</CardTitle>
+            <div className="flex items-center gap-3 text-slate-900">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
+                <StatusIcon className={cn('h-5 w-5', statusVisual.color)} />
+              </div>
+              <CardTitle className="text-xl font-semibold tracking-tight">{friendlyName}</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">{summary}</p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
