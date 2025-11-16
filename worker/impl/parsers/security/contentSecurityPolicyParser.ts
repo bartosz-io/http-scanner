@@ -43,12 +43,11 @@ const hasNonceOrHash = (tokens: string[]): boolean =>
   );
 
 const toNotes = (
-  headerValue: string,
   failReasons: string[],
   warnReasons: string[],
   infoNotes: string[],
 ): string[] => {
-  const notes = [`Observed CSP: ${headerValue}`];
+  const notes = [];
   if (failReasons.length > 0) {
     notes.push(...failReasons.map(reason => `❌ ${reason}`));
   }
@@ -162,7 +161,7 @@ export const contentSecurityPolicyParser: HeaderParser = {
     return {
       scoreDelta: context.weight * scoreMultiplier,
       status: severity,
-      notes: toNotes(value, failReasons, warnReasons, infoNotes),
+      notes: toNotes(failReasons, warnReasons, infoNotes),
     };
   },
 };
