@@ -140,6 +140,9 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
   const scannerNotes = header.notes ?? [];
   const bestPractices = guide?.bestPractices ?? [];
   const fixSteps = guide?.fixSteps ?? [];
+  const hasGuidanceContent = Boolean(guide);
+  const isDetectedNotEvaluated =
+    type === HeaderTabType.DETECTED && statusKey === 'unknown' && !hasGuidanceContent && scannerNotes.length === 0;
   const friendlyName = header.name
     .split('-')
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
@@ -165,6 +168,43 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
       </span>
     );
   };
+
+  if (isDetectedNotEvaluated) {
+    return (
+      <Card className="border border-dashed border-slate-200 bg-slate-50/60 text-left">
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+              <Info className="h-4 w-4 text-slate-500" />
+              <CardTitle className="text-base">{friendlyName}</CardTitle>
+            </div>
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
+              Not evaluated
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            We detected this header but have not published analyzer guidance yet. Track its value below while we
+            expand coverage.
+          </p>
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">
+            Score impact:{' '}
+            <span className="font-semibold text-foreground">
+              {scoreSummary}
+            </span>
+          </div>
+        </CardHeader>
+
+        <CardContent className="pt-0">
+          <div className="space-y-2">
+            <div className="text-sm font-medium text-slate-900">Detected value</div>
+            <div className="rounded-md border bg-white/70 p-3 text-sm font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto">
+              <FormattedHeaderValue headerName={header.name} value={detectedValue} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card
