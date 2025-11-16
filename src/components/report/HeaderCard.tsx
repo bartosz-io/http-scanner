@@ -286,7 +286,7 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
               {guide?.recommendedValue && (
                 <section className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium">Recommended directive</h3>
+                    <h3 className="text-sm font-medium">Recommended base value</h3>
                     <button
                       type="button"
                       onClick={() => copy(guide.recommendedValue)}
