@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { HeaderEntry } from '@/types';
 import { HeaderTabType } from '@/types/reportTypes';
 import { getHeaderGuide } from '@/lib/headerGuides';
+import { FormattedHeaderValue } from './FormattedHeaderValue';
 
 const statusConfig: Record<
   NonNullable<HeaderEntry['status']> | 'unknown',
@@ -144,7 +145,11 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join('-');
 
-  const detectedValue = header.value ?? (header.present ? 'Header present (value redacted)' : 'Not present');
+  const detectedValue = header.value
+    ? header.value
+    : header.present
+      ? 'Header present (value redacted)'
+      : 'Not present';
 
   const handleToggle = () => {
     setExpanded(prev => !prev);
@@ -229,8 +234,8 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
             <div className="grid gap-6 md:grid-cols-2">
               <section className="space-y-2">
                 <div className="text-sm font-medium">Detected value</div>
-                <div className="rounded-md border bg-muted/50 p-3 text-sm font-mono leading-relaxed overflow-x-auto">
-                  {detectedValue}
+                <div className="rounded-md border bg-muted/50 p-3 text-sm font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto">
+                  <FormattedHeaderValue headerName={header.name} value={detectedValue} />
                 </div>
               </section>
 
@@ -247,8 +252,8 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
                       <ChevronRight className="h-3 w-3 rotate-90" />
                     </button>
                   </div>
-                  <div className="rounded-md border bg-background/50 p-3 text-sm font-mono leading-relaxed overflow-x-auto">
-                    {guide.recommendedValue}
+                  <div className="rounded-md border bg-background/50 p-3 text-sm font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto">
+                    <FormattedHeaderValue headerName={header.name} value={guide.recommendedValue} />
                   </div>
                 </section>
               )}
