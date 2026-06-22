@@ -19,6 +19,8 @@ import { FetchReportsUseCase } from '../../usecases/FetchReportsUseCase';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
 import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
 import { StatsRepository } from '../../interfaces/repositories/StatsRepository';
+import { createPostHogClient } from '../../lib/posthog';
+import { PostHog } from 'posthog-node';
 
 /**
  * Factory class for creating application dependencies
@@ -53,6 +55,8 @@ export class DependencyFactory {
     DB: D1Database;
     IMAGES: R2Bucket;
     CDN_DOMAIN: string;
+    POSTHOG_PROJECT_TOKEN?: string;
+    POSTHOG_HOST?: string;
   }): ScanController {
     // Create repositories and services
     const reportRepository = this.createReportRepository(env.DB);
@@ -70,8 +74,13 @@ export class DependencyFactory {
       reportRepository
     );
 
+    const posthog: PostHog | undefined =
+      env.POSTHOG_PROJECT_TOKEN && env.POSTHOG_HOST
+        ? createPostHogClient(env.POSTHOG_PROJECT_TOKEN, env.POSTHOG_HOST)
+        : undefined;
+
     // Create and return controller
-    return new ScanController(scanUrlUseCase, env.CDN_DOMAIN);
+    return new ScanController(scanUrlUseCase, env.CDN_DOMAIN, posthog);
   }
 
   /**
@@ -101,19 +110,26 @@ export class DependencyFactory {
   static createDeleteReportController(env: {
     DB: D1Database;
     IMAGES: R2Bucket;
+    POSTHOG_PROJECT_TOKEN?: string;
+    POSTHOG_HOST?: string;
   }): DeleteReportController {
     // Create repositories
     const reportRepository = this.createReportRepository(env.DB);
     const imageRepository = this.createImageRepository(env.IMAGES);
-    
+
     // Create use case
     const deleteReportUseCase = new DeleteReportUseCase(
       reportRepository,
       imageRepository
     );
-    
+
+    const posthog: PostHog | undefined =
+      env.POSTHOG_PROJECT_TOKEN && env.POSTHOG_HOST
+        ? createPostHogClient(env.POSTHOG_PROJECT_TOKEN, env.POSTHOG_HOST)
+        : undefined;
+
     // Create and return controller
-    return new DeleteReportController(deleteReportUseCase);
+    return new DeleteReportController(deleteReportUseCase, posthog);
   }
 
   /**

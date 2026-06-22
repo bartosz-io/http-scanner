@@ -4,12 +4,15 @@ import { DependencyFactory } from './impl/factories/DependencyFactory';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
 import { cloudflareAccessAuth } from './impl/middleware/cloudflareAccessAuth';
 import { shareRoute } from './routes/shareRoute';
+import { createPostHogClient, getDistinctId } from './lib/posthog';
 
 // Define environment interface
 interface Env {
   DB: D1Database;
   IMAGES: R2Bucket;
   CDN_DOMAIN: string;
+  POSTHOG_PROJECT_TOKEN?: string;
+  POSTHOG_HOST?: string;
 }
 
 // Create Hono app
@@ -123,14 +126,22 @@ api.get('/images/:key', async (c) => {
 
 app.onError((err, c) => {
   console.error('Application error:', err);
-  
+
   const errorCode = err instanceof Error ? err.message : 'INTERNAL_ERROR';
   const errorInfo = ERROR_MAP[errorCode] || ERROR_MAP.INTERNAL_ERROR;
+
+  if (errorInfo.status >= 500 && c.env.POSTHOG_PROJECT_TOKEN && c.env.POSTHOG_HOST) {
+    const posthog = createPostHogClient(c.env.POSTHOG_PROJECT_TOKEN, c.env.POSTHOG_HOST);
+    const distinctId = getDistinctId(c.req);
+    posthog.captureException(err, distinctId);
+    void posthog.shutdown();
+  }
+
   const response: ErrorResponse = {
     error: errorInfo.message,
     code: errorCode
   };
-  
+
   return c.json(response, errorInfo.status as 400 | 401 | 403 | 404 | 429 | 500 | 504);
 });
 

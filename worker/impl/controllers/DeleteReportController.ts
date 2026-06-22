@@ -1,6 +1,8 @@
 import { Context } from 'hono';
+import { PostHog } from 'posthog-node';
 import { DeleteReportRequestDTO } from '../../../src/types';
 import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
+import { getDistinctId } from '../../lib/posthog';
 
 /**
  * Controller for handling report deletion requests
@@ -8,7 +10,8 @@ import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
  */
 export class DeleteReportController {
   constructor(
-    private readonly deleteReportUseCase: DeleteReportUseCase
+    private readonly deleteReportUseCase: DeleteReportUseCase,
+    private readonly posthog?: PostHog
   ) {}
 
   /**
@@ -33,7 +36,7 @@ export class DeleteReportController {
         hash: body.hash,
         deleteToken: body.deleteToken
       });
-      
+
       // If report was not found or token didn't match, return 401
       if (!deleted) {
         return c.json(
@@ -41,7 +44,13 @@ export class DeleteReportController {
           401
         );
       }
-      
+
+      if (this.posthog) {
+        const distinctId = getDistinctId(c.req);
+        this.posthog.capture({ distinctId, event: 'report deleted', properties: { hash: body.hash } });
+        await this.posthog.shutdown();
+      }
+
       // Return 204 No Content on success
       return new Response(null, { status: 204 });
     } catch (error) {

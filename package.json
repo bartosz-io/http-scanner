@@ -24,6 +24,7 @@
 		"date-fns": "^4.1.0",
 		"hono": "^4.7.7",
 		"lucide-react": "^0.503.0",
+		"posthog-node": "^5.37.1",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.56.1",
