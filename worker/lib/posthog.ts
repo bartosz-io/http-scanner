@@ -11,6 +11,7 @@ export function createPostHogClient(token: string, host: string): PostHog {
 
 export function getDistinctId(req: { header: (name: string) => string | undefined }): string {
   return (
+    req.header('X-POSTHOG-DISTINCT-ID') ||
     req.header('CF-Connecting-IP') ||
     req.header('x-forwarded-for')?.split(',')[0].trim() ||
     'anonymous'

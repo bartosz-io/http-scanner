@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePostHog } from '@posthog/react';
 import { ScanFormViewModel, ScanRequestDTO, ScanResponseDTO } from '../types';
 
 /**
@@ -6,6 +7,7 @@ import { ScanFormViewModel, ScanRequestDTO, ScanResponseDTO } from '../types';
  * Designed to work with React Hook Form
  */
 export const useScanForm = () => {
+  const posthog = usePostHog();
   const [formState, setFormState] = useState<ScanFormViewModel>({
     url: '',
     isValid: false,
@@ -28,7 +30,9 @@ export const useScanForm = () => {
       isSubmitting: true,
       errorMessage: undefined
     }));
-    
+
+    posthog?.capture('scan submitted', { url });
+
     try {
       const response = await fetch('/api/scan', {
         method: 'POST',
@@ -58,6 +62,11 @@ export const useScanForm = () => {
       return scanResponse;
     } catch (error) {
       const typedError = error as Error & { cause?: { code?: string } };
+      posthog?.capture('scan failed', {
+        url,
+        error_message: typedError.message,
+        error_code: typedError.cause?.code,
+      });
       setFormState((prev) => ({
         ...prev,
         isSubmitting: false,

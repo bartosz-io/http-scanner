@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { usePostHog } from '@posthog/react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { HeaderEntry } from '../../types';
@@ -27,6 +28,8 @@ export const ReportView: React.FC = () => {
   const [showTokenWarning, setShowTokenWarning] = useState(false);
   
   // State is fully resolved
+
+  const posthog = usePostHog();
 
   // Use the custom hook to manage the report state and functionality
   const {
@@ -57,6 +60,16 @@ export const ReportView: React.FC = () => {
     console.error('Unexpected headers format:', report.headers);
     return { detected: [], missing: [], leaking: [] };
   }, [report]);
+
+  useEffect(() => {
+    if (report) {
+      posthog?.capture('report viewed', {
+        url: report.url,
+        score: report.score,
+        hash: report.hash,
+      });
+    }
+  }, [report, posthog]);
 
   // Effect to check if we should display the token warning
   // This runs when the report and tokenParam are available
