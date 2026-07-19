@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FetchReportResponseDTO } from '../types';
+import { isValidReportHash } from '../../shared/reportHash';
 
 /**
  * Custom hook for fetching and storing report data
@@ -14,7 +15,7 @@ export function useReportData(hash: string) {
   // Fetch report data
   const fetchReport = useCallback(async () => {
     // Skip fetching if hash is invalid
-    if (!hash || !/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       setError('Invalid report hash format');
       setErrorCode('INVALID_HASH_FORMAT');
       setIsLoading(false);

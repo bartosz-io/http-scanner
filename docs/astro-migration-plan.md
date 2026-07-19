@@ -137,6 +137,8 @@ Wymagania:
 
 ```text
 astro.config.mjs
+shared/
+└── reportHash.ts
 src/
 ├── components/
 │   ├── astro/
@@ -187,17 +189,18 @@ Po zakończeniu migracji usuwamy nieużywane:
 
 ### M0 — kontrakt migracji i safety net (0,5 dnia)
 
-- [ ] Utworzyć branch `codex/astro-migration`.
-- [ ] Zapisać statusy i przykładowe odpowiedzi dla `/`, `/api/reports`, `/api/report/:hash` i `/share/:hash`.
-- [ ] Zapisać listę obecnych eventów PostHog oraz właściwości, które muszą przetrwać.
-- [ ] Dodać minimalne testy funkcji mapujących stare URL-e i parsujących `/report/:hash`.
-- [ ] Ustalić testowy hash raportu do lokalnej weryfikacji bez używania produkcyjnego tokenu usuwania.
+- [x] Utworzyć branch `codex/astro-migration`.
+- [x] Zapisać statusy i przykładowe odpowiedzi dla `/`, `/api/reports`, `/api/report/:hash` i `/share/:hash`.
+- [x] Zapisać listę obecnych eventów PostHog oraz właściwości, które muszą przetrwać.
+- [x] Dodać minimalne testy funkcji mapujących stare URL-e i parsujących `/report/:hash`.
+- [x] Ustalić testowy hash raportu do lokalnej weryfikacji bez używania produkcyjnego tokenu usuwania.
 
 Kryterium ukończenia: znamy zachowanie, które migracja ma zachować, i mamy testowalne przykłady URL-i.
 
 ### M1 — równoległy build Astro (0,5–1 dnia)
 
 - [ ] Dodać `astro`, `@astrojs/react`, `@astrojs/sitemap` i narzędzia do `astro check`.
+- [ ] Usunąć lub zaktualizować bezpośrednie zależności wskazane przez baseline `npm audit`; nie używać automatycznego `audit fix` bez testów kontraktowych.
 - [ ] Utworzyć `astro.config.mjs` z React, Tailwind, aliasem `@` i `output: 'static'`.
 - [ ] Dostosować TypeScript i ESLint do plików Astro bez osłabiania istniejących reguł TS.
 - [ ] Wprowadzić minimalny browser-safe moduł analityczny i usunąć inicjalizację PostHog z modułowego poziomu `main.tsx`, aby prerender nie odwoływał się do `window`.
@@ -341,7 +344,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 
 | Milestone | Status | Dowód ukończenia |
 |---|---|---|
-| M0 — kontrakt i safety net | pending | testy URL + zapisane kontrakty |
+| M0 — kontrakt i safety net | complete | `astro-migration-baseline.md`; 31 testów; lint i legacy build przechodzą |
 | M1 — build Astro | pending | `astro check` i `astro build` |
 | M2 — homepage i islands | pending | statyczny HTML + działający skan |
 | M3 — report shell | pending | direct navigation przez Wrangler |

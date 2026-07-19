@@ -1,5 +1,6 @@
 import { Report } from '../entities/Report';
 import { ReportRepository } from '../interfaces/repositories/ReportRepository';
+import { isValidReportHash } from '../../shared/reportHash';
 
 /**
  * Use case for fetching a report by its hash
@@ -18,7 +19,7 @@ export class FetchReportUseCase {
    */
   async execute(hash: string): Promise<Report | null> {
     // Validate hash format (this is also done in the repository, but we validate here for completeness)
-    if (!hash || typeof hash !== 'string' || !/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       throw new Error('INVALID_HASH_FORMAT');
     }
 

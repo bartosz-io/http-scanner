@@ -1,0 +1,63 @@
+import { describe, expect, it } from 'vitest';
+import {
+  createSanitizedReportUrl,
+  parseDeleteToken,
+  parseReportPathname,
+} from './reportLocation';
+
+const REPORT_HASH = '9249232fefb9a1c0455ba007d7784f6c';
+const DELETE_TOKEN = '0123456789abcdef0123456789abcdef';
+
+describe('parseReportPathname', () => {
+  it('returns the hash from a canonical report path', () => {
+    expect(parseReportPathname(`/report/${REPORT_HASH}`)).toBe(REPORT_HASH);
+  });
+
+  it('accepts an optional trailing slash and uppercase hex', () => {
+    const uppercaseHash = REPORT_HASH.toUpperCase();
+    expect(parseReportPathname(`/report/${uppercaseHash}/`)).toBe(uppercaseHash);
+  });
+
+  it.each([
+    '/report/not-a-hash',
+    `/reports/${REPORT_HASH}`,
+    `/report/${REPORT_HASH}/extra`,
+    '/report/0123456789abcdef',
+  ])('rejects invalid path %s', (pathname) => {
+    expect(parseReportPathname(pathname)).toBeNull();
+  });
+});
+
+describe('parseDeleteToken', () => {
+  it('returns a valid delete token', () => {
+    expect(parseDeleteToken(`?token=${DELETE_TOKEN}`)).toBe(DELETE_TOKEN);
+  });
+
+  it.each(['', '?token=invalid', '?token=0123456789abcdef'])(
+    'rejects missing or invalid token in %s',
+    (search) => {
+      expect(parseDeleteToken(search)).toBeNull();
+    }
+  );
+});
+
+describe('createSanitizedReportUrl', () => {
+  it('removes the delete token while preserving unrelated parameters', () => {
+    expect(
+      createSanitizedReportUrl(
+        `/report/${REPORT_HASH}`,
+        `?token=${DELETE_TOKEN}&source=scan`
+      )
+    ).toBe(`/report/${REPORT_HASH}?source=scan`);
+  });
+
+  it('preserves a fragment and normalizes its prefix', () => {
+    expect(
+      createSanitizedReportUrl(
+        `/report/${REPORT_HASH}`,
+        `?token=${DELETE_TOKEN}`,
+        'headers'
+      )
+    ).toBe(`/report/${REPORT_HASH}#headers`);
+  });
+});

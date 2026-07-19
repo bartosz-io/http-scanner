@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FetchReportResponseDTO } from '../types';
 import { HeaderTabType } from '../types/reportTypes';
+import { isValidReportHash } from '../../shared/reportHash';
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error && error.message) {
@@ -42,7 +43,7 @@ export function useReportView(hash: string) {
   // Fetch report data
   const fetchReport = useCallback(async () => {
     // Skip fetching if hash is invalid
-    if (!hash || !/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       setError('Invalid report hash format');
       setErrorCode('INVALID_HASH_FORMAT');
       setIsLoading(false);

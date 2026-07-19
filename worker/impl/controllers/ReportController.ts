@@ -1,5 +1,6 @@
 import { Context } from 'hono';
 import { FetchReportResponseDTO } from '../../../src/types';
+import { isValidReportHash } from '../../../shared/reportHash';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
 import { ReportMapper } from '../mappers/ReportMapper';
 
@@ -22,7 +23,7 @@ export class ReportController {
     const hash = c.req.param('hash');
     
     // Validate hash format (32-character hex string)
-    if (!hash || !/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       throw new Error('INVALID_HASH_FORMAT');
     }
     

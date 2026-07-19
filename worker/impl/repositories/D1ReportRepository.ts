@@ -1,4 +1,5 @@
 import { Report } from '../../entities/Report';
+import { isValidReportHash } from '../../../shared/reportHash';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
 import { HeaderEntry } from '../../entities/HeaderEntry';
 
@@ -50,7 +51,7 @@ export class D1ReportRepository implements ReportRepository {
   
   async findByHash(hash: string): Promise<Report | null> {
     // Validate hash format (32-character hex string)
-    if (!/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       throw new Error('INVALID_HASH_FORMAT');
     }
     
@@ -85,7 +86,7 @@ export class D1ReportRepository implements ReportRepository {
   
   async deleteByHashAndToken(hash: string, deleteToken: string): Promise<boolean> {
     // Validate hash format (32-character hex string)
-    if (!/^[0-9a-f]{32}$/i.test(hash)) {
+    if (!isValidReportHash(hash)) {
       throw new Error('INVALID_HASH_FORMAT');
     }
     
