@@ -1,7 +1,7 @@
 # Migracja HTTPScanner z Vite SPA do Astro SSG
 
 Data planu: 2026-07-19  
-Status: M1 ukończone
+Status: M2 ukończone
 Szacowany czas: 5–7 dni roboczych
 
 ## 1. Cel migracji
@@ -217,17 +217,20 @@ a legacy UI i Worker nadal kompilują się osobno. Wyniki są w
 
 ### M2 — statyczny layout i homepage (1–1,5 dnia)
 
-- [ ] Przenieść globalny CSS/Tailwind do wejścia Astro.
-- [ ] Utworzyć `BaseLayout.astro` z `lang="en"`, viewportem, faviconą i propsami SEO.
-- [ ] Przenieść header, footer i nawigację do komponentów Astro z normalnymi `<a href>`.
-- [ ] Zmienić nazwę produktu w headerze z nagłówka H1 na link/tekst; homepage ma dokładnie jeden główny H1.
-- [ ] Wydzielić `ScannerIsland`, zastąpić `useNavigate()` normalnym przejściem do `/report/:hash?token=...` i użyć browser-safe modułu analitycznego zamiast `usePostHog()`.
-- [ ] Wydzielić `RecentScansIsland`; kliknięcie wiersza prowadzi do normalnego URL-a.
-- [ ] Utworzyć `/reports` jako działającą stronę z istniejącą paginacją, ale początkowo `noindex` i poza sitemap.
-- [ ] Usunąć lub zastąpić linki do nieistniejących `/about` i `/how-it-works`; nie publikować placeholderów.
-- [ ] Dodać skrypt przekierowujący stare hash routes.
+- [x] Przenieść globalny CSS/Tailwind do wejścia Astro.
+- [x] Utworzyć `BaseLayout.astro` z `lang="en"`, viewportem, faviconą i propsami SEO.
+- [x] Przenieść header, footer i nawigację do komponentów Astro z normalnymi `<a href>`.
+- [x] Zmienić nazwę produktu w headerze z nagłówka H1 na link/tekst; homepage ma dokładnie jeden główny H1.
+- [x] Wydzielić `ScannerIsland`, zastąpić `useNavigate()` normalnym przejściem do `/report/:hash?token=...` i użyć browser-safe modułu analitycznego zamiast `usePostHog()`.
+- [x] Wydzielić `RecentScansIsland`; kliknięcie wiersza prowadzi do normalnego URL-a.
+- [x] Utworzyć `/reports` jako działającą stronę z istniejącą paginacją, ale początkowo `noindex` i poza sitemap.
+- [x] Usunąć lub zastąpić linki do nieistniejących `/about` i `/how-it-works`; nie publikować placeholderów.
+- [x] Dodać skrypt przekierowujący stare hash routes.
 
-Kryterium ukończenia: `dist/index.html` zawiera title, description, canonical, H1, opis narzędzia i HTML formularza przed uruchomieniem JavaScriptu; w interfejsie nie ma linków `/#/`.
+Kryterium ukończenia: `dist-astro/index.html` zawiera title, description,
+canonical, pojedynczy H1, opis narzędzia i HTML formularza przed uruchomieniem
+JavaScriptu; w interfejsie nie ma linków `/#/`. Wyniki są w
+`docs/astro-migration-m2.md`.
 
 ### M3 — raport bez React Routera (1–1,5 dnia)
 
@@ -351,7 +354,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 |---|---|---|
 | M0 — kontrakt i safety net | complete | `astro-migration-baseline.md`; 31 testów; lint i legacy build przechodzą |
 | M1 — build Astro | complete | `astro-migration-m1.md`; check, oba buildy, proxy i hydratacja przechodzą |
-| M2 — homepage i islands | pending | statyczny HTML + działający skan |
+| M2 — homepage i islands | complete | `astro-migration-m2.md`; statyczny HTML, dane API i islands przechodzą |
 | M3 — report shell | pending | direct navigation przez Wrangler |
 | M4 — SEO techniczne | pending | sitemap, robots, canonical, prawdziwe 404 |
 | M5 — PostHog i hydratacja | pending | event audit + brak tokenu |

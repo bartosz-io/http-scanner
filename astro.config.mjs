@@ -11,21 +11,30 @@ export default defineConfig({
   build: {
     format: 'directory',
   },
-  integrations: [react(), sitemap()],
+  integrations: [
+    react(),
+    sitemap({
+      filter: (page) => {
+        const pathname = new URL(page).pathname.replace(/\/$/, '') || '/';
+        return pathname !== '/reports' && !pathname.startsWith('/report/');
+      },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
       },
     },
     server: {
       proxy: {
-        '/api': {
+        '^/api(?:/|$)': {
           target: 'http://localhost:8787',
           changeOrigin: true,
         },
-        '/share': {
+        '^/share(?:/|$)': {
           target: 'http://localhost:8787',
           changeOrigin: true,
         },

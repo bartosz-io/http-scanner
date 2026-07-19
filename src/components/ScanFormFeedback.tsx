@@ -32,7 +32,7 @@ export const ScanFormFeedback: React.FC<ScanFormFeedbackProps> = ({
           <AlertDescription className="text-amber-700">
             This domain was scanned recently. Please wait at least one minute between scans of the same domain.
             <div className="mt-2 text-sm">
-              You can search for existing reports in the <a href="/#/reports" className="underline font-medium hover:text-amber-800">Reports section</a>.
+              You can search for existing reports in the <a href="/reports" className="underline font-medium hover:text-amber-800">Reports section</a>.
             </div>
           </AlertDescription>
         </Alert>

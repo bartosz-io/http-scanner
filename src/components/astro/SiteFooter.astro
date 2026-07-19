@@ -1,0 +1,49 @@
+---
+import scannerLogo from '@/assets/scanner-logo.png';
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-border bg-background py-10">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+      <div>
+        <a href="/" class="mb-4 flex items-center gap-2">
+          <img src={scannerLogo.src} alt="" width="24" height="24" class="h-6 w-6" />
+          <span class="text-lg font-bold">HTTP Scanner</span>
+        </a>
+        <p class="max-w-sm text-muted-foreground">
+          Analyze HTTP security headers and find practical opportunities to harden your website.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="mb-4 font-medium">Quick links</h2>
+        <ul class="space-y-2">
+          <li><a href="/" class="text-muted-foreground hover:text-foreground">Scan a website</a></li>
+          <li><a href="/reports" class="text-muted-foreground hover:text-foreground">Recent reports</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="mb-4 font-medium">Security resources</h2>
+        <ul class="space-y-2">
+          <li>
+            <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground">
+              MDN HTTP headers
+            </a>
+          </li>
+          <li>
+            <a href="https://owasp.org/www-project-secure-headers/" target="_blank" rel="noopener noreferrer" class="text-muted-foreground hover:text-foreground">
+              OWASP Secure Headers Project
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-8 border-t border-border pt-8 text-center text-muted-foreground">
+      <p>© {currentYear} HTTP Scanner. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

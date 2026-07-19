@@ -1,0 +1,49 @@
+---
+import SiteFooter from '@/components/astro/SiteFooter.astro';
+import SiteHeader from '@/components/astro/SiteHeader.astro';
+import SeoHead from '@/components/astro/SeoHead.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  noindex?: boolean;
+}
+
+const { title, description, canonicalPath, noindex = false } = Astro.props;
+const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      noindex={noindex}
+    />
+  </head>
+  <body>
+    <div class="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main class="flex-1">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
+
+    <script>
+      import { getLegacyHashRedirect } from '@/lib/legacyHashRoute';
+      import { initializePostHog } from '@/lib/posthogClient';
+
+      const redirect = getLegacyHashRedirect(window.location.hash);
+      if (redirect) {
+        window.location.replace(redirect);
+      } else {
+        initializePostHog();
+      }
+    </script>
+  </body>
+</html>

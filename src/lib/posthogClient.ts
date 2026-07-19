@@ -1,5 +1,7 @@
 import posthog from 'posthog-js';
 
+type EventProperties = Record<string, unknown>;
+
 export function initializePostHog(): typeof posthog | null {
   if (typeof window === 'undefined') {
     return null;
@@ -19,4 +21,11 @@ export function initializePostHog(): typeof posthog | null {
   }
 
   return posthog;
+}
+
+export function capturePostHogEvent(
+  eventName: string,
+  properties?: EventProperties
+): void {
+  initializePostHog()?.capture(eventName, properties);
 }

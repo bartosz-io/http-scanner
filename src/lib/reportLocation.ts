@@ -1,4 +1,4 @@
-import { isValidReportHash } from '../../shared/reportHash';
+import { isValidReportHash } from '@shared/reportHash';
 
 const DELETE_TOKEN_PATTERN = /^[0-9a-f]{32}$/i;
 const REPORT_PATH_PATTERN = /^\/report\/([^/]+)\/?$/;
@@ -12,6 +12,24 @@ export function parseReportPathname(pathname: string): string | null {
 export function parseDeleteToken(search: string): string | null {
   const token = new URLSearchParams(search).get('token');
   return token && DELETE_TOKEN_PATTERN.test(token) ? token : null;
+}
+
+export function createReportPath(hash: string, deleteToken?: string): string {
+  if (!isValidReportHash(hash)) {
+    throw new Error('Cannot create a report path from an invalid hash');
+  }
+
+  const pathname = `/report/${hash}`;
+  if (!deleteToken) {
+    return pathname;
+  }
+
+  if (!DELETE_TOKEN_PATTERN.test(deleteToken)) {
+    throw new Error('Cannot create a report path from an invalid delete token');
+  }
+
+  const params = new URLSearchParams({ token: deleteToken });
+  return `${pathname}?${params.toString()}`;
 }
 
 export function createSanitizedReportUrl(

@@ -1,0 +1,25 @@
+---
+import { ReportsIsland } from '@/components/islands/ReportsIsland';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const title = 'Recent HTTP Security Reports — HTTP Scanner';
+const description = 'Browse recent public HTTP security header scans and open their detailed reports.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath="/reports"
+  noindex
+>
+  <section class="container mx-auto px-4 py-12 sm:py-16">
+    <div class="mb-8 max-w-2xl">
+      <h1 class="text-4xl font-bold tracking-tight">Recent security reports</h1>
+      <p class="mt-3 text-lg text-muted-foreground">
+        Browse public scans, compare security-header scores and open a detailed report for any website.
+      </p>
+    </div>
+
+    <ReportsIsland client:load />
+  </section>
+</BaseLayout>

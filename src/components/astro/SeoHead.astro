@@ -1,0 +1,26 @@
+---
+import scannerLogo from '@/assets/scanner-logo.png';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl: URL;
+  noindex?: boolean;
+}
+
+const { title, description, canonicalUrl, noindex = false } = Astro.props;
+---
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+<link rel="icon" type="image/png" href={scannerLogo.src} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="HTTP Scanner" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta name="twitter:card" content="summary" />
+<title>{title}</title>

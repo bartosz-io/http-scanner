@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createReportPath,
   createSanitizedReportUrl,
   parseDeleteToken,
   parseReportPathname,
@@ -39,6 +40,25 @@ describe('parseDeleteToken', () => {
       expect(parseDeleteToken(search)).toBeNull();
     }
   );
+});
+
+describe('createReportPath', () => {
+  it('creates a normal report URL without a hash route', () => {
+    expect(createReportPath(REPORT_HASH)).toBe(`/report/${REPORT_HASH}`);
+  });
+
+  it('adds a validated delete token after a successful scan', () => {
+    expect(createReportPath(REPORT_HASH, DELETE_TOKEN)).toBe(
+      `/report/${REPORT_HASH}?token=${DELETE_TOKEN}`
+    );
+  });
+
+  it('rejects malformed report data', () => {
+    expect(() => createReportPath('invalid')).toThrow(/invalid hash/);
+    expect(() => createReportPath(REPORT_HASH, 'invalid')).toThrow(
+      /invalid delete token/
+    );
+  });
 });
 
 describe('createSanitizedReportUrl', () => {

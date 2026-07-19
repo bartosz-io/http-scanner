@@ -1,15 +1,15 @@
 import React from 'react';
 import type { ReportListItemDTO } from '../types';
-import { useNavigate } from 'react-router-dom';
 import { TableCell, TableRow as ShadcnTableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from 'date-fns';
+import { createReportPath } from '../lib/reportLocation';
 
 interface TableRowProps {
   scan: ReportListItemDTO;
 }
 
 export const TableRow: React.FC<TableRowProps> = ({ scan }: TableRowProps) => {
-  const navigate = useNavigate();
+  const reportPath = createReportPath(scan.hash);
   
   // Format the URL for display (truncate if too long)
   const displayUrl = () => {
@@ -49,7 +49,7 @@ export const TableRow: React.FC<TableRowProps> = ({ scan }: TableRowProps) => {
   };
   
   const handleRowClick = () => {
-    navigate(`/report/${scan.hash}`);
+    window.location.assign(reportPath);
   };
   
   return (
@@ -57,7 +57,11 @@ export const TableRow: React.FC<TableRowProps> = ({ scan }: TableRowProps) => {
       className="cursor-pointer hover:bg-muted/50 transition-colors text-left"
       onClick={handleRowClick}
     >
-      <TableCell className="font-medium text-left">{displayUrl()}</TableCell>
+      <TableCell className="font-medium text-left">
+        <a href={reportPath} className="hover:underline" onClick={(event) => event.stopPropagation()}>
+          {displayUrl()}
+        </a>
+      </TableCell>
       <TableCell className="text-left">{formatDate()}</TableCell>
       <TableCell className={`font-medium text-left ${getScoreColorClass()}`}>
         {scan.score.toFixed(1)}
