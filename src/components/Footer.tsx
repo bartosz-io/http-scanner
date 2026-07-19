@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import scannerLogo from '../assets/scanner-logo.png';
+import scannerLogo from '../assets/scanner-logo.png?url';
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();

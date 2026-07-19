@@ -1,7 +1,7 @@
 # Migracja HTTPScanner z Vite SPA do Astro SSG
 
 Data planu: 2026-07-19  
-Status: plan zatwierdzany przed implementacją  
+Status: M1 ukończone
 Szacowany czas: 5–7 dni roboczych
 
 ## 1. Cel migracji
@@ -21,7 +21,9 @@ Po migracji:
 
 ### 2.1 Astro działa jako SSG
 
-Astro buduje publiczne strony do `dist/`. Ustawiamy jawnie:
+Docelowo Astro buduje publiczne strony do `dist/`. W M1 równoległy, niewdrażany
+build trafia do `dist-astro/`, aby nie nadpisać artefaktów legacy przed cutoverem.
+W M6 zmienimy `outDir` na `dist/`. Ustawiamy jawnie:
 
 ```js
 export default defineConfig({
@@ -199,16 +201,19 @@ Kryterium ukończenia: znamy zachowanie, które migracja ma zachować, i mamy te
 
 ### M1 — równoległy build Astro (0,5–1 dnia)
 
-- [ ] Dodać `astro`, `@astrojs/react`, `@astrojs/sitemap` i narzędzia do `astro check`.
-- [ ] Usunąć lub zaktualizować bezpośrednie zależności wskazane przez baseline `npm audit`; nie używać automatycznego `audit fix` bez testów kontraktowych.
-- [ ] Utworzyć `astro.config.mjs` z React, Tailwind, aliasem `@` i `output: 'static'`.
-- [ ] Dostosować TypeScript i ESLint do plików Astro bez osłabiania istniejących reguł TS.
-- [ ] Wprowadzić minimalny browser-safe moduł analityczny i usunąć inicjalizację PostHog z modułowego poziomu `main.tsx`, aby prerender nie odwoływał się do `window`.
-- [ ] Dodać skrypty `dev:web`, `dev:worker`, `check`, `build`, `preview` i `deploy`.
-- [ ] Zachować tymczasowy `build:legacy`, dopóki homepage i raport nie przejdą testów.
-- [ ] Ustawić proxy deweloperskie `/api` i `/share` z Astro do lokalnego Workera.
+- [x] Dodać `astro`, `@astrojs/react`, `@astrojs/sitemap` i narzędzia do `astro check`.
+- [x] Usunąć lub zaktualizować bezpośrednie zależności wskazane przez baseline `npm audit`; nie używać automatycznego `audit fix` bez testów kontraktowych.
+- [x] Utworzyć `astro.config.mjs` z React, Tailwind, aliasem `@` i `output: 'static'`.
+- [x] Dostosować TypeScript i ESLint do plików Astro bez osłabiania istniejących reguł TS.
+- [x] Wprowadzić minimalny browser-safe moduł analityczny i usunąć inicjalizację PostHog z modułowego poziomu `main.tsx`, aby prerender nie odwoływał się do `window`.
+- [x] Dodać skrypty `dev:web`, `dev:worker`, `check`, `build`, `preview` i `deploy`.
+- [x] Zachować tymczasowy `build:legacy`, dopóki homepage i raport nie przejdą testów.
+- [x] Ustawić proxy deweloperskie `/api` i `/share` z Astro do lokalnego Workera.
 
-Kryterium ukończenia: pusty layout Astro buduje się do `dist`, a istniejący Worker nadal kompiluje się osobno.
+Kryterium ukończenia: minimalna strona Astro buduje się równolegle do `dist-astro`,
+jej wyspa React hydratyzuje się w przeglądarce, proxy trafia do lokalnego Workera,
+a legacy UI i Worker nadal kompilują się osobno. Wyniki są w
+`docs/astro-migration-m1.md`.
 
 ### M2 — statyczny layout i homepage (1–1,5 dnia)
 
@@ -345,7 +350,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | Milestone | Status | Dowód ukończenia |
 |---|---|---|
 | M0 — kontrakt i safety net | complete | `astro-migration-baseline.md`; 31 testów; lint i legacy build przechodzą |
-| M1 — build Astro | pending | `astro check` i `astro build` |
+| M1 — build Astro | complete | `astro-migration-m1.md`; check, oba buildy, proxy i hydratacja przechodzą |
 | M2 — homepage i islands | pending | statyczny HTML + działający skan |
 | M3 — report shell | pending | direct navigation przez Wrangler |
 | M4 — SEO techniczne | pending | sitemap, robots, canonical, prawdziwe 404 |

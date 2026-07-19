@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { usePostHog } from '@posthog/react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HeaderEntry } from '../../types';
+import type { HeaderEntry } from '../../types';
 import { useReportData } from '../../hooks/useReportData';
 import { Header } from '../Header';
 import { Footer } from '../Footer';

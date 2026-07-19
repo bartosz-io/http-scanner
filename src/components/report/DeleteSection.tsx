@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { DeleteSectionProps } from '../../types/reportTypes';
+import type { DeleteSectionProps } from '../../types/reportTypes';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { useReportDelete } from '../../hooks/useReportDelete';
 import { usePostHog } from '@posthog/react';

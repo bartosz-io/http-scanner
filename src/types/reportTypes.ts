@@ -1,4 +1,4 @@
-import { FetchReportResponseDTO, HeaderEntry } from "../types";
+import type { FetchReportResponseDTO, HeaderEntry } from "../types";
 
 /**
  * Enum representing the different types of header tabs in the Report View

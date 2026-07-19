@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReportListItemDTO } from '../types';
+import type { ReportListItemDTO } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { TableCell, TableRow as ShadcnTableRow } from "@/components/ui/table";
 import { formatDistanceToNow } from 'date-fns';

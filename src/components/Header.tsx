@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationMenu } from './NavigationMenu';
-import scannerLogo from '../assets/scanner-logo.png';
+import scannerLogo from '../assets/scanner-logo.png?url';
 
 export const Header: React.FC = () => {
   return (

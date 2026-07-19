@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePostHog } from '@posthog/react';
-import { ScanFormViewModel, ScanRequestDTO, ScanResponseDTO } from '../types';
+import type { ScanFormViewModel, ScanRequestDTO, ScanResponseDTO } from '../types';
 
 /**
  * Custom hook for handling scan form operations

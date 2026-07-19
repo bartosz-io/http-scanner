@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2, ChevronRight, ExternalLink, Info, Lightbul
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { HeaderEntry } from '@/types';
+import type { HeaderEntry } from '@/types';
 import { HeaderTabType } from '@/types/reportTypes';
 import { getHeaderGuide } from '@/lib/headerGuides';
 import { FormattedHeaderValue } from './FormattedHeaderValue';

@@ -1,11 +1,11 @@
 import React from 'react';
 import { ScanForm } from './ScanForm';
 import { ScanFormFeedback } from './ScanFormFeedback';
-import { ScanResponseDTO } from '../types';
+import type { ScanResponseDTO } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import scannerLogo from '../assets/scanner-logo.png';
+import scannerLogo from '../assets/scanner-logo.png?url';
 
 export const ScanSection: React.FC = () => {
   const navigate = useNavigate();

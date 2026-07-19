@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScoreGaugeProps } from '../../types/reportTypes';
+import type { ScoreGaugeProps } from '../../types/reportTypes';
 
 /**
  * ScoreGauge component displaying a circular gauge representing the security score

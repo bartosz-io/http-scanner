@@ -1,0 +1,28 @@
+---
+import { AstroMigrationProbe } from '@/components/islands/AstroMigrationProbe';
+import '../index.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:," />
+    <title>HTTP Scanner — Astro migration scaffold</title>
+  </head>
+  <body>
+    <main class="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6">
+      <p class="text-sm text-muted-foreground">Internal migration scaffold</p>
+      <h1 class="text-4xl font-bold">HTTP Scanner Astro build</h1>
+      <p>
+        This parallel output verifies static generation, Tailwind and React hydration.
+        It is not connected to the production deploy command.
+      </p>
+      <div>
+        <AstroMigrationProbe client:load />
+      </div>
+    </main>
+  </body>
+</html>

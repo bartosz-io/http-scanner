@@ -1,6 +1,6 @@
 import React from 'react';
 import { Search } from 'lucide-react';
-import { HeaderListProps } from '@/types/reportTypes';
+import type { HeaderListProps } from '@/types/reportTypes';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { HeaderCard } from './HeaderCard';

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { HeaderTabType, HeaderTabsProps } from '../../types/reportTypes';
+import { HeaderTabType } from '../../types/reportTypes';
+import type { HeaderTabsProps } from '../../types/reportTypes';
 
 /**
  * HeaderTabs component for navigating between different header categories

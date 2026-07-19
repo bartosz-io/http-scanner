@@ -1,6 +1,7 @@
 import React from 'react';
 import { TabsContent, Tabs } from '@/components/ui/tabs';
-import { HeadersSectionProps, HeaderTabType } from '../../types/reportTypes';
+import { HeaderTabType } from '../../types/reportTypes';
+import type { HeadersSectionProps } from '../../types/reportTypes';
 import { useHeaderTabs } from '../../hooks/useHeaderTabs';
 import { HeaderTabs } from './HeaderTabs';
 import { HeaderList } from './HeaderList';

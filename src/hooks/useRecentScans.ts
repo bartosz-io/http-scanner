@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ReportListItemDTO, ReportsResponseDTO } from '../types';
+import type { ReportListItemDTO, ReportsResponseDTO } from '../types';
 
 export const useRecentScans = (limit = 10) => {
   const [recentScans, setRecentScans] = useState<{

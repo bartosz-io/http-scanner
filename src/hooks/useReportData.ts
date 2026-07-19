@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FetchReportResponseDTO } from '../types';
+import type { FetchReportResponseDTO } from '../types';
 import { isValidReportHash } from '../../shared/reportHash';
 
 /**

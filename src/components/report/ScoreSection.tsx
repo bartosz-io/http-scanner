@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScoreSectionProps } from '../../types/reportTypes';
+import type { ScoreSectionProps } from '../../types/reportTypes';
 import { ScoreGauge } from './ScoreGauge';
 
 /**

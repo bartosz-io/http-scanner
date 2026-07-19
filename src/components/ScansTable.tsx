@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReportListItemDTO } from '../types';
+import type { ReportListItemDTO } from '../types';
 import { TableRow } from './TableRow.tsx';
 import {
   Table,

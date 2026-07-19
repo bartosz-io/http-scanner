@@ -1,6 +1,6 @@
 import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ReportHeaderProps } from '../../types/reportTypes';
+import type { ReportHeaderProps } from '../../types/reportTypes';
 
 /**
  * ReportHeader component displays the URL and timestamp of the scan

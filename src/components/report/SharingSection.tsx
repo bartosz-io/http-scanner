@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { SharingSectionProps } from '../../types/reportTypes';
+import type { SharingSectionProps } from '../../types/reportTypes';
 import { usePostHog } from '@posthog/react';
 
 /**
