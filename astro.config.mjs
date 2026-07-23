@@ -3,6 +3,7 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { SITE_ORIGIN, shouldIncludeInSitemap } from './src/lib/seoPolicy.ts';
 
 const reportPathPattern = /^\/report\/[0-9a-f]{32}\/?$/i;
 const localWorkerOrigin = (
@@ -32,7 +33,7 @@ function reportDevRedirect() {
 }
 
 export default defineConfig({
-  site: 'https://httpscanner.com',
+  site: SITE_ORIGIN,
   output: 'static',
   outDir: './dist-astro',
   build: {
@@ -41,12 +42,7 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
-      filter: (page) => {
-        const pathname = new URL(page).pathname.replace(/\/$/, '') || '/';
-        return pathname !== '/reports'
-          && pathname !== '/report'
-          && !pathname.startsWith('/report/');
-      },
+      filter: shouldIncludeInSitemap,
     }),
   ],
   vite: {

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /report/
+Disallow: /reports
+Disallow: /share/
+
+Sitemap: https://httpscanner.com/sitemap-index.xml

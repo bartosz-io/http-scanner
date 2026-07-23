@@ -249,13 +249,13 @@ Kryterium ukończenia: bezpośrednie wejście i odświeżenie `/report/:hash` dz
 
 ### M4 — SEO techniczne i obsługa błędów (0,5–1 dnia)
 
-- [ ] Dodać `site`, canonicale i centralne propsy metadanych.
-- [ ] Dodać `@astrojs/sitemap` z filtrem wykluczającym `/report/`, `/reports`, `/share/` i strony `noindex`.
-- [ ] Dodać `robots.txt`.
-- [ ] Dodać statyczne `404.astro` i `not_found_handling: "404-page"`.
-- [ ] Sprawdzić, że nieznany URL nie otrzymuje homepage ze statusem 200.
-- [ ] Ustawić odpowiednie cache headers dla hashowanych assetów; HTML pozostawić rewalidowalny.
-- [ ] Nie dodawać jeszcze stron przyszłych checkerów do routera ani sitemap.
+- [x] Zweryfikować istniejące canonicale i centralne propsy metadanych oraz wydzielić produkcyjny `SITE_ORIGIN`.
+- [x] Dodać `@astrojs/sitemap` z filtrem wykluczającym `/report/`, `/reports`, `/share/` i strony `noindex`.
+- [x] Dodać `robots.txt`.
+- [x] Dodać statyczne `404.astro` i `not_found_handling: "404-page"`.
+- [x] Sprawdzić, że nieznany URL nie otrzymuje homepage ze statusem 200.
+- [x] Ustawić odpowiednie cache headers dla hashowanych assetów; HTML pozostawić rewalidowalny.
+- [x] Nie dodawać jeszcze stron przyszłych checkerów do routera ani sitemap.
 
 Kryterium ukończenia: crawler otrzymuje poprawne statusy, canonicale, robots i sitemap bez pustych/technicznych tras.
 
@@ -356,7 +356,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | M1 — build Astro | complete | `astro-migration-m1.md`; check, oba buildy, proxy i hydratacja przechodzą |
 | M2 — homepage i islands | complete | `astro-migration-m2.md`; statyczny HTML, dane API i islands przechodzą |
 | M3 — report shell | complete | `astro-migration-m3.md`; direct navigation i refresh przez Wrangler |
-| M4 — SEO techniczne | pending | sitemap, robots, canonical, prawdziwe 404 |
+| M4 — SEO techniczne | complete | `astro-migration-m4.md`; 57 testów; sitemap, robots, canonical, prawdziwe 404 i cache headers |
 | M5 — PostHog i hydratacja | pending | event audit + brak tokenu |
 | M6 — cleanup i cutover | pending | pełna macierz testów + produkcyjny smoke test |
 
