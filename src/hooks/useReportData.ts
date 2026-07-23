@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { FetchReportResponseDTO } from '../types';
-import { isValidReportHash } from '../../shared/reportHash';
+import { isValidReportHash } from '@shared/reportHash';
+
+class ReportApiError extends Error {
+  constructor(message: string, readonly code: string) {
+    super(message);
+  }
+}
 
 /**
  * Custom hook for fetching and storing report data
@@ -30,15 +36,18 @@ export function useReportData(hash: string) {
       const response = await fetch(`/api/report/${hash}`);
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch report');
+        const errorData = await response.json() as { error?: string; code?: string };
+        throw new ReportApiError(
+          errorData.error || 'Failed to fetch report',
+          errorData.code || 'UNKNOWN_ERROR'
+        );
       }
       
       const data = await response.json();
       setReport(data);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      const errorCode = (err as { code?: string })?.code || 'UNKNOWN_ERROR';
+      const errorCode = err instanceof ReportApiError ? err.code : 'UNKNOWN_ERROR';
       setError(errorMessage);
       setErrorCode(errorCode);
     } finally {
@@ -48,7 +57,7 @@ export function useReportData(hash: string) {
   
   // Initialize data fetching
   useEffect(() => {
-    fetchReport();
+    void fetchReport();
   }, [fetchReport]);
   
   return {

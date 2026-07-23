@@ -33,7 +33,7 @@ export const TokenWarningAlert: React.FC<TokenWarningAlertProps> = ({ deleteToke
           <span className="text-xs font-medium flex-shrink-0">
             Save this token for deletion:
           </span>
-          <div className="flex-1 p-1.5 bg-background border rounded-md font-mono text-xs overflow-hidden flex min-w-0">
+          <div className="ph-no-capture ph-mask flex min-w-0 flex-1 overflow-hidden rounded-md border bg-background p-1.5 font-mono text-xs">
             <div className="truncate">
               {deleteToken}
             </div>

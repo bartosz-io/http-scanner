@@ -8,7 +8,13 @@
 	"main": "worker/index.ts",
 	"compatibility_date": "2025-04-17",
 	"assets": {
-		// "not_found_handling": "single-page-application"
+		"directory": "./dist-astro",
+		"binding": "ASSETS",
+		"run_worker_first": [
+			"/api/*",
+			"/share/*",
+			"/report/*"
+		]
 	},
 	"observability": {
 		"enabled": true

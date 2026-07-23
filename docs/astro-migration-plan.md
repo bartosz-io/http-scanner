@@ -1,7 +1,7 @@
 # Migracja HTTPScanner z Vite SPA do Astro SSG
 
 Data planu: 2026-07-19  
-Status: M2 ukończone
+Status: M3 ukończone
 Szacowany czas: 5–7 dni roboczych
 
 ## 1. Cel migracji
@@ -234,16 +234,16 @@ JavaScriptu; w interfejsie nie ma linków `/#/`. Wyniki są w
 
 ### M3 — raport bez React Routera (1–1,5 dnia)
 
-- [ ] Zmienić `ReportView`, aby przyjmował `hash` i `token` jako props zamiast `useParams()` i `useSearchParams()`.
-- [ ] Utworzyć `ReportIsland`, który bezpiecznie parsuje `window.location` po stronie klienta.
-- [ ] Przenieść eventy z `usePostHog()` w komponentach raportu, share i delete do wspólnego modułu analitycznego.
-- [ ] Przenieść statyczny header/footer raportu do shellu Astro.
-- [ ] Zachować skeleton, błędy API, udostępnianie i usuwanie raportu.
-- [ ] Usunąć token z URL-a po zapisaniu go w stanie komponentu.
-- [ ] Dodać `reportShellRoute` w Hono i binding `ASSETS` do typu `Env`.
-- [ ] Dodać `X-Robots-Tag` oraz meta robots dla report shellu.
-- [ ] Zaktualizować `/share/:hash`, aby przekierowywał do `/report/:hash`.
-- [ ] Zmienić wszystkie powroty po usunięciu/błędzie z `/#/` na `/`.
+- [x] Zmienić `ReportView`, aby przyjmował `hash` i `token` jako props zamiast `useParams()` i `useSearchParams()`.
+- [x] Utworzyć `ReportIsland`, który bezpiecznie parsuje `window.location` po stronie klienta.
+- [x] Przenieść eventy z `usePostHog()` w komponentach raportu, share i delete do wspólnego modułu analitycznego.
+- [x] Przenieść statyczny header/footer raportu do shellu Astro.
+- [x] Zachować skeleton, błędy API, udostępnianie i usuwanie raportu.
+- [x] Usunąć token z URL-a po zapisaniu go w stanie komponentu.
+- [x] Dodać `reportShellRoute` w Hono i binding `ASSETS` do typu `Env`.
+- [x] Dodać `X-Robots-Tag` oraz meta robots dla report shellu.
+- [x] Zaktualizować `/share/:hash`, aby przekierowywał do `/report/:hash`.
+- [x] Zmienić wszystkie powroty po usunięciu/błędzie z `/#/` na `/`.
 
 Kryterium ukończenia: bezpośrednie wejście i odświeżenie `/report/:hash` działa bez hash routera, a raport nie jest indeksowalny.
 
@@ -355,7 +355,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | M0 — kontrakt i safety net | complete | `astro-migration-baseline.md`; 31 testów; lint i legacy build przechodzą |
 | M1 — build Astro | complete | `astro-migration-m1.md`; check, oba buildy, proxy i hydratacja przechodzą |
 | M2 — homepage i islands | complete | `astro-migration-m2.md`; statyczny HTML, dane API i islands przechodzą |
-| M3 — report shell | pending | direct navigation przez Wrangler |
+| M3 — report shell | complete | `astro-migration-m3.md`; direct navigation i refresh przez Wrangler |
 | M4 — SEO techniczne | pending | sitemap, robots, canonical, prawdziwe 404 |
 | M5 — PostHog i hydratacja | pending | event audit + brak tokenu |
 | M6 — cleanup i cutover | pending | pełna macierz testów + produkcyjny smoke test |

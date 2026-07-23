@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['.astro', '.playwright-cli', 'dist', 'dist-astro'] },
+  { ignores: ['.astro', '.playwright-cli', '.wrangler', 'dist', 'dist-astro'] },
   ...astro.configs.recommended,
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],

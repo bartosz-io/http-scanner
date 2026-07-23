@@ -3,19 +3,18 @@ import { Button } from '@/components/ui/button';
 import type { DeleteSectionProps } from '../../types/reportTypes';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { useReportDelete } from '../../hooks/useReportDelete';
-import { usePostHog } from '@posthog/react';
+import { capturePostHogEvent } from '../../lib/posthogClient';
 
 /**
  * DeleteSection component for deleting a report
  */
 export const DeleteSection: React.FC<DeleteSectionProps> = ({ hash }) => {
-  const posthog = usePostHog();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { deleteReport, isDeleting, deleteError } = useReportDelete(hash);
   
   // Open delete confirmation modal
   const handleOpenModal = () => {
-    posthog?.capture('delete report initiated', { hash });
+    capturePostHogEvent('delete report initiated', { hash });
     setIsModalOpen(true);
   };
   

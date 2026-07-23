@@ -1,13 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import type { SharingSectionProps } from '../../types/reportTypes';
-import { usePostHog } from '@posthog/react';
+import { capturePostHogEvent } from '../../lib/posthogClient';
 
 /**
  * SharingSection component for sharing the report on social media
  */
 export const SharingSection: React.FC<SharingSectionProps> = ({ score, hash, shareImageUrl }) => {
-  const posthog = usePostHog();
   // Generate share text
   const roundedScore = Math.round(score);
   const shareText = `I scored ${roundedScore}/100 on security headers with HTTP Scanner!`;
@@ -38,7 +37,7 @@ export const SharingSection: React.FC<SharingSectionProps> = ({ score, hash, sha
 
   // Handle share button clicks
   const handleShare = (platform: 'linkedin' | 'twitter') => {
-    posthog?.capture('report shared', { platform, hash, score: roundedScore });
+    capturePostHogEvent('report shared', { platform, hash, score: roundedScore });
     const shareUrl = platform === 'linkedin' ? getLinkedInShareUrl() : getTwitterShareUrl();
     window.open(shareUrl, '_blank', 'width=600,height=400');
   };

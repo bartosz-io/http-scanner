@@ -3,6 +3,13 @@ import { isValidReportHash } from '@shared/reportHash';
 const DELETE_TOKEN_PATTERN = /^[0-9a-f]{32}$/i;
 const REPORT_PATH_PATTERN = /^\/report\/([^/]+)\/?$/;
 
+export interface BrowserReportLocation {
+  hash: string | null;
+  deleteToken: string | null;
+  sanitizedUrl: string;
+  shouldSanitize: boolean;
+}
+
 export function parseReportPathname(pathname: string): string | null {
   const match = REPORT_PATH_PATTERN.exec(pathname);
   const hash = match?.[1];
@@ -48,4 +55,19 @@ export function createSanitizedReportUrl(
     : '';
 
   return `${pathname}${query ? `?${query}` : ''}${normalizedFragment}`;
+}
+
+export function parseBrowserReportLocation(
+  pathname: string,
+  search: string,
+  fragment = ''
+): BrowserReportLocation {
+  const params = new URLSearchParams(search);
+
+  return {
+    hash: parseReportPathname(pathname),
+    deleteToken: parseDeleteToken(search),
+    sanitizedUrl: createSanitizedReportUrl(pathname, search, fragment),
+    shouldSanitize: params.has('token'),
+  };
 }

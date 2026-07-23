@@ -7,7 +7,7 @@
 		"dev": "vite",
 		"dev:legacy": "vite",
 		"dev:web": "ASTRO_TELEMETRY_DISABLED=1 astro dev",
-		"dev:worker": "wrangler dev --local --port 8787",
+		"dev:worker": "wrangler dev --config wrangler.jsonc --local --port 8787",
 		"build": "npm run build:legacy",
 		"build:legacy": "tsc -b && vite build",
 		"build:astro": "npm run check && ASTRO_TELEMETRY_DISABLED=1 astro build",
@@ -17,7 +17,7 @@
 		"preview": "npm run build && vite preview",
 		"preview:astro": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
 		"deploy": "npm run build && wrangler deploy",
-		"cf-typegen": "wrangler types"
+		"cf-typegen": "wrangler types --include-runtime false"
 	},
 	"dependencies": {
 		"@astrojs/react": "^6.0.1",

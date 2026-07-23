@@ -1,13 +1,6 @@
 import { Hono } from 'hono';
 import { DependencyFactory } from '../impl/factories/DependencyFactory';
-import { PublicReportDTO } from '../../src/types';
-
-// Define environment interface
-interface Env {
-  DB: D1Database;
-  IMAGES: R2Bucket;
-  CDN_DOMAIN: string;
-}
+import type { PublicReportDTO } from '../../src/types';
 
 /**
  * Route for social media sharing with proper OG metadata
@@ -73,8 +66,8 @@ shareRoute.get('/:hash', async (c) => {
           <!-- LinkedIn specific -->
           <meta property="og:site_name" content="HTTP Scanner" />
           
-          <!-- Redirect to the hash-based URL after metadata is picked up -->
-          <meta http-equiv="refresh" content="0;url=/#/report/${hash}">
+          <!-- Redirect to the canonical report URL after metadata is picked up -->
+          <meta http-equiv="refresh" content="0;url=/report/${hash}">
           
           <style>
             body {
@@ -113,7 +106,7 @@ shareRoute.get('/:hash', async (c) => {
           <div>
             <h1>${url} scored ${roundedScore}/100 on HTTP Scanner</h1>
             <p>Redirecting to full report...</p>
-            <p>If you are not redirected automatically, <a href="/#/report/${hash}">click here</a>.</p>
+            <p>If you are not redirected automatically, <a href="/report/${hash}">click here</a>.</p>
           </div>
         </body>
       </html>

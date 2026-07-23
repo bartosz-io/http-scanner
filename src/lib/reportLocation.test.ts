@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createReportPath,
   createSanitizedReportUrl,
+  parseBrowserReportLocation,
   parseDeleteToken,
   parseReportPathname,
 } from './reportLocation';
@@ -79,5 +80,32 @@ describe('createSanitizedReportUrl', () => {
         'headers'
       )
     ).toBe(`/report/${REPORT_HASH}#headers`);
+  });
+});
+
+describe('parseBrowserReportLocation', () => {
+  it('keeps a valid token in memory and removes it from the browser URL', () => {
+    expect(
+      parseBrowserReportLocation(
+        `/report/${REPORT_HASH}`,
+        `?token=${DELETE_TOKEN}&source=scan`
+      )
+    ).toEqual({
+      hash: REPORT_HASH,
+      deleteToken: DELETE_TOKEN,
+      sanitizedUrl: `/report/${REPORT_HASH}?source=scan`,
+      shouldSanitize: true,
+    });
+  });
+
+  it('removes an invalid token before analytics without retaining it', () => {
+    expect(
+      parseBrowserReportLocation(`/report/${REPORT_HASH}`, '?token=invalid')
+    ).toEqual({
+      hash: REPORT_HASH,
+      deleteToken: null,
+      sanitizedUrl: `/report/${REPORT_HASH}`,
+      shouldSanitize: true,
+    });
   });
 });

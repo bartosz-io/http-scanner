@@ -1,12 +1,11 @@
 import { useState, useCallback } from 'react';
-import { usePostHog } from '@posthog/react';
+import { capturePostHogEvent } from '../lib/posthogClient';
 
 /**
  * Custom hook for report deletion functionality
  * @param hash The report hash identifier
  */
 export function useReportDelete(hash: string) {
-  const posthog = usePostHog();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [deleteError, setDeleteError] = useState<string | undefined>();
   
@@ -34,15 +33,15 @@ export function useReportDelete(hash: string) {
       }
       
       // Success - redirect to home
-      window.location.href = '/#/';
+      window.location.assign('/');
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      posthog?.capture('delete report failed', { hash, error_message: errorMessage });
+      capturePostHogEvent('delete report failed', { hash, error_message: errorMessage });
       setDeleteError(errorMessage);
     } finally {
       setIsDeleting(false);
     }
-  }, [hash, posthog]);
+  }, [hash]);
   
   return {
     isDeleting,

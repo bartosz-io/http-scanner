@@ -9,9 +9,16 @@ interface Props {
   description: string;
   canonicalPath: string;
   noindex?: boolean;
+  initializeAnalytics?: boolean;
 }
 
-const { title, description, canonicalPath, noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex = false,
+  initializeAnalytics = true,
+} = Astro.props;
 const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
 ---
 
@@ -25,7 +32,7 @@ const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
       noindex={noindex}
     />
   </head>
-  <body>
+  <body data-initialize-analytics={initializeAnalytics ? 'true' : 'false'}>
     <div class="flex min-h-screen flex-col">
       <SiteHeader />
       <main class="flex-1">
@@ -41,7 +48,7 @@ const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
       const redirect = getLegacyHashRedirect(window.location.hash);
       if (redirect) {
         window.location.replace(redirect);
-      } else {
+      } else if (document.body.dataset.initializeAnalytics === 'true') {
         initializePostHog();
       }
     </script>

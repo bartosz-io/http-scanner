@@ -4,16 +4,8 @@ import { DependencyFactory } from './impl/factories/DependencyFactory';
 import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
 import { cloudflareAccessAuth } from './impl/middleware/cloudflareAccessAuth';
 import { shareRoute } from './routes/shareRoute';
+import { createReportShellRoute } from './routes/reportShellRoute';
 import { createPostHogClient, getDistinctId } from './lib/posthog';
-
-// Define environment interface
-interface Env {
-  DB: D1Database;
-  IMAGES: R2Bucket;
-  CDN_DOMAIN: string;
-  POSTHOG_PROJECT_TOKEN?: string;
-  POSTHOG_HOST?: string;
-}
 
 // Create Hono app
 const app = new Hono<{ Bindings: Env }>();
@@ -23,6 +15,12 @@ app.use('*', cors());
 
 // Add social sharing route
 app.route('/share', shareRoute);
+
+// Serve one static Astro shell for every valid report URL.
+const reportShellRoute = createReportShellRoute((env: Env) =>
+  DependencyFactory.createReportShellController(env)
+);
+app.route('/report', reportShellRoute);
 
 // Create API router for grouping routes under /api prefix
 const api = new Hono<{ Bindings: Env }>();

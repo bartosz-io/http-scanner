@@ -11,8 +11,10 @@ import { ReportController } from '../controllers/ReportController';
 import { DeleteReportController } from '../controllers/DeleteReportController';
 import { AdminStatsController } from '../controllers/AdminStatsController';
 import { ReportsController } from '../controllers/ReportsController';
+import { ReportShellController } from '../controllers/ReportShellController';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
+import { FetchReportShellUseCase } from '../../usecases/FetchReportShellUseCase';
 import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
 import { FetchStatsUseCase } from '../../usecases/FetchStatsUseCase';
 import { FetchReportsUseCase } from '../../usecases/FetchReportsUseCase';
@@ -21,6 +23,8 @@ import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
 import { StatsRepository } from '../../interfaces/repositories/StatsRepository';
 import { createPostHogClient } from '../../lib/posthog';
 import { PostHog } from 'posthog-node';
+import { CloudflareReportShellGateway } from '../gateways/CloudflareReportShellGateway';
+import type { ReportShellGateway } from '../../interfaces/gateways/ReportShellGateway';
 
 /**
  * Factory class for creating application dependencies
@@ -100,6 +104,23 @@ export class DependencyFactory {
 
     // Create and return controller
     return new ReportController(fetchReportUseCase);
+  }
+
+  /**
+   * Create the hosting adapter used to load the static report shell.
+   */
+  static createReportShellGateway(assets: Pick<Fetcher, 'fetch'>): ReportShellGateway {
+    return new CloudflareReportShellGateway(assets);
+  }
+
+  /**
+   * Create all dependencies needed for the dynamic report shell endpoint.
+   */
+  static createReportShellController(env: Pick<Env, 'ASSETS'>): ReportShellController {
+    const reportShellGateway = this.createReportShellGateway(env.ASSETS);
+    const fetchReportShellUseCase = new FetchReportShellUseCase(reportShellGateway);
+
+    return new ReportShellController(fetchReportShellUseCase);
   }
   
   /**

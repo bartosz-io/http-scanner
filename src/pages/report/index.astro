@@ -1,0 +1,24 @@
+---
+import { ReportIsland } from '@/components/islands/ReportIsland';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const title = 'Security Scan Report — HTTP Scanner';
+const description = 'View the HTTP security header score and detailed findings for this website scan.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath="/report/"
+  noindex
+  initializeAnalytics={false}
+>
+  <ReportIsland client:only="react">
+    <div slot="fallback" class="container mx-auto space-y-4 px-4 py-8" aria-label="Loading report">
+      <div class="h-8 w-3/4 animate-pulse rounded-md bg-accent"></div>
+      <div class="h-20 w-full animate-pulse rounded-md bg-accent"></div>
+      <div class="h-40 w-full animate-pulse rounded-md bg-accent"></div>
+      <div class="h-60 w-full animate-pulse rounded-md bg-accent"></div>
+    </div>
+  </ReportIsland>
+</BaseLayout>
