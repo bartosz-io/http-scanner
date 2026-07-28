@@ -5,9 +5,10 @@ Captured: 2026-07-28
 Branch: `codex/astro-migration`
 
 M6 switches the repository to a single Astro frontend build and removes the
-legacy Vite SPA. This document records the local cutover checkpoint only.
-Uploading a preview version, changing production traffic, and submitting URLs
-to Search Console require a separate approval after the local gate is green.
+legacy Vite SPA. Commit `3b499ad` passed the local gate, was uploaded as a
+Cloudflare preview version, and was subsequently deployed to production.
+On 2026-07-28 the site owner confirmed submission of the sitemap and homepage
+in Google Search Console, completing the final external checkpoint.
 
 ## Single frontend build
 
@@ -138,15 +139,69 @@ After the fix, `npm run deploy:dry`:
 - recognized the D1, R2, `ASSETS`, and environment bindings;
 - exited at `--dry-run` without uploading or deploying anything.
 
-## External deployment checkpoint
+## External deployment
 
-The following actions have not been performed:
+### Rollback target
 
-- upload a Cloudflare preview version;
-- route any production traffic to the M6 build;
-- run production smoke tests;
-- submit the homepage or sitemap to Search Console.
+Before cutover, production served Worker version
+`be6434ac-132b-47e8-acf6-2771c2019d3e` through deployment
+`ab68e214-88bb-4dd9-b0d9-a517304b2c8d` at 100% traffic. No D1 migration or
+data-format change was part of M6, so this version remains the direct rollback
+target.
 
-Before a later production deployment, record the active Cloudflare Worker
-version ID. Cloudflare versions include Worker code, static assets, bindings,
-and compatibility settings; the recorded version is the rollback target.
+### Preview
+
+Commit `3b499ad` was uploaded without production traffic as version
+`d8adc08a-a686-4f54-a96d-f81519ca60f4`.
+
+- version URL:
+  `https://d8adc08a-http-scanner.dev-academy.workers.dev`;
+- alias URL: `https://astro-m6-http-scanner.dev-academy.workers.dev`;
+- `/`, `/reports`, `robots.txt`, `sitemap-index.xml`, `/api/reports`, an
+  existing report, and its share page returned their expected statuses;
+- an unknown URL and an invalid report hash returned 404;
+- raw homepage HTML contained its canonical, description, H1, and form;
+- report HTML was non-indexable and share HTML contained Open Graph and
+  Twitter metadata;
+- desktop and 390x844 browser checks found no console errors, hydration
+  warnings, or horizontal overflow;
+- the legacy `/#/report/:hash` URL redirected to the clean report URL.
+
+The preview platform adds a global `X-Robots-Tag: noindex` response header to
+preview URLs. The production report response was therefore checked separately
+for the application-owned `noindex, nofollow` contract.
+
+### Production cutover
+
+The exact preview version was deployed at 100% traffic through deployment
+`3c569dfb-6a85-4070-a368-0e01b945aff8`. Production smoke tests at
+`https://httpscanner.com` confirmed:
+
+- homepage 200 with server-rendered SEO content and hydrated recent reports;
+- `/reports` 200, real 404 handling, robots and sitemap 200;
+- unchanged report-list and report-detail API responses;
+- direct report and share pages 200, including report
+  `X-Robots-Tag: noindex, nofollow` and share social metadata;
+- one controlled production scan completed and its clean report URL survived
+  a direct refresh;
+- the delete token was removed from the browser URL immediately;
+- no browser console errors or horizontal overflow.
+
+PostHog project `Http Scanner` recorded the production funnel for the same
+anonymous visitor:
+
+```text
+$pageview → scan submitted → url scanned → $pageview → report viewed
+```
+
+A query for that visitor found zero events with `token=` in `$current_url`.
+
+### Search Console
+
+On 2026-07-28 the site owner confirmed:
+
+- submission of `https://httpscanner.com/sitemap-index.xml`;
+- a fresh indexing request for `https://httpscanner.com/`.
+
+With the local gate, preview, production smoke tests, analytics verification,
+rollback target, and Search Console submission recorded, M6 is complete.

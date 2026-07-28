@@ -1,8 +1,7 @@
 # Migracja HTTPScanner z Vite SPA do Astro SSG
 
 Data planu: 2026-07-19  
-Status: M6 w toku — lokalny cutover ukończony, wdrożenie zewnętrzne oczekuje
-osobnej decyzji
+Status: migracja M0–M6 ukończona
 Szacowany czas: 5–7 dni roboczych
 
 ## 1. Cel migracji
@@ -281,9 +280,9 @@ Kryterium ukończenia: lejek `landing page → scan submitted → scan success �
 - [x] Sprawdzić requesty `/api`, `/share` i `/report` w logach Workera.
 - [x] Usunąć stary entrypoint SPA i zależności po potwierdzeniu braku importów.
 - [x] Wykonać końcowy build po cleanupie.
-- [ ] Wdrożyć najpierw wersję testową/preview, następnie produkcję.
-- [ ] Po wdrożeniu sprawdzić homepage, przykładowy raport, share preview i PostHog.
-- [ ] Zgłosić sitemap i homepage do ponownej inspekcji w Search Console.
+- [x] Wdrożyć najpierw wersję testową/preview, następnie produkcję.
+- [x] Po wdrożeniu sprawdzić homepage, przykładowy raport, share preview i PostHog.
+- [x] Zgłosić sitemap i homepage do ponownej inspekcji w Search Console.
 
 Kryterium ukończenia: wszystkie testy przechodzą na buildzie identycznym z produkcyjnym, a powrót do poprzedniej wersji jest możliwy jednym redeployem.
 
@@ -360,7 +359,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | M3 — report shell | complete | `astro-migration-m3.md`; direct navigation i refresh przez Wrangler |
 | M4 — SEO techniczne | complete | `astro-migration-m4.md`; 57 testów; sitemap, robots, canonical, prawdziwe 404 i cache headers |
 | M5 — PostHog i hydratacja | complete | `astro-migration-m5.md`; 73 testy; event audit, atrybucja sesji, brak tokenu i czysta hydratacja |
-| M6 — cleanup i cutover | in progress | legacy SPA usunięte; 77 testów; lokalna macierz, PostHog i finalny dry-run `dist` przechodzą; preview/produkcja oczekują |
+| M6 — cleanup i cutover | complete | commit `3b499ad`; preview i produkcja na wersji `d8adc08a-a686-4f54-a96d-f81519ca60f4`; smoke i PostHog przechodzą; sitemap i homepage zgłoszone w GSC |
 
 Statusy aktualizujemy na `in progress`, `blocked` albo `complete`. Każde `complete` musi zawierać dowód: polecenie, wynik testu, screenshot lub URL wdrożenia.
 

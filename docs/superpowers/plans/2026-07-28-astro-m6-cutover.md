@@ -410,3 +410,15 @@ Before that later production step, record the active deployment/version ID.
 Cloudflare versions capture Worker code, static assets, bindings, and
 compatibility settings, so the recorded version can be restored with
 `wrangler rollback <VERSION_ID>`.
+
+## External continuation after approval
+
+- [x] Record rollback version
+  `be6434ac-132b-47e8-acf6-2771c2019d3e`.
+- [x] Upload commit `3b499ad` as preview version
+  `d8adc08a-a686-4f54-a96d-f81519ca60f4`.
+- [x] Run preview HTTP, desktop, and mobile smoke tests.
+- [x] Deploy the exact preview version to 100% production traffic.
+- [x] Run production HTTP, browser, scan, refresh, and PostHog checks.
+- [x] Submit the sitemap and homepage in Search Console; completion confirmed
+  by the site owner on 2026-07-28.
