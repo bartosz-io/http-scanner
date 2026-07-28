@@ -35,7 +35,7 @@ function reportDevRedirect() {
 export default defineConfig({
   site: SITE_ORIGIN,
   output: 'static',
-  outDir: './dist-astro',
+  outDir: './dist',
   build: {
     format: 'directory',
   },

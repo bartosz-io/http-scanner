@@ -1,7 +1,8 @@
 # Migracja HTTPScanner z Vite SPA do Astro SSG
 
 Data planu: 2026-07-19  
-Status: M3 ukończone
+Status: M6 w toku — lokalny cutover ukończony, wdrożenie zewnętrzne oczekuje
+osobnej decyzji
 Szacowany czas: 5–7 dni roboczych
 
 ## 1. Cel migracji
@@ -21,14 +22,15 @@ Po migracji:
 
 ### 2.1 Astro działa jako SSG
 
-Docelowo Astro buduje publiczne strony do `dist/`. W M1 równoległy, niewdrażany
-build trafia do `dist-astro/`, aby nie nadpisać artefaktów legacy przed cutoverem.
-W M6 zmienimy `outDir` na `dist/`. Ustawiamy jawnie:
+Docelowo Astro buduje publiczne strony do `dist/`. W M1 równoległy,
+niewdrażany build trafia do `dist-astro/`, aby nie nadpisać artefaktów legacy
+przed cutoverem. W M6 zmieniamy `outDir` na `dist/`. Ustawiamy jawnie:
 
 ```js
 export default defineConfig({
   site: 'https://httpscanner.com',
   output: 'static',
+  outDir: './dist',
   build: { format: 'directory' },
 });
 ```
@@ -272,13 +274,13 @@ Kryterium ukończenia: lejek `landing page → scan submitted → scan success �
 
 ### M6 — test produkcyjny, cleanup i cutover (1 dzień)
 
-- [ ] Uruchomić `npm run lint`, `npm run check` i `npm run build`.
-- [ ] Uruchomić build przez lokalny `wrangler dev`, nie tylko `astro preview`.
-- [ ] Wykonać macierz testów z sekcji 5 w przeglądarce desktop i mobile.
-- [ ] Sprawdzić HTML odpowiedzi bez JavaScriptu.
-- [ ] Sprawdzić requesty `/api`, `/share` i `/report` w logach Workera.
-- [ ] Usunąć stary entrypoint SPA i zależności po potwierdzeniu braku importów.
-- [ ] Wykonać końcowy build po cleanupie.
+- [x] Uruchomić `npm run lint`, `npm run check` i `npm run build`.
+- [x] Uruchomić build przez lokalny `wrangler dev`, nie tylko `astro preview`.
+- [x] Wykonać macierz testów z sekcji 5 w przeglądarce desktop i mobile.
+- [x] Sprawdzić HTML odpowiedzi bez JavaScriptu.
+- [x] Sprawdzić requesty `/api`, `/share` i `/report` w logach Workera.
+- [x] Usunąć stary entrypoint SPA i zależności po potwierdzeniu braku importów.
+- [x] Wykonać końcowy build po cleanupie.
 - [ ] Wdrożyć najpierw wersję testową/preview, następnie produkcję.
 - [ ] Po wdrożeniu sprawdzić homepage, przykładowy raport, share preview i PostHog.
 - [ ] Zgłosić sitemap i homepage do ponownej inspekcji w Search Console.
@@ -358,7 +360,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | M3 — report shell | complete | `astro-migration-m3.md`; direct navigation i refresh przez Wrangler |
 | M4 — SEO techniczne | complete | `astro-migration-m4.md`; 57 testów; sitemap, robots, canonical, prawdziwe 404 i cache headers |
 | M5 — PostHog i hydratacja | complete | `astro-migration-m5.md`; 73 testy; event audit, atrybucja sesji, brak tokenu i czysta hydratacja |
-| M6 — cleanup i cutover | pending | pełna macierz testów + produkcyjny smoke test |
+| M6 — cleanup i cutover | in progress | legacy SPA usunięte; 77 testów; lokalna macierz, PostHog i finalny dry-run `dist` przechodzą; preview/produkcja oczekują |
 
 Statusy aktualizujemy na `in progress`, `blocked` albo `complete`. Każde `complete` musi zawierać dowód: polecenie, wynik testu, screenshot lub URL wdrożenia.
 

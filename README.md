@@ -12,13 +12,14 @@ A modern web application for scanning and analyzing HTTP security headers of web
 ## 🛠️ Tech Stack
 
 ### Frontend
-- React 19 + TypeScript 5
-- Vite for fast bundling
+- Astro 7 static pages with React 19 islands
+- TypeScript 5 and Vite-powered development
 - Tailwind CSS 4 + shadcn/ui components
-- Hash-based routing
+- Normal document routes with a compatibility redirect for legacy hash URLs
 
 ### Backend
 - Cloudflare Workers (TypeScript)
+- Cloudflare Workers Static Assets
 - Clean Architecture principles
 
 ### Storage
@@ -40,22 +41,39 @@ cd http-scanner
 # Install dependencies
 npm install
 
-# Start development server
+# Terminal 1: start the Worker and local bindings
+npm run dev:worker
+
+# Terminal 2: start Astro with API/share proxies
 npm run dev
 ```
 
 ### Development Commands
 
 ```bash
-# Run development server
+# Run the Astro development server
 npm run dev
+
+# Run the Worker with local D1, R2 and built static assets
+npm run dev:worker
 
 # Build for production
 npm run build
 
+# Build and run the production-shaped local application
+npm run build
+npm run dev:worker
+
+# Build the exact Wrangler bundle without deploying
+npm run deploy:dry
+
 # Deploy to Cloudflare Workers
 npm run deploy
 ```
+
+The final Astro build is emitted to `dist`. Wrangler serves those assets
+directly and invokes the Hono Worker first for `/api/*`, `/share/*`, and
+`/report/*`.
 
 ## 🧪 Testing
 
@@ -63,8 +81,11 @@ npm run deploy
 # Run unit tests
 npm test
 
-# Run e2e tests with Playwright
-npm run test:e2e
+# Type-check Astro, React and Worker sources
+npm run check
+
+# Run ESLint
+npm run lint
 ```
 
 ## 📝 License
