@@ -261,12 +261,12 @@ Kryterium ukończenia: crawler otrzymuje poprawne statusy, canonicale, robots i 
 
 ### M5 — analityka i hydratacja (0,5–1 dnia)
 
-- [ ] Dokończyć usuwanie `PostHogProvider` jako globalnego root SPA oraz sprawdzić, że nie pozostał żaden import `usePostHog()`.
-- [ ] Zachować nazwy i właściwości istniejących eventów.
-- [ ] Dodać landing page/path i referrer tam, gdzie są potrzebne do scorecard SEO.
-- [ ] Sprawdzić, że pageview nie jest wysyłany podwójnie.
-- [ ] Sprawdzić, że delete token i pełny URL z tokenem nie trafiają do PostHog.
-- [ ] Sprawdzić brak błędów hydratacji w konsoli dla homepage i raportu.
+- [x] Dokończyć usuwanie `PostHogProvider` jako globalnego root SPA oraz sprawdzić, że nie pozostał żaden import `usePostHog()`.
+- [x] Zachować nazwy i właściwości istniejących eventów.
+- [x] Dodać landing page/path i referrer tam, gdzie są potrzebne do scorecard SEO.
+- [x] Sprawdzić, że pageview nie jest wysyłany podwójnie.
+- [x] Sprawdzić, że delete token i pełny URL z tokenem nie trafiają do PostHog.
+- [x] Sprawdzić brak błędów hydratacji w konsoli dla homepage i raportu.
 
 Kryterium ukończenia: lejek `landing page → scan submitted → scan success → report viewed` działa po migracji i nie zbiera sekretów.
 
@@ -357,7 +357,7 @@ Po buildzie uruchamiamy również smoke test na `wrangler dev`, ponieważ `astro
 | M2 — homepage i islands | complete | `astro-migration-m2.md`; statyczny HTML, dane API i islands przechodzą |
 | M3 — report shell | complete | `astro-migration-m3.md`; direct navigation i refresh przez Wrangler |
 | M4 — SEO techniczne | complete | `astro-migration-m4.md`; 57 testów; sitemap, robots, canonical, prawdziwe 404 i cache headers |
-| M5 — PostHog i hydratacja | pending | event audit + brak tokenu |
+| M5 — PostHog i hydratacja | complete | `astro-migration-m5.md`; 73 testy; event audit, atrybucja sesji, brak tokenu i czysta hydratacja |
 | M6 — cleanup i cutover | pending | pełna macierz testów + produkcyjny smoke test |
 
 Statusy aktualizujemy na `in progress`, `blocked` albo `complete`. Każde `complete` musi zawierać dowód: polecenie, wynik testu, screenshot lub URL wdrożenia.

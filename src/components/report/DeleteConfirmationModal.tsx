@@ -58,7 +58,7 @@ export const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = (
                 required
                 pattern="^[0-9a-f]{32}$"
                 autoComplete="off"
-                className={errorMessage ? 'border-red-500' : ''}
+                className={`ph-no-capture ph-mask ${errorMessage ? 'border-red-500' : ''}`}
               />
               {errorMessage && (
                 <p className="text-sm text-red-500">{errorMessage}</p>

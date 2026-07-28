@@ -2,10 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles/global.css'
 import App from './App.tsx'
-import { PostHogProvider } from '@posthog/react'
-import { initializePostHog } from './lib/posthogClient'
-
-const posthog = initializePostHog()
 
 const app = (
   <StrictMode>
@@ -13,10 +9,4 @@ const app = (
   </StrictMode>
 )
 
-createRoot(document.getElementById('root')!).render(
-  posthog ? (
-    <PostHogProvider client={posthog}>
-      {app}
-    </PostHogProvider>
-  ) : app,
-)
+createRoot(document.getElementById('root')!).render(app)

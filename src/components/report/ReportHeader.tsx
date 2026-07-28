@@ -27,7 +27,9 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({ url, createdAt, dele
         <Alert>
           <AlertDescription>
             <div className="font-medium">Important: Save this delete token</div>
-            <div className="mt-1 text-sm break-all font-mono">{deleteToken}</div>
+            <div className="ph-no-capture ph-mask mt-1 break-all font-mono text-sm">
+              {deleteToken}
+            </div>
             <div className="mt-2 text-sm">You will need this token if you want to delete this report later. It will only be shown once.</div>
           </AlertDescription>
         </Alert>

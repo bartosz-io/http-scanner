@@ -1,4 +1,6 @@
 import posthog from 'posthog-js';
+import { getAnalyticsAttribution } from './analyticsAttribution';
+import { sanitizePostHogCapture } from './analyticsPrivacy';
 
 type EventProperties = Record<string, unknown>;
 
@@ -7,15 +9,17 @@ export function initializePostHog(): typeof posthog | null {
     return null;
   }
 
-  const projectToken = import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN;
+  const projectToken = import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!projectToken) {
     return null;
   }
 
   if (!posthog.__loaded) {
     posthog.init(projectToken, {
-      api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+      api_host: import.meta.env.PUBLIC_POSTHOG_HOST,
       defaults: '2026-01-30',
+      capture_pageview: true,
+      before_send: sanitizePostHogCapture,
       __add_tracing_headers: [window.location.host, 'localhost'],
     });
   }
@@ -27,5 +31,9 @@ export function capturePostHogEvent(
   eventName: string,
   properties?: EventProperties
 ): void {
-  initializePostHog()?.capture(eventName, properties);
+  const attribution = getAnalyticsAttribution();
+  initializePostHog()?.capture(eventName, {
+    ...(properties ?? {}),
+    ...(attribution ?? {}),
+  });
 }
