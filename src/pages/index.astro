@@ -4,8 +4,8 @@ import { RecentScansIsland } from '@/components/islands/RecentScansIsland';
 import { ScannerIsland } from '@/components/islands/ScannerIsland';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
-const title = 'HTTP Security Header Scanner — Free Website Security Check';
-const description = 'Scan a website for missing, weak and leaking HTTP security headers. Get a clear security score and an actionable report in seconds.';
+const title = 'Security Headers Checker — Free HTTP Security Scan';
+const description = 'Check your website’s HTTP security headers for missing or weak CSP, HSTS, X-Frame-Options, Permissions-Policy and more. Get a free, actionable report.';
 ---
 
 <BaseLayout title={title} description={description} canonicalPath="/">
@@ -15,10 +15,12 @@ const description = 'Scan a website for missing, weak and leaking HTTP security 
         <img src={scannerLogo.src} alt="" width="32" height="32" class="h-8 w-8" />
       </div>
       <h1 class="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl">
-        Scan your website for HTTP security headers
+        Free Security Headers Checker
       </h1>
       <p class="mx-auto mb-10 mt-5 max-w-2xl text-lg text-muted-foreground">
-        Find missing protections, information leaks and configuration weaknesses. HTTP Scanner returns a practical report without requiring an account.
+        Check the HTTP security headers of any public website. Find missing
+        protections, risky configuration and information leaks, then get practical
+        remediation guidance — no account required.
       </p>
 
       <ScannerIsland client:load />
