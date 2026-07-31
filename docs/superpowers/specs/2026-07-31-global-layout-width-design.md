@@ -12,10 +12,10 @@ page functionality.
 
 ## Selected Design
 
-Introduce a project-owned Tailwind utility in `src/styles/global.css`:
+Introduce a project-owned CSS class in `src/styles/global.css`:
 
 ```css
-@utility site-container {
+.site-container {
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
