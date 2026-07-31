@@ -1,20 +1,12 @@
 import { HttpService } from '../../interfaces/services/HttpService';
+import {
+  extractResponseHeaders,
+  filterScannerTransportHeaders,
+} from './responseHeaders';
 
 export class FetchHttpService implements HttpService {
   private readonly MAX_RETRIES = 3;
   private readonly TIMEOUT_MS = 5000;
-  private readonly CLOUDFLARE_ADDED_HEADERS = [
-    'cf-ray',
-    'cf-cache-status',
-    'cf-mitigated',
-    'cf-worker',
-    'cf-edge-cache',
-    'cf-connecting-ip',
-    'cf-bgj',
-    'cf-visitor',
-    'cf-apo-via',
-    'alt-svc'
-  ];
 
   async fetchHeaders(url: string): Promise<Record<string, string>> {
     console.log(`[FetchHttpService] Starting fetchHeaders for URL: ${url}`);
@@ -88,9 +80,9 @@ export class FetchHttpService implements HttpService {
         console.log(`[FetchHttpService] Direct STS header check: ${response.headers.get('strict-transport-security')}`);
         console.log(`[FetchHttpService] Direct CSP header check: ${response.headers.get('content-security-policy')}`);
         
-        // Extract and filter Cloudflare-added headers
-        const extractedHeaders = this.extractHeaders(response.headers);
-        const filteredHeaders = this.filterCloudflareHeaders(extractedHeaders);
+        // Extract and filter scanner transport headers
+        const extractedHeaders = extractResponseHeaders(response.headers);
+        const filteredHeaders = filterScannerTransportHeaders(extractedHeaders);
         
         console.log('[FetchHttpService] Final headers after filtering:', JSON.stringify(filteredHeaders, null, 2));
         
@@ -121,39 +113,4 @@ export class FetchHttpService implements HttpService {
     throw new Error('Failed to fetch headers after multiple attempts');
   }
 
-  private extractHeaders(headers: Headers): Record<string, string> {
-    console.log(`[FetchHttpService] Extracting headers from Headers object`);
-    const result: Record<string, string> = {};
-    
-    console.log(`[FetchHttpService] Headers entries:`);
-    headers.forEach((value, key) => {
-      console.log(`[FetchHttpService]   - ${key}: ${value}`);
-      result[key.toLowerCase()] = value;
-    });
-
-    console.log(`[FetchHttpService] Final extracted headers count: ${Object.keys(result).length}`);
-    
-    return result;
-  }
-
-  private filterCloudflareHeaders(headers: Record<string, string>): Record<string, string> {
-    console.log(`[FetchHttpService] Filtering out Cloudflare-specific headers`);
-    const filteredHeaders: Record<string, string> = { ...headers };
-    
-    // Remove known Cloudflare headers
-    this.CLOUDFLARE_ADDED_HEADERS.forEach(header => {
-      if (filteredHeaders[header]) {
-        console.log(`[FetchHttpService] Removing Cloudflare header: ${header}`);
-        delete filteredHeaders[header];
-      }
-    });
-    
-    // Special case for server header with Cloudflare value
-    if (filteredHeaders['server']?.toLowerCase().includes('cloudflare')) {
-      console.log(`[FetchHttpService] Removing Cloudflare server header`);
-      delete filteredHeaders['server'];
-    }
-    
-    return filteredHeaders;
-  }
 }
