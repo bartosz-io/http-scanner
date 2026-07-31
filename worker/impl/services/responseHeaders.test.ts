@@ -24,7 +24,7 @@ describe('filterScannerTransportHeaders', () => {
       'cache-control': 'max-age=60',
       'cf-ray': 'ray-id',
       'cf-cache-status': 'DYNAMIC',
-      'alt-svc': 'h3=\":443\"',
+      'alt-svc': 'h3=":443"',
       server: 'cloudflare',
     };
 
