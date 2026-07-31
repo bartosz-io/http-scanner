@@ -34,6 +34,20 @@ describe('site container contract', () => {
     }
   });
 
+  it('keeps the scan-results reading width inside the shared layout container', () => {
+    const homepageSeoSource = readFileSync(
+      new URL('src/components/astro/HomepageSeoContent.astro', projectRoot),
+      'utf8'
+    );
+
+    expect(homepageSeoSource).toContain(
+      '<div class="site-container mx-auto px-4 py-14 sm:py-16">\n    <div class="mx-auto grid max-w-5xl gap-8'
+    );
+    expect(homepageSeoSource).not.toContain(
+      'site-container mx-auto grid max-w-5xl'
+    );
+  });
+
   it('does not alter the component query utility', () => {
     const cardSource = readFileSync(
       new URL('src/components/ui/card.tsx', projectRoot),
