@@ -15,7 +15,7 @@ const seoContentSource = readFileSync(
 describe('homepage SEO contract', () => {
   it('owns the security headers checker search intent', () => {
     expect(homepageSource).toContain(
-      "const title = 'Security Headers Checker — Free HTTP Security Scan';"
+      "const title = 'Free Security Headers Checker | HTTP Scanner';"
     );
     expect(homepageSource).toContain(
       "const description = 'Check your website’s HTTP security headers for missing or weak CSP, HSTS, X-Frame-Options, Permissions-Policy and more. Get a free, actionable report.';"
