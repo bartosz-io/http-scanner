@@ -11,6 +11,14 @@ const seoContentSource = readFileSync(
   new URL('../components/astro/HomepageSeoContent.astro', import.meta.url),
   'utf8'
 );
+const scannerIslandSource = readFileSync(
+  new URL('../components/islands/ScannerIsland.tsx', import.meta.url),
+  'utf8'
+);
+const useScanFormSource = readFileSync(
+  new URL('../hooks/useScanForm.ts', import.meta.url),
+  'utf8'
+);
 
 describe('homepage SEO contract', () => {
   it('owns the security headers checker search intent', () => {
@@ -28,13 +36,15 @@ describe('homepage SEO contract', () => {
 
   it('keeps the canonical homepage and scanner-first interaction', () => {
     expect(homepageSource).toContain('canonicalPath="/"');
-    expect(homepageSource).toContain('<ScannerIsland client:load />');
+    expect(homepageSource).toContain(
+      '<ScannerIsland resultView="security-analysis" client:load />'
+    );
 
     const headingPosition = homepageSource.indexOf(
       'Free Security Headers Checker'
     );
     const scannerPosition = homepageSource.indexOf(
-      '<ScannerIsland client:load />'
+      '<ScannerIsland resultView="security-analysis" client:load />'
     );
     const contentPosition = homepageSource.indexOf('<HomepageSeoContent />');
     const recentScansPosition = homepageSource.indexOf(
@@ -45,6 +55,16 @@ describe('homepage SEO contract', () => {
     expect(scannerPosition).toBeGreaterThan(headingPosition);
     expect(contentPosition).toBeGreaterThan(scannerPosition);
     expect(recentScansPosition).toBeGreaterThan(contentPosition);
+  });
+
+  it('propagates scanner presentation intent to redirects and analytics', () => {
+    expect(scannerIslandSource).toContain(
+      'const scannerMode = getScannerMode(resultView);'
+    );
+    expect(scannerIslandSource).toContain('scannerMode={scannerMode}');
+    expect(scannerIslandSource).toContain('deleteToken: response.deleteToken');
+    expect(scannerIslandSource).toContain('view: resultView');
+    expect(useScanFormSource.match(/scanner_mode: scannerMode/g)).toHaveLength(2);
   });
 
   it('renders the approved explanation as static Astro content', () => {

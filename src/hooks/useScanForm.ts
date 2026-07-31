@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import type { ScanFormViewModel, ScanRequestDTO, ScanResponseDTO } from '../types';
 import { capturePostHogEvent } from '../lib/posthogClient';
+import type { ScannerMode } from '../lib/reportView';
 
 /**
  * Custom hook for handling scan form operations
  * Designed to work with React Hook Form
  */
-export const useScanForm = () => {
+export const useScanForm = (scannerMode: ScannerMode) => {
   const [formState, setFormState] = useState<ScanFormViewModel>({
     url: '',
     isValid: false,
@@ -30,7 +31,7 @@ export const useScanForm = () => {
       errorMessage: undefined
     }));
 
-    capturePostHogEvent('scan submitted', { url });
+    capturePostHogEvent('scan submitted', { url, scanner_mode: scannerMode });
 
     try {
       const response = await fetch('/api/scan', {
@@ -63,6 +64,7 @@ export const useScanForm = () => {
       const typedError = error as Error & { cause?: { code?: string } };
       capturePostHogEvent('scan failed', {
         url,
+        scanner_mode: scannerMode,
         error_message: typedError.message,
         error_code: typedError.cause?.code,
       });

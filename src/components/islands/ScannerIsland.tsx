@@ -4,15 +4,26 @@ import { Button } from '@/components/ui/button';
 import { ScanForm } from '@/components/ScanForm';
 import { ScanFormFeedback } from '@/components/ScanFormFeedback';
 import { createReportPath } from '@/lib/reportLocation';
+import { getScannerMode, type ScannerResultView } from '@/lib/reportView';
 import type { ScanResponseDTO } from '@/types';
 
-export const ScannerIsland: React.FC = () => {
+interface ScannerIslandProps {
+  resultView?: ScannerResultView;
+}
+
+export const ScannerIsland: React.FC<ScannerIslandProps> = ({
+  resultView = 'security-analysis',
+}) => {
+  const scannerMode = getScannerMode(resultView);
   const [error, setError] = React.useState<string>();
   const [errorCode, setErrorCode] = React.useState<string>();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleScanSuccess = (response: ScanResponseDTO) => {
-    window.location.assign(createReportPath(response.hash, { deleteToken: response.deleteToken }));
+    window.location.assign(createReportPath(response.hash, {
+      deleteToken: response.deleteToken,
+      view: resultView,
+    }));
   };
 
   const handleScanStart = () => {
@@ -30,6 +41,7 @@ export const ScannerIsland: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-3xl">
       <ScanForm
+        scannerMode={scannerMode}
         onScanSuccess={handleScanSuccess}
         onScanStart={handleScanStart}
         onScanError={handleScanError}

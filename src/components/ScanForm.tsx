@@ -8,9 +8,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Search } from 'lucide-react';
 import { useScanForm } from '../hooks/useScanForm';
+import type { ScannerMode } from '@/lib/reportView';
 
 
 interface ScanFormProps {
+  scannerMode: ScannerMode;
   onScanSuccess: (response: ScanResponseDTO) => void;
   onScanStart: () => void;
   onScanError: (error: Error & { cause?: { code?: string } }) => void;
@@ -50,12 +52,13 @@ const formSchema = z.object({
 });
 
 export const ScanForm: React.FC<ScanFormProps> = ({ 
+  scannerMode,
   onScanSuccess, 
   onScanStart,
   onScanError 
 }: ScanFormProps) => {
   // Use both React Hook Form for UI validation and useScanForm for API interaction
-  const { submitScan, resetForm: resetScanForm } = useScanForm();
+  const { submitScan, resetForm: resetScanForm } = useScanForm(scannerMode);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
