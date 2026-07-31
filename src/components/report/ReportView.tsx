@@ -26,6 +26,8 @@ export const ReportView: React.FC<ReportViewProps> = ({
   view,
   onViewChange,
 }) => {
+  const initialReportView = React.useRef(view);
+
   // Use the custom hook to manage the report state and functionality
   const {
     report,
@@ -63,10 +65,10 @@ export const ReportView: React.FC<ReportViewProps> = ({
         url: report.url,
         score: report.score,
         hash: report.hash,
-        report_view: view,
+        report_view: initialReportView.current,
       });
     }
-  }, [report, view]);
+  }, [report]);
 
   // Render loading state
   if (isLoading) {

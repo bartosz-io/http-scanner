@@ -65,8 +65,19 @@ describe('report view switching integration', () => {
     expect(islandSource).not.toContain('useReportData');
 
     expect(reportSource.match(/useReportData\(/g)).toHaveLength(1);
-    expect(reportSource).toContain('report_view: view');
+    expect(reportSource).toContain('report_view: initialReportView.current');
     expect(reportSource).toContain('selectAllResponseHeaders');
     expect(reportSource).toContain('linkGuides={false}');
+  });
+
+  it('keeps report viewed eligible only when the report initially loads', () => {
+    const reportSource = readSource('src/components/report/ReportView.tsx');
+    const reportViewedEffect = reportSource.match(
+      /useEffect\(\(\) => \{[\s\S]*?capturePostHogEvent\('report viewed'[\s\S]*?\n\s*\}\n\s*\}, \[([^\]]*)\]\);/
+    );
+
+    expect(reportSource).toContain('React.useRef(view)');
+    expect(reportViewedEffect).not.toBeNull();
+    expect(reportViewedEffect?.[1].trim()).toBe('report');
   });
 });
