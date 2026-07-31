@@ -1,7 +1,7 @@
 # All Headers Scanner SEO Design
 
 **Date:** 2026-07-31  
-**Status:** Approved in conversation; pending written-spec review  
+**Status:** Approved
 **Scope:** HTTP Headers Checker, neutral report view, header reference cluster
 
 ## Context
