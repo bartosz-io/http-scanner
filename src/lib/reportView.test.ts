@@ -3,7 +3,9 @@ import {
   createReportViewUrl,
   getScannerMode,
   parseReportView,
+  selectAllResponseHeaders,
 } from './reportView';
+import type { ReportHeaderGroups } from './reportView';
 
 describe('parseReportView', () => {
   it('returns the all-headers view when requested', () => {
@@ -33,5 +35,112 @@ describe('createReportViewUrl', () => {
     expect(
       createReportViewUrl('/report/hash', '?view=all-headers&source=scan', 'security-analysis')
     ).toBe('/report/hash?source=scan');
+  });
+});
+
+describe('selectAllResponseHeaders', () => {
+  it('projects present detected and leaking headers with neutral catalog metadata', () => {
+    const groups: ReportHeaderGroups = {
+      detected: [
+        {
+          name: 'Server',
+          value: 'nginx',
+          present: true,
+          weight: 0,
+          leaking: true,
+        },
+        {
+          name: 'Cache-Control',
+          value: 'public, max-age=60',
+          present: true,
+          weight: 0,
+          leaking: false,
+        },
+        {
+          name: 'X-Custom-Trace',
+          value: 'trace-1',
+          present: true,
+          weight: 0,
+          leaking: false,
+        },
+      ],
+      missing: [
+        {
+          name: 'Strict-Transport-Security',
+          present: false,
+          weight: 0,
+          leaking: false,
+        },
+      ],
+      leaking: [
+        {
+          name: 'server',
+          value: 'Apache',
+          present: true,
+          weight: 0,
+          leaking: true,
+        },
+      ],
+    };
+
+    expect(selectAllResponseHeaders(groups)).toEqual([
+      {
+        name: 'cache-control',
+        displayName: 'Cache-Control',
+        value: 'public, max-age=60',
+        category: 'Caching',
+        summary: expect.any(String),
+        guideSlug: 'cache-control',
+      },
+      {
+        name: 'server',
+        displayName: 'Server',
+        value: 'nginx',
+        category: 'Infrastructure and disclosure',
+        summary: expect.any(String),
+        guideSlug: 'server',
+      },
+      {
+        name: 'x-custom-trace',
+        displayName: 'X-Custom-Trace',
+        value: 'trace-1',
+        category: 'Other',
+        summary: 'This response header is not yet covered by the HTTP Scanner reference.',
+      },
+    ]);
+  });
+
+  it('excludes absent headers and preserves multiline values', () => {
+    const groups: ReportHeaderGroups = {
+      detected: [
+        {
+          name: 'Set-Cookie',
+          value: 'session=abc; Secure\nprefs=dark; SameSite=Lax',
+          present: true,
+          weight: 0,
+          leaking: false,
+        },
+        {
+          name: 'X-Omitted',
+          value: 'not-present',
+          present: false,
+          weight: 0,
+          leaking: false,
+        },
+      ],
+      missing: [],
+      leaking: [],
+    };
+
+    expect(selectAllResponseHeaders(groups)).toEqual([
+      {
+        name: 'set-cookie',
+        displayName: 'Set-Cookie',
+        value: 'session=abc; Secure\nprefs=dark; SameSite=Lax',
+        category: 'Cookies and authentication',
+        summary: expect.any(String),
+        guideSlug: 'set-cookie',
+      },
+    ]);
   });
 });
