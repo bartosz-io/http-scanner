@@ -14,6 +14,8 @@ const astroLayoutFiles = [
   'src/pages/reports.astro',
   'src/pages/report/index.astro',
   'src/pages/404.astro',
+  'src/components/report/ReportView.tsx',
+  'src/components/islands/ReportIsland.tsx',
 ];
 
 describe('site container contract', () => {
@@ -25,12 +27,12 @@ describe('site container contract', () => {
     expect(globalCss).not.toContain('@layer site-container');
   });
 
-  it('uses site-container on every Astro application surface', () => {
+  it('uses site-container on every application surface', () => {
     for (const file of astroLayoutFiles) {
       const source = readFileSync(new URL(file, projectRoot), 'utf8');
 
       expect(source, file).toContain('site-container');
-      expect(source, file).not.toMatch(/class="container(?:\s|"|$)/);
+      expect(source, file).not.toMatch(/(?:class|className)="container(?:\s|"|$)/);
     }
   });
 

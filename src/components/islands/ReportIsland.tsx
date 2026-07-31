@@ -34,7 +34,7 @@ export const ReportIsland: React.FC = () => {
 
   if (!reportLocation.hash) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="site-container mx-auto px-4 py-8">
         <Alert variant="destructive">
           <AlertTitle>Invalid report address</AlertTitle>
           <AlertDescription>

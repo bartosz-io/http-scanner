@@ -63,7 +63,7 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
   // Render loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto space-y-4 px-4 py-8">
+      <div className="site-container mx-auto space-y-4 px-4 py-8">
         <Skeleton className="h-8 w-3/4" />
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-40 w-full" />
@@ -75,7 +75,7 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
   // Render error state
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="site-container mx-auto px-4 py-8">
         <Alert variant="destructive">
           <AlertTitle>Error loading report</AlertTitle>
           <AlertDescription>
@@ -93,7 +93,7 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
 
   // Render the report view
   return (
-    <div className="container mx-auto space-y-8 px-4 py-8">
+    <div className="site-container mx-auto space-y-8 px-4 py-8">
       {report && (
         <div className="space-y-8">
           {/* Report header with URL and timestamp */}
