@@ -6,23 +6,23 @@ import scannerLogo from '@/assets/scanner-logo.png';
   <div class="site-container mx-auto flex items-center justify-between px-4 py-4">
     <a href="/" class="flex items-center gap-2" aria-label="HTTP Scanner home">
       <img src={scannerLogo.src} alt="" width="32" height="32" class="h-8 w-8" />
-      <span class="text-xl font-bold">HTTP Scanner</span>
+      <span class="hidden text-xl font-bold sm:inline">HTTP Scanner</span>
     </a>
 
     <nav aria-label="Primary navigation">
       <ul class="flex items-center gap-1">
         <li>
-          <a href="/" class="inline-flex h-9 items-center rounded-md px-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+          <a href="/" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
             Home
           </a>
         </li>
         <li>
-          <a href="/http-headers-checker/" class="inline-flex h-9 items-center rounded-md px-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+          <a href="/http-headers-checker/" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
             HTTP Headers
           </a>
         </li>
         <li>
-          <a href="/reports" class="inline-flex h-9 items-center rounded-md px-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+          <a href="/reports" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
             Reports
           </a>
         </li>
