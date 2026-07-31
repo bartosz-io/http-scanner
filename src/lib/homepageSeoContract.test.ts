@@ -95,6 +95,15 @@ describe('homepage SEO contract', () => {
     expect(seoContentSource).not.toContain('application/ld+json');
   });
 
+  it('offers contextual discovery of the complete response view', () => {
+    expect(seoContentSource).toContain(
+      'Need the complete response instead of a security score?'
+    );
+    expect(seoContentSource).toContain(
+      '<a href="/http-headers-checker/">View all HTTP response headers</a>.'
+    );
+  });
+
   it('lists every registered security parser exactly once', () => {
     const displayedHeaders = homepageSecurityHeaderGroups
       .flatMap((group) => group.headers)

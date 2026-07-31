@@ -1,0 +1,35 @@
+---
+import scannerLogo from '@/assets/scanner-logo.png';
+import HttpHeadersCheckerContent from '@/components/astro/HttpHeadersCheckerContent.astro';
+import { ScannerIsland } from '@/components/islands/ScannerIsland';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const title = 'HTTP Headers Checker — View Response Headers | HTTP Scanner';
+const description = 'Check all HTTP response headers returned by any public website. Search header names and values, understand common fields, and inspect the result for free.';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath="/http-headers-checker/"
+>
+  <section class="border-b border-border/60 bg-gradient-to-b from-muted/50 to-background">
+    <div class="site-container mx-auto px-4 py-16 text-center sm:py-20">
+      <div class="mb-6 inline-flex items-center justify-center rounded-full bg-primary/10 p-3">
+        <img src={scannerLogo.src} alt="" width="32" height="32" class="h-8 w-8" />
+      </div>
+      <h1 class="mx-auto max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl">
+        Free HTTP Headers Checker
+      </h1>
+      <p class="mx-auto mb-10 mt-5 max-w-2xl text-lg text-muted-foreground">
+        Enter any public URL to inspect the HTTP response headers observed by our
+        scanner. Search the complete values, group common headers by purpose, and
+        open a neutral result with no account required.
+      </p>
+
+      <ScannerIsland resultView="all-headers" client:load />
+    </div>
+  </section>
+
+  <HttpHeadersCheckerContent />
+</BaseLayout>

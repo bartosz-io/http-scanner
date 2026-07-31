@@ -19,6 +19,7 @@ describe('SEO policy', () => {
 
   it.each([
     'https://httpscanner.com/',
+    'https://httpscanner.com/http-headers-checker/',
     'https://httpscanner.com/security-headers-checker/',
   ])('includes indexable URL %s', (page) => {
     expect(shouldIncludeInSitemap(page)).toBe(true);

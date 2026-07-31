@@ -1,0 +1,237 @@
+<section aria-labelledby="response-headers" class="site-container mx-auto px-4 py-14 sm:py-16">
+  <div class="mx-auto max-w-3xl">
+    <h2 id="response-headers" class="text-3xl font-semibold tracking-tight">
+      What are HTTP response headers?
+    </h2>
+    <div class="mt-5 space-y-4 leading-7 text-muted-foreground">
+      <p>
+        HTTP response headers are metadata sent by a server or intermediary with
+        an HTTP response. They describe how clients should cache, interpret,
+        authenticate, share and process the returned content.
+      </p>
+      <p>
+        They are separate from the response body. A single page can return
+        content details, cookies, cross-origin rules, timing data and security
+        instructions through its headers before the browser renders the body.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="check-headers" class="border-y border-border/60 bg-muted/30">
+  <div class="site-container mx-auto px-4 py-14 sm:py-16">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 id="check-headers" class="text-3xl font-semibold tracking-tight">
+        How to check HTTP headers
+      </h2>
+    </div>
+
+    <ol class="mx-auto mt-10 grid max-w-5xl gap-5 md:grid-cols-3">
+      <li class="rounded-lg border border-border bg-card p-6">
+        <span class="text-sm font-semibold text-muted-foreground">Step 1</span>
+        <h3 class="mt-2 font-semibold">Enter a public URL</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Provide the HTTPS or HTTP address whose response you want to inspect.
+        </p>
+      </li>
+      <li class="rounded-lg border border-border bg-card p-6">
+        <span class="text-sm font-semibold text-muted-foreground">Step 2</span>
+        <h3 class="mt-2 font-semibold">Make one server-side request</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Submit the URL once. The scanner follows redirects and records the
+          final successful response returned to its Cloudflare Worker.
+        </p>
+      </li>
+      <li class="rounded-lg border border-border bg-card p-6">
+        <span class="text-sm font-semibold text-muted-foreground">Step 3</span>
+        <h3 class="mt-2 font-semibold">Inspect the stored result</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Search names and complete values, then browse headers grouped by their
+          common purpose.
+        </p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section aria-labelledby="header-categories" class="site-container mx-auto px-4 py-14 sm:py-16">
+  <div class="mx-auto max-w-5xl">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 id="header-categories" class="text-3xl font-semibold tracking-tight">
+        Response header categories
+      </h2>
+      <p class="mt-4 leading-7 text-muted-foreground">
+        The result groups familiar fields by purpose while keeping every
+        observed value available for inspection.
+      </p>
+    </div>
+
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Caching</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Freshness, validation and cache behavior.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Content representation</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Media type, encoding, language and negotiation.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">CORS</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Cross-origin access and exposed response fields.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Cookies and authentication</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Session cookies and authentication challenges.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Redirects</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Target locations and response navigation.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Linking and performance</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Related resources, hints and server timings.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Security and privacy</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Browser protections and information policies.
+        </p>
+      </article>
+      <article class="rounded-lg border border-border bg-card p-5">
+        <h3 class="font-semibold">Infrastructure</h3>
+        <p class="mt-2 text-sm leading-6 text-muted-foreground">
+          Server, proxy, CDN and request-tracing details.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="header-example" class="border-y border-border/60 bg-muted/30">
+  <div class="site-container mx-auto px-4 py-14 sm:py-16">
+    <div class="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2 lg:items-center">
+      <div>
+        <h2 id="header-example" class="text-3xl font-semibold tracking-tight">
+          Example HTTP response headers
+        </h2>
+        <p class="mt-5 leading-7 text-muted-foreground">
+          A response starts with a status line, followed by named fields and
+          their values. The exact set varies by website, route and request.
+        </p>
+      </div>
+
+      <pre class="overflow-x-auto rounded-lg border border-border bg-card p-6 text-sm leading-7"><code>HTTP/2 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: public, max-age=300
+Content-Encoding: br
+Vary: Accept-Encoding
+Server-Timing: edge;dur=23</code></pre>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="checker-boundaries" class="site-container mx-auto px-4 py-14 sm:py-16">
+  <div class="mx-auto max-w-5xl">
+    <h2 id="checker-boundaries" class="text-3xl font-semibold tracking-tight">
+      What this checker can and cannot show
+    </h2>
+    <div class="mt-8 grid gap-5 lg:grid-cols-2">
+      <article class="rounded-lg border border-border bg-card p-6 sm:p-8">
+        <h3 class="text-xl font-semibold">The response the scanner observed</h3>
+        <div class="mt-4 space-y-4 leading-7 text-muted-foreground">
+          <p>
+            The checker follows redirects and shows the final successful response.
+            Values reflect what the Cloudflare Worker observed, so they are not a
+            guaranteed direct response from the origin server. A CDN, proxy or
+            other intermediary may add, remove or change fields.
+          </p>
+          <p>
+            Known scanner-transport headers are excluded from the result. Custom
+            and less common fields can still appear under Other even when the
+            checker does not yet publish an explanation for them.
+          </p>
+        </div>
+      </article>
+
+      <article class="rounded-lg border border-border bg-card p-6 sm:p-8">
+        <h3 class="text-xl font-semibold">A neutral inventory, not a verdict</h3>
+        <div class="mt-4 space-y-4 leading-7 text-muted-foreground">
+          <p>
+            This neutral view is not a vulnerability assessment. It shows the
+            response metadata the scanner can observe without grading the result
+            or claiming that the website is secure.
+          </p>
+          <p>
+            The homepage Security Headers Checker provides security analysis for
+            supported browser-facing protections. Neither view replaces broader
+            application testing or a penetration test.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="headers-checker-faq" class="border-t border-border/60 bg-muted/30">
+  <div class="site-container mx-auto px-4 py-14 sm:py-16">
+    <div class="mx-auto max-w-3xl">
+      <h2 id="headers-checker-faq" class="text-3xl font-semibold tracking-tight">
+        HTTP headers checker FAQ
+      </h2>
+
+      <div class="mt-8 divide-y divide-border rounded-lg border border-border bg-card px-6">
+        <article class="py-6">
+          <h3 class="font-semibold">Is the HTTP headers checker free?</h3>
+          <p class="mt-2 leading-7 text-muted-foreground">
+            Yes. You can scan a public URL and inspect its result for free,
+            without creating an account.
+          </p>
+        </article>
+        <article class="py-6">
+          <h3 class="font-semibold">Does the checker change response headers?</h3>
+          <p class="mt-2 leading-7 text-muted-foreground">
+            The checker does not edit the website’s response. It reports what the
+            Cloudflare Worker receives after redirects, with known
+            scanner-transport fields filtered from the display.
+          </p>
+        </article>
+        <article class="py-6">
+          <h3 class="font-semibold">Are cookies shown?</h3>
+          <p class="mt-2 leading-7 text-muted-foreground">
+            Yes. Visible Set-Cookie response values are shown unmasked, exactly
+            as the scanner observed them on the public response. Review results
+            carefully before sharing them.
+          </p>
+        </article>
+        <article class="py-6">
+          <h3 class="font-semibold">Why can browser DevTools show different headers?</h3>
+          <p class="mt-2 leading-7 text-muted-foreground">
+            Your browser and the Worker can take different network paths, send
+            different request headers or receive personalized and cached
+            responses. Browser extensions, service workers, CDNs and timing can
+            also make DevTools differ from this server-side observation.
+          </p>
+        </article>
+        <article class="py-6">
+          <h3 class="font-semibold">Are custom headers supported?</h3>
+          <p class="mt-2 leading-7 text-muted-foreground">
+            Yes. Custom or unrecognized response fields remain visible under
+            Other even when no published explanation is available.
+          </p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
