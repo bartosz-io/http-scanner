@@ -35,6 +35,7 @@ export function getScannerMode(view: ScannerResultView): ScannerMode {
 export function createReportViewUrl(
   pathname: string,
   search: string,
+  hash: string,
   view: ScannerResultView
 ): string {
   const params = new URLSearchParams(search);
@@ -45,7 +46,7 @@ export function createReportViewUrl(
   }
 
   const query = params.toString();
-  return `${pathname}${query ? `?${query}` : ''}`;
+  return `${pathname}${query ? `?${query}` : ''}${hash}`;
 }
 
 export function selectAllResponseHeaders(groups: ReportHeaderGroups): AllResponseHeader[] {

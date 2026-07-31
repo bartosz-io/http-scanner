@@ -26,15 +26,31 @@ describe('getScannerMode', () => {
 
 describe('createReportViewUrl', () => {
   it('adds the all-headers view after existing safe parameters', () => {
-    expect(createReportViewUrl('/report/hash', '?source=scan', 'all-headers')).toBe(
+    expect(createReportViewUrl('/report/hash', '?source=scan', '', 'all-headers')).toBe(
       '/report/hash?source=scan&view=all-headers'
     );
   });
 
   it('removes the default view while preserving unrelated parameters', () => {
     expect(
-      createReportViewUrl('/report/hash', '?view=all-headers&source=scan', 'security-analysis')
+      createReportViewUrl(
+        '/report/hash',
+        '?view=all-headers&source=scan',
+        '',
+        'security-analysis'
+      )
     ).toBe('/report/hash?source=scan');
+  });
+
+  it('preserves the current fragment when switching views', () => {
+    expect(
+      createReportViewUrl(
+        '/report/hash',
+        '?source=scan',
+        '#response-headers',
+        'all-headers'
+      )
+    ).toBe('/report/hash?source=scan&view=all-headers#response-headers');
   });
 });
 
@@ -140,6 +156,32 @@ describe('selectAllResponseHeaders', () => {
         category: 'Cookies and authentication',
         summary: expect.any(String),
         guideSlug: 'set-cookie',
+      },
+    ]);
+  });
+
+  it('projects inherited object keys as neutral Other headers', () => {
+    const groups: ReportHeaderGroups = {
+      detected: [
+        {
+          name: 'constructor',
+          value: 'target-value',
+          present: true,
+          weight: 0,
+          leaking: false,
+        },
+      ],
+      missing: [],
+      leaking: [],
+    };
+
+    expect(selectAllResponseHeaders(groups)).toEqual([
+      {
+        name: 'constructor',
+        displayName: 'Constructor',
+        value: 'target-value',
+        category: 'Other',
+        summary: 'This response header is not yet covered by the HTTP Scanner reference.',
       },
     ]);
   });

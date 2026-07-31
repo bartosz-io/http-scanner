@@ -104,6 +104,11 @@ describe('HTTP headers checker SEO contract', () => {
     );
   });
 
+  it('uses a valid HTTP status line in the static response example', () => {
+    expect(contentSource).toContain('HTTP/1.1 200 OK');
+    expect(contentSource).not.toContain('HTTP/2 200 OK');
+  });
+
   it('does not publish links to the future header reference library or guides', () => {
     for (const source of [pageSource, contentSource]) {
       expect(source).not.toMatch(/href=["'][^"']*\/headers\//i);

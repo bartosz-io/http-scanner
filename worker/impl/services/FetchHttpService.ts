@@ -9,7 +9,6 @@ export class FetchHttpService implements HttpService {
   private readonly TIMEOUT_MS = 5000;
 
   async fetchHeaders(url: string): Promise<Record<string, string>> {
-    console.log(`[FetchHttpService] Starting fetchHeaders for URL: ${url}`);
     let retries = 0;
     let lastError: Error | null = null;
 
@@ -58,7 +57,6 @@ export class FetchHttpService implements HttpService {
         
         clearTimeout(timeoutId);
         console.log(`[FetchHttpService] Response received, status: ${response.status}, type: ${response.type}`);
-        console.log(`[FetchHttpService] Final URL after redirects: ${response.url}`);
         
         // Check if the response status is not in the successful range (200-299)
         if (response.status < 200 || response.status >= 300) {
@@ -66,28 +64,11 @@ export class FetchHttpService implements HttpService {
           throw new Error(`URL returned status code ${response.status}`);
         }
         
-        // Log if we're on HTTPS which is required for STS header
-        console.log(`[FetchHttpService] Protocol: ${new URL(response.url).protocol}`);
-        
-        // Log all headers as a complete object
-        const headersObj: Record<string, string> = {};
-        response.headers.forEach((value, key) => {
-          headersObj[key] = value;
-        });
-        console.log('[FetchHttpService] All response headers:', JSON.stringify(headersObj, null, 2));
-        
-        // Log specific security headers directly from response
-        console.log(`[FetchHttpService] Direct STS header check: ${response.headers.get('strict-transport-security')}`);
-        console.log(`[FetchHttpService] Direct CSP header check: ${response.headers.get('content-security-policy')}`);
-        
         // Extract and filter scanner transport headers
         const extractedHeaders = extractResponseHeaders(response.headers);
         const filteredHeaders = filterScannerTransportHeaders(extractedHeaders);
-        
-        console.log('[FetchHttpService] Final headers after filtering:', JSON.stringify(filteredHeaders, null, 2));
-        
-        // Verify STS header in extracted result
-        console.log(`[FetchHttpService] STS in extracted headers: ${filteredHeaders['strict-transport-security']}`);
+        console.log(`[FetchHttpService] Extracted response header count: ${Object.keys(extractedHeaders).length}`);
+        console.log(`[FetchHttpService] Response header count after transport filtering: ${Object.keys(filteredHeaders).length}`);
         
         return filteredHeaders;
       } catch (error) {

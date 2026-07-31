@@ -206,7 +206,10 @@ const headerCatalogEntries = Object.values(headerCatalog);
 const headerCatalogByName: Record<string, HeaderCatalogEntry> = headerCatalog;
 
 export function getHeaderCatalogEntry(name: string): HeaderCatalogEntry | undefined {
-  return headerCatalogByName[name.toLowerCase()];
+  const normalizedName = name.toLowerCase();
+  return Object.hasOwn(headerCatalogByName, normalizedName)
+    ? headerCatalogByName[normalizedName]
+    : undefined;
 }
 
 export function listHeaderCatalogEntries(): HeaderCatalogEntry[] {

@@ -45,4 +45,9 @@ describe('header catalog', () => {
     expect(getHeaderCatalogEntry('Cache-Control')?.slug).toBe('cache-control');
     expect(getHeaderCatalogEntry('X-Custom-Thing')).toBeUndefined();
   });
+
+  it('does not resolve inherited object keys as catalog entries', () => {
+    expect(getHeaderCatalogEntry('constructor')).toBeUndefined();
+    expect(getHeaderCatalogEntry('__proto__')).toBeUndefined();
+  });
 });
