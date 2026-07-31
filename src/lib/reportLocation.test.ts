@@ -48,15 +48,22 @@ describe('createReportPath', () => {
     expect(createReportPath(REPORT_HASH)).toBe(`/report/${REPORT_HASH}`);
   });
 
-  it('adds a validated delete token after a successful scan', () => {
-    expect(createReportPath(REPORT_HASH, DELETE_TOKEN)).toBe(
-      `/report/${REPORT_HASH}?token=${DELETE_TOKEN}`
+  it('adds a view before a validated delete token after a successful scan', () => {
+    expect(createReportPath(REPORT_HASH, {
+      deleteToken: DELETE_TOKEN,
+      view: 'all-headers',
+    })).toBe(`/report/${REPORT_HASH}?view=all-headers&token=${DELETE_TOKEN}`);
+  });
+
+  it('omits the default report view from generated URLs', () => {
+    expect(createReportPath(REPORT_HASH, { view: 'security-analysis' })).toBe(
+      `/report/${REPORT_HASH}`
     );
   });
 
   it('rejects malformed report data', () => {
     expect(() => createReportPath('invalid')).toThrow(/invalid hash/);
-    expect(() => createReportPath(REPORT_HASH, 'invalid')).toThrow(
+    expect(() => createReportPath(REPORT_HASH, { deleteToken: 'invalid' })).toThrow(
       /invalid delete token/
     );
   });
@@ -67,9 +74,9 @@ describe('createSanitizedReportUrl', () => {
     expect(
       createSanitizedReportUrl(
         `/report/${REPORT_HASH}`,
-        `?token=${DELETE_TOKEN}&source=scan`
+        `?token=${DELETE_TOKEN}&view=all-headers&source=scan`
       )
-    ).toBe(`/report/${REPORT_HASH}?source=scan`);
+    ).toBe(`/report/${REPORT_HASH}?view=all-headers&source=scan`);
   });
 
   it('preserves a fragment and normalizes its prefix', () => {
@@ -88,13 +95,14 @@ describe('parseBrowserReportLocation', () => {
     expect(
       parseBrowserReportLocation(
         `/report/${REPORT_HASH}`,
-        `?token=${DELETE_TOKEN}&source=scan`
+        `?token=${DELETE_TOKEN}&view=all-headers&source=scan`
       )
     ).toEqual({
       hash: REPORT_HASH,
       deleteToken: DELETE_TOKEN,
-      sanitizedUrl: `/report/${REPORT_HASH}?source=scan`,
+      sanitizedUrl: `/report/${REPORT_HASH}?view=all-headers&source=scan`,
       shouldSanitize: true,
+      view: 'all-headers',
     });
   });
 
@@ -106,6 +114,7 @@ describe('parseBrowserReportLocation', () => {
       deleteToken: null,
       sanitizedUrl: `/report/${REPORT_HASH}`,
       shouldSanitize: true,
+      view: 'security-analysis',
     });
   });
 });

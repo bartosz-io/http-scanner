@@ -12,7 +12,7 @@ export const ScannerIsland: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleScanSuccess = (response: ScanResponseDTO) => {
-    window.location.assign(createReportPath(response.hash, response.deleteToken));
+    window.location.assign(createReportPath(response.hash, { deleteToken: response.deleteToken }));
   };
 
   const handleScanStart = () => {
