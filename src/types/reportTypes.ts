@@ -1,4 +1,8 @@
-import type { FetchReportResponseDTO, HeaderEntry } from "../types";
+import type { FetchReportResponseDTO, HeaderEntry } from '../types';
+import type {
+  AllResponseHeader,
+  ScannerResultView,
+} from '../lib/reportView';
 
 /**
  * Enum representing the different types of header tabs in the Report View
@@ -16,6 +20,27 @@ export interface ReportHeaderProps {
   url: string;
   createdAt: number;
   deleteToken?: string;
+}
+
+export interface ReportViewProps {
+  hash: string;
+  token: string | null;
+  view: ScannerResultView;
+  onViewChange(view: ScannerResultView): void;
+}
+
+export interface ReportViewSwitchProps {
+  value: ScannerResultView;
+  onChange(view: ScannerResultView): void;
+}
+
+export interface AllHeadersSectionProps {
+  headers: AllResponseHeader[];
+  linkGuides?: boolean;
+}
+
+export interface AllHeaderCardProps {
+  header: AllResponseHeader;
 }
 
 /**

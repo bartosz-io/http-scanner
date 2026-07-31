@@ -1,25 +1,31 @@
 import React, { useEffect } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { HeaderEntry } from '../../types';
+import type { ReportViewProps } from '../../types/reportTypes';
 import { useReportData } from '../../hooks/useReportData';
 import { capturePostHogEvent } from '../../lib/posthogClient';
+import {
+  selectAllResponseHeaders,
+  type ReportHeaderGroups,
+} from '../../lib/reportView';
 import { ReportHeader } from './ReportHeader';
+import { ReportViewSwitch } from './ReportViewSwitch';
 import { ScoreSection } from './ScoreSection';
 import { HeadersSection } from './HeadersSection';
 import { SharingSection } from './SharingSection';
 import { DeleteSection } from './DeleteSection';
 import { TokenWarningAlert } from './TokenWarningAlert';
+import { AllHeadersSection } from './AllHeadersSection';
 
 /**
  * ReportView component displays the detailed scan results for a security header scan
  */
-interface ReportViewProps {
-  hash: string;
-  token: string | null;
-}
-
-export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
+export const ReportView: React.FC<ReportViewProps> = ({
+  hash,
+  token,
+  view,
+  onViewChange,
+}) => {
   // Use the custom hook to manage the report state and functionality
   const {
     report,
@@ -34,11 +40,7 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
 
     // Headers in this application come in a grouped format
     // Make sure we properly handle the structure
-    const headers = report.headers as unknown as {
-      detected: HeaderEntry[];
-      missing: HeaderEntry[];
-      leaking: HeaderEntry[];
-    };
+    const headers = report.headers as unknown as ReportHeaderGroups;
     
     // Validate the structure to ensure it has the expected properties
     if (headers && 'detected' in headers && 'missing' in headers && 'leaking' in headers) {
@@ -50,15 +52,21 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
     return { detected: [], missing: [], leaking: [] };
   }, [report]);
 
+  const allHeaders = React.useMemo(
+    () => selectAllResponseHeaders(headerData),
+    [headerData]
+  );
+
   useEffect(() => {
     if (report) {
       capturePostHogEvent('report viewed', {
         url: report.url,
         score: report.score,
         hash: report.hash,
+        report_view: view,
       });
     }
-  }, [report]);
+  }, [report, view]);
 
   // Render loading state
   if (isLoading) {
@@ -108,30 +116,40 @@ export const ReportView: React.FC<ReportViewProps> = ({ hash, token }) => {
             <TokenWarningAlert deleteToken={token} />
           )}
 
-          {/* Two-column layout for score and sharing with equal heights */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Left column: Score section with gauge */}
-            <div className="flex h-full">
-              <div className="flex-grow">
-                <ScoreSection score={report.score} />
-              </div>
-            </div>
+          <ReportViewSwitch value={view} onChange={onViewChange} />
 
-            {/* Right column: Sharing options */}
-            <div className="flex h-full">
-              <div className="flex-grow">
-                <SharingSection
-                  url={report.url}
-                  score={report.score}
-                  hash={report.hash}
-                  shareImageUrl={report.share_image_url}
-                />
-              </div>
-            </div>
-          </div>
+          {view === 'security-analysis' && (
+            <>
+              {/* Two-column layout for score and sharing with equal heights */}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {/* Left column: Score section with gauge */}
+                <div className="flex h-full">
+                  <div className="flex-grow">
+                    <ScoreSection score={report.score} />
+                  </div>
+                </div>
 
-          {/* Headers section with tabs */}
-          <HeadersSection headers={headerData} />
+                {/* Right column: Sharing options */}
+                <div className="flex h-full">
+                  <div className="flex-grow">
+                    <SharingSection
+                      url={report.url}
+                      score={report.score}
+                      hash={report.hash}
+                      shareImageUrl={report.share_image_url}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Headers section with tabs */}
+              <HeadersSection headers={headerData} />
+            </>
+          )}
+
+          {view === 'all-headers' && (
+            <AllHeadersSection headers={allHeaders} linkGuides={false} />
+          )}
 
           {/* Delete report option */}
           <DeleteSection hash={report.hash} />
