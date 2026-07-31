@@ -1,11 +1,11 @@
 import type { HeaderEntry } from '@/types';
 
-export interface HeaderGuideResource {
+export interface HeaderSecurityGuideResource {
   label: string;
   url: string;
 }
 
-export interface HeaderGuide {
+export interface HeaderSecurityGuide {
   /** Short copy that appears in the header card summary */
   summary: string;
   /** Longer explanation that helps developers understand the risk */
@@ -19,12 +19,12 @@ export interface HeaderGuide {
   /** Extra insights or best practices we want to surface */
   bestPractices?: string[];
   /** Authoritative resources */
-  resources?: HeaderGuideResource[];
+  resources?: HeaderSecurityGuideResource[];
 }
 
-type HeaderGuideRegistry = Record<string, HeaderGuide>;
+type HeaderSecurityGuideRegistry = Record<string, HeaderSecurityGuide>;
 
-const headerGuides: HeaderGuideRegistry = {
+const headerSecurityGuides: HeaderSecurityGuideRegistry = {
   'content-security-policy': {
     summary: 'Defines which origins are trusted to load scripts, styles, frames, and other resources so browsers can block everything else.',
     risk: 'Weak or missing CSP means any injected markup can load external code or run inline scripts, opening the door to XSS, data exfiltration, and clickjacking.',
@@ -306,8 +306,8 @@ const headerGuides: HeaderGuideRegistry = {
   },
 };
 
-export const getHeaderGuide = (headerName: HeaderEntry['name']) => {
-  return headerGuides[headerName.toLowerCase()];
+export const getHeaderSecurityGuide = (headerName: HeaderEntry['name']) => {
+  return headerSecurityGuides[headerName.toLowerCase()];
 };
 
-export const listGuidedHeaders = () => Object.keys(headerGuides);
+export const listSecurityGuidedHeaders = () => Object.keys(headerSecurityGuides);

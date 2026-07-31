@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { HeaderEntry } from '@/types';
 import { HeaderTabType } from '@/types/reportTypes';
-import { getHeaderGuide } from '@/lib/headerGuides';
+import { getHeaderSecurityGuide } from '@/lib/headerSecurityGuides';
 import { FormattedHeaderValue } from './FormattedHeaderValue';
 
 const statusConfig: Record<
@@ -126,7 +126,7 @@ const tabStatusLabel: Record<HeaderTabType, string> = {
 export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
   const [expanded, setExpanded] = React.useState(false);
   const { copy, copiedValue } = useCopyToClipboard();
-  const guide = getHeaderGuide(header.name);
+  const guide = getHeaderSecurityGuide(header.name);
 
   const statusKey = header.status ?? 'unknown';
   const status = statusConfig[statusKey] ?? statusConfig.unknown;
