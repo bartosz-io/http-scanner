@@ -11,7 +11,7 @@ const description = 'Check your website’s HTTP security headers for missing or
 
 <BaseLayout title={title} description={description} canonicalPath="/">
   <section class="border-b border-border/60 bg-gradient-to-b from-muted/50 to-background">
-    <div class="container mx-auto px-4 py-16 text-center sm:py-20">
+    <div class="site-container mx-auto px-4 py-16 text-center sm:py-20">
       <div class="mb-6 inline-flex items-center justify-center rounded-full bg-primary/10 p-3">
         <img src={scannerLogo.src} alt="" width="32" height="32" class="h-8 w-8" />
       </div>
@@ -30,7 +30,7 @@ const description = 'Check your website’s HTTP security headers for missing or
 
   <HomepageSeoContent />
 
-  <div class="container mx-auto px-4">
+  <div class="site-container mx-auto px-4">
     <RecentScansIsland client:visible />
   </div>
 </BaseLayout>
