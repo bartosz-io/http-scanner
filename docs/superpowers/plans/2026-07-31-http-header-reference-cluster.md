@@ -275,7 +275,7 @@ git commit -m "content: add infrastructure and caching guides"
 **Interfaces:**
 - Produces catalog category `Content and representation`
 
-- [ ] **Step 1: Add and run a RED group inventory**
+- [x] **Step 1: Add and run a RED group inventory**
 
 ```ts
 const representationSlugs = [
@@ -284,7 +284,7 @@ const representationSlugs = [
 ];
 ```
 
-- [ ] **Step 2: Author all 7 documents using this matrix**
+- [x] **Step 2: Author all 7 documents using this matrix**
 
 | Slug | Required syntax/example and distinction | Primary source |
 |---|---|---|
@@ -298,7 +298,7 @@ const representationSlugs = [
 
 Include concrete mistakes involving compressed byte length, charset assumptions, unsafe filenames, or confusing response fields with request counterparts.
 
-- [ ] **Step 3: Validate and commit the batch**
+- [x] **Step 3: Validate and commit the batch**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts
