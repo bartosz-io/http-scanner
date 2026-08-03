@@ -1,0 +1,11 @@
+---
+import HeaderReferenceIndex from '@/components/astro/HeaderReferenceIndex.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const title = 'HTTP Header Reference | HTTP Scanner';
+const description = 'Learn what common HTTP response headers mean, how their syntax works, and how to interpret real values from caching, CORS, cookies, security, redirects, and more.';
+---
+
+<BaseLayout title={title} description={description} canonicalPath="/headers/">
+  <HeaderReferenceIndex />
+</BaseLayout>

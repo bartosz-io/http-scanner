@@ -1,0 +1,77 @@
+---
+import {
+  HEADER_CATEGORIES,
+  listHeaderCatalogEntries,
+  type HeaderCatalogEntry,
+} from '@/lib/headerCatalog';
+
+const entries = listHeaderCatalogEntries();
+const groups = HEADER_CATEGORIES.map((category) => ({
+  category,
+  entries: entries.filter((entry) => entry.category === category),
+}));
+
+function guidePath(entry: HeaderCatalogEntry): string {
+  return `/headers/${entry.slug}/`;
+}
+---
+
+<section class="border-b border-border/60 bg-gradient-to-b from-muted/50 to-background">
+  <div class="site-container px-4 py-16 sm:py-20">
+    <p class="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      HTTP Scanner reference
+    </p>
+    <h1 class="mt-3 max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl">
+      HTTP Response Header Reference
+    </h1>
+    <p class="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
+      Browse practical explanations of common HTTP response headers, including
+      syntax, examples, implementation mistakes, and security considerations.
+    </p>
+    <a
+      href="/http-headers-checker/"
+      class="mt-8 inline-flex rounded-md bg-primary px-5 py-3 font-semibold text-primary-foreground"
+    >
+      Check a website’s response headers
+    </a>
+  </div>
+</section>
+
+<div class="site-container px-4 py-14 sm:py-16">
+  <div class="space-y-14">
+    {groups.map(({ category, entries: categoryEntries }) => (
+      <section aria-labelledby={`category-${category.toLowerCase().replaceAll(' ', '-')}`}>
+        <h2
+          id={`category-${category.toLowerCase().replaceAll(' ', '-')}`}
+          class="text-2xl font-semibold tracking-tight"
+        >
+          {category}
+        </h2>
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          {categoryEntries.map((entry) => (
+            <article class="rounded-lg border border-border bg-card p-5">
+              <h3 class="font-semibold">
+                <a class="underline-offset-4 hover:underline" href={guidePath(entry)}>
+                  {entry.displayName}
+                </a>
+              </h3>
+              <p class="mt-2 text-sm leading-6 text-muted-foreground">{entry.summary}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <aside class="mt-14 rounded-lg border border-border bg-muted/30 p-6 sm:p-8">
+    <h2 class="text-xl font-semibold">Looking for a custom header?</h2>
+    <p class="mt-3 max-w-3xl leading-7 text-muted-foreground">
+      The checker displays custom and uncommon response fields even when this
+      reference does not yet have a dedicated page for them. Scan the URL to see
+      the complete observed names and values.
+    </p>
+    <a class="mt-5 inline-block font-semibold underline underline-offset-4" href="/http-headers-checker/">
+      Open the free HTTP Headers Checker
+    </a>
+  </aside>
+</div>

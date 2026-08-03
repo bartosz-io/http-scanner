@@ -21,6 +21,10 @@ describe('SEO policy', () => {
     'https://httpscanner.com/',
     'https://httpscanner.com/http-headers-checker/',
     'https://httpscanner.com/security-headers-checker/',
+    'https://httpscanner.com/headers/',
+    'https://httpscanner.com/headers/content-security-policy/',
+    'https://httpscanner.com/headers/cache-control/',
+    'https://httpscanner.com/headers/set-cookie/',
   ])('includes indexable URL %s', (page) => {
     expect(shouldIncludeInSitemap(page)).toBe(true);
   });

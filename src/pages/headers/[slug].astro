@@ -1,0 +1,66 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import HeaderGuidePage from '@/components/astro/HeaderGuidePage.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  getHeaderCatalogEntry,
+  listHeaderCatalogEntries,
+  type HeaderCatalogEntry,
+} from '@/lib/headerCatalog';
+
+interface Props {
+  guide: CollectionEntry<'headers'>;
+  catalogEntry: HeaderCatalogEntry;
+  relatedEntries: HeaderCatalogEntry[];
+}
+
+export async function getStaticPaths() {
+  const guides = await getCollection('headers');
+  const guideIds = new Set(guides.map((guide) => guide.id));
+
+  for (const entry of listHeaderCatalogEntries()) {
+    if (!guideIds.has(entry.slug)) {
+      throw new Error(`Missing header guide content for catalog entry: ${entry.slug}`);
+    }
+  }
+
+  return guides.map((guide) => {
+    const catalogEntry = getHeaderCatalogEntry(guide.data.headerName);
+    if (!catalogEntry || catalogEntry.slug !== guide.id) {
+      throw new Error(`Header guide ${guide.id} does not match a catalog entry`);
+    }
+
+    const relatedEntries = guide.data.relatedHeaders.map((name) => {
+      const relatedEntry = getHeaderCatalogEntry(name);
+      if (!relatedEntry) {
+        throw new Error(`Unknown related header ${name} in guide ${guide.id}`);
+      }
+      return relatedEntry;
+    });
+
+    return {
+      params: { slug: catalogEntry.slug },
+      props: { guide, catalogEntry, relatedEntries },
+    };
+  });
+}
+
+const { guide, catalogEntry, relatedEntries } = Astro.props;
+const { Content } = await render(guide);
+const title = `${catalogEntry.displayName} HTTP Header — Syntax & Examples | HTTP Scanner`;
+const canonicalPath = `/headers/${catalogEntry.slug}/`;
+---
+
+<BaseLayout
+  title={title}
+  description={guide.data.description}
+  canonicalPath={canonicalPath}
+>
+  <HeaderGuidePage
+    guide={guide}
+    catalogEntry={catalogEntry}
+    relatedEntries={relatedEntries}
+  >
+    <Content />
+  </HeaderGuidePage>
+</BaseLayout>

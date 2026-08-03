@@ -413,21 +413,21 @@ Expected: exactly 45 unique content files and zero schema/source errors.
 - Produces static `/headers/` and one `/headers/<catalog-slug>/` per document
 - Consumes `getCollection('headers')`, `render(entry)`, and catalog lookup
 
-- [ ] **Step 1: Write RED static-route contracts**
+- [x] **Step 1: Write RED static-route contracts**
 
 Assert approved index title/H1/canonical and guide title pattern. Assert `[slug].astro` uses `getStaticPaths`, `getCollection('headers')`, and catalog lookup. Assert neither Astro component contains `client:`. Add `/headers/` and representative guides to sitemap-policy include cases.
 
-- [ ] **Step 2: Run and confirm RED**
+- [x] **Step 2: Run and confirm RED**
 
 ```bash
 npm test -- src/lib/headerReferenceSeoContract.test.ts src/lib/seoPolicy.test.ts
 ```
 
-- [ ] **Step 3: Build the grouped index**
+- [x] **Step 3: Build the grouped index**
 
 Use title `HTTP Header Reference | HTTP Scanner`, H1 `HTTP Response Header Reference`, canonical `/headers/`, and description `Learn what common HTTP response headers mean, how their syntax works, and how to interpret real values from caching, CORS, cookies, security, redirects, and more.` Group `listHeaderCatalogEntries()` in `HEADER_CATEGORIES` order; link every entry; add checker CTA and explain that custom headers may lack dedicated pages.
 
-- [ ] **Step 4: Generate only catalog-backed guide paths**
+- [x] **Step 4: Generate only catalog-backed guide paths**
 
 Fail the build if any content ID/header name lacks a matching catalog entry. Use:
 
@@ -438,7 +438,7 @@ const canonicalPath = `/headers/${catalogEntry.slug}/`;
 
 Render one H1, summary, applicability, syntax, all examples/use cases/mistakes, security consideration, related catalog links, sources, Markdown content, checker CTA, and for security/privacy entries a homepage Security Headers Checker link. Pass `guide.data.description` to `BaseLayout` so every guide emits its unique meta description.
 
-- [ ] **Step 5: Test, build, and commit routes**
+- [x] **Step 5: Test, build, and commit routes**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts src/lib/headerReferenceSeoContract.test.ts src/lib/seoPolicy.test.ts
