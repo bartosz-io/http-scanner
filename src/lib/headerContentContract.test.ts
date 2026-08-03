@@ -1,6 +1,7 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateHeaderGuideSource } from './headerContentContract';
+import { listHeaderCatalogEntries } from './headerCatalog';
 
 const PROJECT_ROOT = new URL('../../', import.meta.url);
 const LONG_BODY = Array.from({ length: 180 }, (_, index) => `word${index + 1}`).join(' ');
@@ -53,6 +54,16 @@ const corsSlugs = [
   'access-control-allow-headers',
   'access-control-expose-headers',
   'access-control-max-age',
+] as const;
+
+const controlAndMetadataSlugs = [
+  'set-cookie',
+  'www-authenticate',
+  'location',
+  'retry-after',
+  'link',
+  'server-timing',
+  'timing-allow-origin',
 ] as const;
 
 function createGuideSource({
@@ -227,5 +238,44 @@ describe('HTTP header guide source contract', () => {
     });
 
     expect(errors).toEqual([]);
+  });
+
+  it('validates every cookie, control, linking, and timing guide', () => {
+    const errors = controlAndMetadataSlugs.flatMap((slug) => {
+      const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
+      if (!existsSync(guideUrl)) {
+        return [`Missing guide: ${slug}`];
+      }
+
+      return validateHeaderGuideSource(slug, readFileSync(guideUrl, 'utf8'))
+        .map((error) => `${slug}: ${error}`);
+    });
+
+    expect(errors).toEqual([]);
+  });
+
+  it('matches the complete catalog one-to-one with unique descriptions', () => {
+    const contentDirectoryUrl = new URL('src/content/headers/', PROJECT_ROOT);
+    const files = readdirSync(contentDirectoryUrl)
+      .filter((file) => file.endsWith('.md'))
+      .sort((left, right) => (
+        left.replace(/\.md$/, '').localeCompare(right.replace(/\.md$/, ''))
+      ));
+    const sources = files.map((file) => readFileSync(new URL(file, contentDirectoryUrl), 'utf8'));
+    const catalogEntries = listHeaderCatalogEntries();
+    const catalogSlugs = catalogEntries.map((entry) => entry.slug).sort();
+    const catalogNames = catalogEntries.map((entry) => entry.name).sort();
+    const sourceNames = sources.map((source) => (
+      source.match(/^headerName:\s*(.+)$/m)?.[1]?.trim() ?? ''
+    )).sort();
+    const descriptions = sources.map((source) => (
+      source.match(/^description:\s*(.+)$/m)?.[1]?.trim() ?? ''
+    ));
+
+    expect(files.map((file) => file.replace(/\.md$/, ''))).toEqual(catalogSlugs);
+    expect(sourceNames).toEqual(catalogNames);
+    expect(descriptions).toHaveLength(45);
+    expect(new Set(descriptions).size).toBe(45);
+    expect(descriptions).not.toContain('');
   });
 });

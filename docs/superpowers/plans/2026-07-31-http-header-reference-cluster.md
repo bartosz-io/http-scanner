@@ -361,7 +361,7 @@ git commit -m "content: add CORS header guides"
 **Interfaces:**
 - Completes the exact 45-document inventory
 
-- [ ] **Step 1: Add the final RED group and full-inventory assertion**
+- [x] **Step 1: Add the final RED group and full-inventory assertion**
 
 ```ts
 const controlAndMetadataSlugs = [
@@ -372,7 +372,7 @@ const controlAndMetadataSlugs = [
 
 Compare sorted Markdown basenames and extracted `headerName:` values with all sorted catalog slugs/names; require one-to-one equality. Extract every top-level `description:` value and assert all 45 descriptions are unique.
 
-- [ ] **Step 2: Author all seven documents using this matrix**
+- [x] **Step 2: Author all seven documents using this matrix**
 
 | Slug | Required syntax/example and distinction | Primary source |
 |---|---|---|
@@ -386,7 +386,7 @@ Compare sorted Markdown basenames and extracted `headerName:` values with all so
 
 State explicitly that scanner reports keep observed `Set-Cookie` values unmasked in this release. Explain timing-field privacy implications.
 
-- [ ] **Step 3: Validate exact inventory and commit**
+- [x] **Step 3: Validate exact inventory and commit**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts
