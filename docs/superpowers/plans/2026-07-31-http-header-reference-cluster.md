@@ -318,7 +318,7 @@ git commit -m "content: add representation header guides"
 **Interfaces:**
 - Produces catalog category `CORS`
 
-- [ ] **Step 1: Add and run a RED group inventory**
+- [x] **Step 1: Add and run a RED group inventory**
 
 ```ts
 const corsSlugs = [
@@ -328,7 +328,7 @@ const corsSlugs = [
 ];
 ```
 
-- [ ] **Step 2: Author all six documents against the Fetch Standard**
+- [x] **Step 2: Author all six documents against the Fetch Standard**
 
 | Slug | Required syntax/example and distinction |
 |---|---|
@@ -341,7 +341,7 @@ const corsSlugs = [
 
 Each document references <https://fetch.spec.whatwg.org/> and its MDN page, explains simple vs preflighted requests, and never claims CORS prevents the network request from reaching a server.
 
-- [ ] **Step 3: Validate and commit the batch**
+- [x] **Step 3: Validate and commit the batch**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts

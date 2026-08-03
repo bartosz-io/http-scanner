@@ -46,6 +46,15 @@ const representationSlugs = [
   'accept-ranges',
 ] as const;
 
+const corsSlugs = [
+  'access-control-allow-origin',
+  'access-control-allow-credentials',
+  'access-control-allow-methods',
+  'access-control-allow-headers',
+  'access-control-expose-headers',
+  'access-control-max-age',
+] as const;
+
 function createGuideSource({
   body = LONG_BODY,
   headerName = 'cache-control',
@@ -194,6 +203,20 @@ describe('HTTP header guide source contract', () => {
 
   it('validates every content and representation guide', () => {
     const errors = representationSlugs.flatMap((slug) => {
+      const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
+      if (!existsSync(guideUrl)) {
+        return [`Missing guide: ${slug}`];
+      }
+
+      return validateHeaderGuideSource(slug, readFileSync(guideUrl, 'utf8'))
+        .map((error) => `${slug}: ${error}`);
+    });
+
+    expect(errors).toEqual([]);
+  });
+
+  it('validates every CORS guide', () => {
+    const errors = corsSlugs.flatMap((slug) => {
       const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
       if (!existsSync(guideUrl)) {
         return [`Missing guide: ${slug}`];
