@@ -89,11 +89,11 @@ The literal Cache-Control document is authored in Task 3 with original prose in 
 - Produces `validateHeaderGuideSource(slug: string, source: string): string[]`
 - Frontmatter types include `applicability`, `syntax`, `examples`, `useCases`, `commonMistakes`, `securityConsiderations`, `relatedHeaders`, and `references`
 
-- [ ] **Step 1: Write RED validator fixture tests**
+- [x] **Step 1: Write RED validator fixture tests**
 
 Test one complete source fixture and fixtures with a missing required heading, mismatched `headerName`, fewer than 180 body words, a `client:` directive, and an unknown related-header slug. The complete fixture returns `[]`; every invalid fixture returns its specific error.
 
-- [ ] **Step 2: Run and confirm RED**
+- [x] **Step 2: Run and confirm RED**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts
@@ -101,7 +101,7 @@ npm test -- src/lib/headerContentContract.test.ts
 
 Expected: FAIL because the validator does not exist.
 
-- [ ] **Step 3: Implement the pure source validator**
+- [x] **Step 3: Implement the pure source validator**
 
 The validator must accumulate errors and enforce all of these rules:
 
@@ -111,7 +111,7 @@ The validator must accumulate errors and enforce all of these rules:
 4. source contains neither `client:` nor `application/ld+json`;
 5. every list item under `relatedHeaders:` resolves through `getHeaderCatalogEntry()`.
 
-- [ ] **Step 4: Define the Astro collection schema**
+- [x] **Step 4: Define the Astro collection schema**
 
 Create `src/content.config.ts`:
 
@@ -143,7 +143,7 @@ const headers = defineCollection({
 export const collections = { headers };
 ```
 
-- [ ] **Step 5: Run tests and Astro check**
+- [x] **Step 5: Run tests and Astro check**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts
@@ -152,7 +152,7 @@ npm run check
 
 Expected: fixtures PASS and the empty collection configuration is valid.
 
-- [ ] **Step 6: Commit the content boundary**
+- [x] **Step 6: Commit the content boundary**
 
 ```bash
 git add src/content.config.ts src/lib/headerContentContract.ts src/lib/headerContentContract.test.ts

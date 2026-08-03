@@ -1,0 +1,123 @@
+import { describe, expect, it } from 'vitest';
+import { validateHeaderGuideSource } from './headerContentContract';
+
+const LONG_BODY = Array.from({ length: 180 }, (_, index) => `word${index + 1}`).join(' ');
+
+function createGuideSource({
+  body = LONG_BODY,
+  headerName = 'cache-control',
+  relatedHeaders = ['etag'],
+}: {
+  body?: string;
+  headerName?: string;
+  relatedHeaders?: string[];
+} = {}): string {
+  return `---
+headerName: ${headerName}
+description: A deliberately complete description used to exercise the Markdown source contract without relying on Astro parsing.
+applicability: response
+syntax: Cache-Control: max-age=3600
+examples:
+  - Cache-Control: no-store
+useCases:
+  - Prevent caching
+  - Control freshness
+commonMistakes:
+  - Applying contradictory directives
+  - Forgetting shared caches
+securityConsiderations: Caching sensitive responses can disclose private information to another user.
+relatedHeaders:
+${relatedHeaders.map((relatedHeader) => `  - ${relatedHeader}`).join('\n')}
+references:
+  - label: RFC 9111
+    url: https://www.rfc-editor.org/rfc/rfc9111
+---
+## Meaning and behavior
+
+${body}
+
+## Implementation notes
+
+Configure the header at the response boundary.
+`;
+}
+
+describe('HTTP header guide source contract', () => {
+  it('accepts a complete guide source', () => {
+    expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
+  });
+
+  it('rejects a guide missing a required heading', () => {
+    const source = createGuideSource().replace('## Meaning and behavior\n', '');
+
+    expect(validateHeaderGuideSource('cache-control', source)).toContain(
+      'Missing required heading: ## Meaning and behavior'
+    );
+  });
+
+  it('rejects a frontmatter headerName that differs from the filename slug', () => {
+    expect(validateHeaderGuideSource('cache-control', createGuideSource({ headerName: 'etag' }))).toContain(
+      'Header slug "cache-control" does not match frontmatter headerName "etag"'
+    );
+  });
+
+  it('rejects a guide body with fewer than 180 words', () => {
+    const source = createGuideSource({
+      body: Array.from({ length: 160 }, () => 'word').join(' '),
+    });
+
+    expect(validateHeaderGuideSource('cache-control', source)).toContain(
+      'Guide body must contain at least 180 words'
+    );
+  });
+
+  it('rejects client directives', () => {
+    const source = createGuideSource().replace(
+      'Configure the header at the response boundary.',
+      '<HeaderWidget client:load />'
+    );
+
+    expect(validateHeaderGuideSource('cache-control', source)).toContain(
+      'Guide source must not contain client: directives'
+    );
+  });
+
+  it('rejects JSON-LD scripts', () => {
+    const source = createGuideSource().replace(
+      'Configure the header at the response boundary.',
+      '<script type="application/ld+json">{}</script>'
+    );
+
+    expect(validateHeaderGuideSource('cache-control', source)).toContain(
+      'Guide source must not contain application/ld+json'
+    );
+  });
+
+  it('rejects related-header slugs that are absent from the catalog', () => {
+    const source = createGuideSource({ relatedHeaders: ['etag', 'not-a-real-header'] });
+
+    expect(validateHeaderGuideSource('cache-control', source)).toContain(
+      'Unknown related header: not-a-real-header'
+    );
+  });
+
+  it('accumulates validation errors in stable contract order', () => {
+    const source = createGuideSource({
+      body: 'client:load application/ld+json',
+      headerName: 'etag',
+      relatedHeaders: ['not-a-real-header'],
+    })
+      .replace('## Meaning and behavior\n', '')
+      .replace('## Implementation notes\n', '');
+
+    expect(validateHeaderGuideSource('cache-control', source)).toEqual([
+      'Header slug "cache-control" does not match frontmatter headerName "etag"',
+      'Missing required heading: ## Meaning and behavior',
+      'Missing required heading: ## Implementation notes',
+      'Guide body must contain at least 180 words',
+      'Guide source must not contain client: directives',
+      'Guide source must not contain application/ld+json',
+      'Unknown related header: not-a-real-header',
+    ]);
+  });
+});
