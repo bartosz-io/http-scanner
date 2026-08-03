@@ -227,7 +227,7 @@ git commit -m "content: add security and privacy header guides"
 **Interfaces:**
 - Produces 6 infrastructure/disclosure and 6 caching guides
 
-- [ ] **Step 1: Add and run a RED group inventory**
+- [x] **Step 1: Add and run a RED group inventory**
 
 ```ts
 const infrastructureAndCachingSlugs = [
@@ -236,7 +236,7 @@ const infrastructureAndCachingSlugs = [
 ];
 ```
 
-- [ ] **Step 2: Author all 12 documents using this matrix**
+- [x] **Step 2: Author all 12 documents using this matrix**
 
 | Slug | Required syntax/example and distinction | Primary source |
 |---|---|---|
@@ -255,7 +255,7 @@ const infrastructureAndCachingSlugs = [
 
 Non-standard guides must state that behavior is implementation-specific. Caching guides include interaction with a related validator or freshness field.
 
-- [ ] **Step 3: Validate and commit the batch**
+- [x] **Step 3: Validate and commit the batch**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts

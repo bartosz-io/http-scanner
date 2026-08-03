@@ -21,6 +21,21 @@ const securityAndPrivacySlugs = [
   'x-dns-prefetch-control',
 ] as const;
 
+const infrastructureAndCachingSlugs = [
+  'server',
+  'x-powered-by',
+  'x-aspnet-version',
+  'x-runtime',
+  'x-generator',
+  'via',
+  'cache-control',
+  'age',
+  'expires',
+  'etag',
+  'last-modified',
+  'vary',
+] as const;
+
 function createGuideSource({
   body = LONG_BODY,
   headerName = 'cache-control',
@@ -141,6 +156,20 @@ describe('HTTP header guide source contract', () => {
 
   it('validates every security and privacy guide', () => {
     const errors = securityAndPrivacySlugs.flatMap((slug) => {
+      const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
+      if (!existsSync(guideUrl)) {
+        return [`Missing guide: ${slug}`];
+      }
+
+      return validateHeaderGuideSource(slug, readFileSync(guideUrl, 'utf8'))
+        .map((error) => `${slug}: ${error}`);
+    });
+
+    expect(errors).toEqual([]);
+  });
+
+  it('validates every infrastructure, disclosure, and caching guide', () => {
+    const errors = infrastructureAndCachingSlugs.flatMap((slug) => {
       const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
       if (!existsSync(guideUrl)) {
         return [`Missing guide: ${slug}`];
