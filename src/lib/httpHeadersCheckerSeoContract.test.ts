@@ -71,6 +71,8 @@ describe('HTTP headers checker SEO contract', () => {
     }
 
     expect(siteHeaderSource).toContain('HTTP Headers');
+    expect(siteHeaderSource).toContain('href="/headers/"');
+    expect(siteHeaderSource).toContain('Header Reference');
     expect(siteFooterSource).toContain('HTTP Headers Checker');
     expect(homepageContentSource).toContain('View all HTTP response headers');
   });
@@ -79,7 +81,26 @@ describe('HTTP headers checker SEO contract', () => {
     expect(siteHeaderSource).toContain(
       '<span class="hidden text-xl font-bold sm:inline">HTTP Scanner</span>'
     );
-    expect(siteHeaderSource.match(/px-2 text-sm sm:px-4/g)).toHaveLength(3);
+    expect(siteHeaderSource).toContain(
+      '<span class="md:hidden">Security</span>'
+    );
+    expect(siteHeaderSource).toContain(
+      '<span class="hidden md:inline">Security Scanner</span>'
+    );
+    expect(siteHeaderSource).toContain(
+      '<span class="md:hidden">Headers</span>'
+    );
+    expect(siteHeaderSource).toContain(
+      '<span class="hidden md:inline">HTTP Headers</span>'
+    );
+    expect(siteHeaderSource).toContain(
+      '<span class="md:hidden">Reference</span>'
+    );
+    expect(siteHeaderSource).toContain(
+      '<span class="hidden md:inline">Header Reference</span>'
+    );
+    expect(siteHeaderSource).toContain('<li class="hidden sm:block">');
+    expect(siteHeaderSource.match(/px-2 text-sm sm:px-4/g)).toHaveLength(4);
   });
 
   it('states the scanner observation and security boundaries accurately', () => {

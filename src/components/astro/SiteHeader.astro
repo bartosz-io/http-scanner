@@ -13,15 +13,23 @@ import scannerLogo from '@/assets/scanner-logo.png';
       <ul class="flex items-center gap-1">
         <li>
           <a href="/" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
-            Home
+            <span class="md:hidden">Security</span>
+            <span class="hidden md:inline">Security Scanner</span>
           </a>
         </li>
         <li>
           <a href="/http-headers-checker/" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
-            HTTP Headers
+            <span class="md:hidden">Headers</span>
+            <span class="hidden md:inline">HTTP Headers</span>
           </a>
         </li>
         <li>
+          <a href="/headers/" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
+            <span class="md:hidden">Reference</span>
+            <span class="hidden md:inline">Header Reference</span>
+          </a>
+        </li>
+        <li class="hidden sm:block">
           <a href="/reports" class="inline-flex h-9 items-center rounded-md px-2 text-sm sm:px-4 font-medium hover:bg-accent hover:text-accent-foreground">
             Reports
           </a>

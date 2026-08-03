@@ -33,7 +33,7 @@
 - Consumes: the existing shared `SiteHeader.astro`, Astro-rendered links, and Tailwind responsive prefixes.
 - Produces: a direct `<a href="/headers/">` primary-navigation link and responsive labels covered by the existing Vitest contract suite.
 
-- [ ] **Step 1: Write the failing navigation contract assertions**
+- [x] **Step 1: Write the failing navigation contract assertions**
 
 Extend the discovery test with the header-reference destination and replace the old narrow-width assertion with explicit responsive requirements:
 
@@ -65,7 +65,7 @@ expect(siteHeaderSource.match(/px-2 text-sm sm:px-4/g)).toHaveLength(4);
 
 Keep the existing assertion that hides the wordmark below `sm`.
 
-- [ ] **Step 2: Run the targeted test and verify the new contract fails**
+- [x] **Step 2: Run the targeted test and verify the new contract fails**
 
 Run:
 
@@ -75,7 +75,7 @@ npm test -- src/lib/httpHeadersCheckerSeoContract.test.ts
 
 Expected: FAIL because `SiteHeader.astro` has no `/headers/` link or responsive navigation-label spans and currently contains only three navigation links.
 
-- [ ] **Step 3: Implement the minimal server-rendered navigation markup**
+- [x] **Step 3: Implement the minimal server-rendered navigation markup**
 
 In `SiteHeader.astro`, keep the existing logo and navigation containers. Replace `Home` with responsive `Security`/`Security Scanner` spans, replace the visible HTTP Headers text with responsive `Headers`/`HTTP Headers` spans, add the direct reference link, and hide the Reports list item below `sm`:
 
@@ -105,7 +105,7 @@ In `SiteHeader.astro`, keep the existing logo and navigation containers. Replace
 </li>
 ```
 
-- [ ] **Step 4: Run the targeted test and verify it passes**
+- [x] **Step 4: Run the targeted test and verify it passes**
 
 Run:
 
@@ -115,7 +115,7 @@ npm test -- src/lib/httpHeadersCheckerSeoContract.test.ts
 
 Expected: all tests in `httpHeadersCheckerSeoContract.test.ts` PASS.
 
-- [ ] **Step 5: Run static verification**
+- [x] **Step 5: Run static verification**
 
 Run:
 
@@ -126,7 +126,7 @@ npm run build
 
 Expected: both commands exit with status 0 and the Astro build includes `/headers/index.html`.
 
-- [ ] **Step 6: Verify desktop and narrow layouts in a real browser**
+- [x] **Step 6: Verify desktop and narrow layouts in a real browser**
 
 Start the local site with `npm run dev:web`. Inspect `/` at 1280 px and 320 px viewport widths.
 
@@ -134,10 +134,9 @@ Expected at 1280 px: the header shows `Security Scanner`, `HTTP Headers`, `Heade
 
 Expected at 320 px: the wordmark and Reports link are hidden; `Security`, `Headers`, and `Reference` remain visible without horizontal overflow. Tab through the links and verify each receives keyboard focus and opens its intended route.
 
-- [ ] **Step 7: Commit the implementation**
+- [x] **Step 7: Commit the implementation**
 
 ```bash
-git add src/components/astro/SiteHeader.astro src/lib/httpHeadersCheckerSeoContract.test.ts
+git add docs/superpowers/plans/2026-08-03-header-reference-navigation.md src/components/astro/SiteHeader.astro src/lib/httpHeadersCheckerSeoContract.test.ts
 git commit -m "feat: add header reference to primary navigation"
 ```
-
