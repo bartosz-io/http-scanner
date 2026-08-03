@@ -6,7 +6,7 @@ import type { HeaderTabsProps } from '../../types/reportTypes';
 /**
  * HeaderTabs component for navigating between different header categories
  */
-export const HeaderTabs: React.FC<HeaderTabsProps> = ({ activeTab, onTabChange }) => {
+export const HeaderTabs: React.FC<HeaderTabsProps> = ({ activeTab, onTabChange, counts }) => {
   const handleTabChange = (value: string) => {
     onTabChange(value as HeaderTabType);
   };
@@ -18,19 +18,19 @@ export const HeaderTabs: React.FC<HeaderTabsProps> = ({ activeTab, onTabChange }
           value={HeaderTabType.DETECTED} 
           className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800"
         >
-          Detected
+          {`Detected (${counts[HeaderTabType.DETECTED]})`}
         </TabsTrigger>
         <TabsTrigger 
           value={HeaderTabType.MISSING} 
           className="data-[state=active]:bg-amber-100 data-[state=active]:text-amber-800"
         >
-          Missing
+          {`Missing (${counts[HeaderTabType.MISSING]})`}
         </TabsTrigger>
         <TabsTrigger 
           value={HeaderTabType.LEAKING} 
           className="data-[state=active]:bg-red-100 data-[state=active]:text-red-800"
         >
-          Leaking
+          {`Leaking (${counts[HeaderTabType.LEAKING]})`}
         </TabsTrigger>
       </TabsList>
     </Tabs>

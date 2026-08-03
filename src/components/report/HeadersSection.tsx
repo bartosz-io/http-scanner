@@ -18,7 +18,15 @@ export const HeadersSection: React.FC<HeadersSectionProps> = ({ headers }) => {
       <div className="border rounded-md">
         <div className="p-4">
           <Tabs value={activeTab} className="w-full">
-            <HeaderTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            <HeaderTabs
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              counts={{
+                [HeaderTabType.DETECTED]: headers.detected.length,
+                [HeaderTabType.MISSING]: headers.missing.length,
+                [HeaderTabType.LEAKING]: headers.leaking.length,
+              }}
+            />
             
             <div className="mt-4">
               <TabsContent value={HeaderTabType.DETECTED}>

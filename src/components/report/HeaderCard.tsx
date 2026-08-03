@@ -178,7 +178,7 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200/80">
                 <Info className="h-5 w-5 text-slate-600" />
               </div>
-              <CardTitle className="text-lg font-semibold tracking-tight">{friendlyName}</CardTitle>
+              <CardTitle className="text-lg font-bold tracking-tight text-slate-950">{friendlyName}</CardTitle>
             </div>
             <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600">
               Not evaluated
@@ -222,7 +222,7 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
                 <StatusIcon className={cn('h-5 w-5', statusVisual.color)} />
               </div>
-              <CardTitle className="text-xl font-semibold tracking-tight">{friendlyName}</CardTitle>
+              <CardTitle className="text-xl font-bold tracking-tight text-slate-950">{friendlyName}</CardTitle>
             </div>
             <p className="text-sm text-muted-foreground">{summary}</p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

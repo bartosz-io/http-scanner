@@ -75,6 +75,7 @@ export interface HeadersSectionProps {
 export interface HeaderTabsProps {
   activeTab: HeaderTabType;
   onTabChange: (tab: HeaderTabType) => void;
+  counts: Record<HeaderTabType, number>;
 }
 
 /**
