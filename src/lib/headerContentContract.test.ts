@@ -1,7 +1,25 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { validateHeaderGuideSource } from './headerContentContract';
 
+const PROJECT_ROOT = new URL('../../', import.meta.url);
 const LONG_BODY = Array.from({ length: 180 }, (_, index) => `word${index + 1}`).join(' ');
+
+const securityAndPrivacySlugs = [
+  'content-security-policy',
+  'strict-transport-security',
+  'x-content-type-options',
+  'x-frame-options',
+  'referrer-policy',
+  'permissions-policy',
+  'cross-origin-opener-policy',
+  'cross-origin-embedder-policy',
+  'cross-origin-resource-policy',
+  'clear-site-data',
+  'origin-agent-cluster',
+  'x-permitted-cross-domain-policies',
+  'x-dns-prefetch-control',
+] as const;
 
 function createGuideSource({
   body = LONG_BODY,
@@ -119,5 +137,19 @@ describe('HTTP header guide source contract', () => {
       'Guide source must not contain application/ld+json',
       'Unknown related header: not-a-real-header',
     ]);
+  });
+
+  it('validates every security and privacy guide', () => {
+    const errors = securityAndPrivacySlugs.flatMap((slug) => {
+      const guideUrl = new URL(`src/content/headers/${slug}.md`, PROJECT_ROOT);
+      if (!existsSync(guideUrl)) {
+        return [`Missing guide: ${slug}`];
+      }
+
+      return validateHeaderGuideSource(slug, readFileSync(guideUrl, 'utf8'))
+        .map((error) => `${slug}: ${error}`);
+    });
+
+    expect(errors).toEqual([]);
   });
 });

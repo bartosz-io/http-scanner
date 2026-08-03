@@ -170,7 +170,7 @@ git commit -m "feat: define HTTP header content collection"
 **Interfaces:**
 - Produces complete content for catalog category `Security and privacy`
 
-- [ ] **Step 1: Add a RED inventory test**
+- [x] **Step 1: Add a RED inventory test**
 
 Read and validate every slug in this exact array:
 
@@ -187,7 +187,7 @@ const securityAndPrivacySlugs = [
 
 Run the focused test and expect 13 missing-file failures.
 
-- [ ] **Step 2: Author all documents using this factual matrix**
+- [x] **Step 2: Author all documents using this factual matrix**
 
 | Slug | Required syntax/example and distinction | Primary source |
 |---|---|---|
@@ -207,7 +207,7 @@ Run the focused test and expect 13 missing-file failures.
 
 Each guide has at least two use cases, two mistakes, catalog-backed related fields, clear compatibility/deprecation notes, governing-standard link, and MDN link when available.
 
-- [ ] **Step 3: Validate and commit the batch**
+- [x] **Step 3: Validate and commit the batch**
 
 ```bash
 npm test -- src/lib/headerContentContract.test.ts
