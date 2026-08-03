@@ -521,7 +521,7 @@ git commit -m "feat: connect HTTP header discovery paths"
 **Interfaces:**
 - Verifies every accepted success criterion
 
-- [ ] **Step 1: Run all automated checks**
+- [x] **Step 1: Run all automated checks**
 
 ```bash
 npm test
@@ -532,22 +532,22 @@ npm run deploy:dry
 
 Expected: all commands exit 0 and no D1 migration is introduced.
 
-- [ ] **Step 2: Verify generated inventory with a read-only Node script**
+- [x] **Step 2: Verify generated inventory with a read-only Node script**
 
 Assert checker and index HTML exist; exactly 45 catalog slug directories contain `index.html`; every guide has one H1, self-canonical, checker CTA, syntax, examples, sources, and useful content; sitemap contains checker + index + 45 guides exactly once and no `/report`, `/reports`, or `/share` URL.
 
-- [ ] **Step 3: Verify local HTTP behavior**
+- [x] **Step 3: Verify local HTTP behavior**
 
 Known representative guide URLs return 200. `/headers/not-a-real-header/` returns status 404 and the existing static 404 page. Report routes remain Worker-served and noindex.
 
-- [ ] **Step 4: Run browser QA at 1440px and 375px**
+- [x] **Step 4: Run browser QA at 1440px and 375px**
 
 Verify useful pre-JavaScript content; no overflow in directory/cards/code/long values; correct default scanner views; no report refetch on switching; working filters and back/forward; known report links vs unknown plain text; bounded analytics; keyboard focus/`aria-pressed`; real 404 behavior.
 
-- [ ] **Step 5: Record the launch measurement baseline**
+- [x] **Step 5: Record the launch measurement baseline**
 
 Record separate previous-28-day GSC clicks/impressions/CTR/position and PostHog organic landing sessions/scan submissions, launch date, and checker/index/guide URL groups. Schedule the first evaluation 28 days after indexing; primary outcome is organic sessions beginning in the new cluster and their scan-submission rate.
 
-- [ ] **Step 6: Commit only real verification fixes or baseline documentation**
+- [x] **Step 6: Commit only real verification fixes or baseline documentation**
 
 Do not create an empty commit, push, or deploy without an explicit user request.

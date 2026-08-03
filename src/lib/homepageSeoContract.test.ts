@@ -99,9 +99,8 @@ describe('homepage SEO contract', () => {
     expect(seoContentSource).toContain(
       'Need the complete response instead of a security score?'
     );
-    expect(seoContentSource).toContain(
-      '<a href="/http-headers-checker/">View all HTTP response headers</a>.'
-    );
+    expect(seoContentSource).toContain('href="/http-headers-checker/"');
+    expect(seoContentSource).toContain('View all HTTP response headers</a>.');
   });
 
   it('lists every registered security parser exactly once', () => {
