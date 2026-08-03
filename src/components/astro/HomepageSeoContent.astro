@@ -1,5 +1,6 @@
 ---
 import { homepageSecurityHeaderGroups } from '@/lib/homepageSecurityHeaders';
+import { getHeaderCatalogEntry } from '@/lib/headerCatalog';
 ---
 
 <section aria-labelledby="checker-purpose" class="site-container mx-auto px-4 py-14 sm:py-16">
@@ -22,7 +23,7 @@ import { homepageSecurityHeaderGroups } from '@/lib/homepageSecurityHeaders';
       </p>
       <p>
         Need the complete response instead of a security score?
-        <a href="/http-headers-checker/">View all HTTP response headers</a>.
+        <a href="/http-headers-checker/" data-analytics-event="guide to checker clicked">View all HTTP response headers</a>.
       </p>
     </div>
   </div>
@@ -53,13 +54,24 @@ import { homepageSecurityHeaderGroups } from '@/lib/homepageSecurityHeaders';
               {group.description}
             </p>
             <ul class="mt-4 flex flex-wrap gap-2" aria-label={`${group.title} headers`}>
-              {group.headers.map((header) => (
-                <li>
-                  <code class="break-all rounded-md bg-muted px-2.5 py-1 text-xs text-foreground">
-                    {header}
-                  </code>
-                </li>
-              ))}
+              {group.headers.map((header) => {
+                const entry = getHeaderCatalogEntry(header);
+                if (!entry) throw new Error(`Missing homepage header catalog entry: ${header}`);
+
+                return (
+                  <li>
+                    <a
+                      href={`/headers/${entry.slug}/`}
+                      data-analytics-event="checker to guide clicked"
+                      data-analytics-header-name={entry.displayName}
+                    >
+                      <code class="break-all rounded-md bg-muted px-2.5 py-1 text-xs text-foreground">
+                        {header}
+                      </code>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </article>
         ))

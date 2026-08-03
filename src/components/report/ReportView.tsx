@@ -150,7 +150,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
           )}
 
           {view === 'all-headers' && (
-            <AllHeadersSection headers={allHeaders} linkGuides={false} />
+            <AllHeadersSection headers={allHeaders} linkGuides={true} />
           )}
 
           {/* Delete report option */}

@@ -109,10 +109,19 @@ describe('HTTP headers checker SEO contract', () => {
     expect(contentSource).not.toContain('HTTP/2 200 OK');
   });
 
-  it('does not publish links to the future header reference library or guides', () => {
-    for (const source of [pageSource, contentSource]) {
-      expect(source).not.toMatch(/href=["'][^"']*\/headers\//i);
-      expect(source).not.toMatch(/href=["'][^"']*guide/i);
+  it('links to the reference index and six popular header guides', () => {
+    expect(contentSource).toContain('href="/headers/"');
+    for (const slug of [
+      'cache-control',
+      'content-type',
+      'set-cookie',
+      'content-security-policy',
+      'server-timing',
+      'access-control-allow-origin',
+    ]) {
+      expect(contentSource).toContain(`href={\`/headers/\${${'entry.slug'}}/\`}`);
+      expect(contentSource).toContain(`'${slug}'`);
     }
+    expect(contentSource).toContain('data-analytics-event="checker to guide clicked"');
   });
 });

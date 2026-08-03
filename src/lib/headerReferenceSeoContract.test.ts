@@ -19,6 +19,8 @@ describe('HTTP header reference SEO contract', () => {
 
     const component = readProjectFile('src/components/astro/HeaderReferenceIndex.astro');
     expect(component).toContain('HTTP Response Header Reference');
+    expect(component).toContain('data-analytics-event="checker to guide clicked"');
+    expect(component).toContain('data-analytics-event="guide to checker clicked"');
     expect(component).not.toContain('client:');
   });
 
@@ -33,6 +35,8 @@ describe('HTTP header reference SEO contract', () => {
     expect(route).toContain('<HeaderGuidePage');
 
     const component = readProjectFile('src/components/astro/HeaderGuidePage.astro');
+    expect(component).toContain('data-analytics-header-name={catalogEntry.displayName}');
+    expect(component).toContain('data-analytics-event="guide to checker clicked"');
     expect(component).not.toContain('client:');
   });
 });

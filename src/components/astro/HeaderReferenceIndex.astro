@@ -30,6 +30,7 @@ function guidePath(entry: HeaderCatalogEntry): string {
     </p>
     <a
       href="/http-headers-checker/"
+      data-analytics-event="guide to checker clicked"
       class="mt-8 inline-flex rounded-md bg-primary px-5 py-3 font-semibold text-primary-foreground"
     >
       Check a website’s response headers
@@ -51,7 +52,12 @@ function guidePath(entry: HeaderCatalogEntry): string {
           {categoryEntries.map((entry) => (
             <article class="rounded-lg border border-border bg-card p-5">
               <h3 class="font-semibold">
-                <a class="underline-offset-4 hover:underline" href={guidePath(entry)}>
+                <a
+                  class="underline-offset-4 hover:underline"
+                  href={guidePath(entry)}
+                  data-analytics-event="checker to guide clicked"
+                  data-analytics-header-name={entry.displayName}
+                >
                   {entry.displayName}
                 </a>
               </h3>
@@ -70,7 +76,11 @@ function guidePath(entry: HeaderCatalogEntry): string {
       reference does not yet have a dedicated page for them. Scan the URL to see
       the complete observed names and values.
     </p>
-    <a class="mt-5 inline-block font-semibold underline underline-offset-4" href="/http-headers-checker/">
+    <a
+      class="mt-5 inline-block font-semibold underline underline-offset-4"
+      href="/http-headers-checker/"
+      data-analytics-event="guide to checker clicked"
+    >
       Open the free HTTP Headers Checker
     </a>
   </aside>

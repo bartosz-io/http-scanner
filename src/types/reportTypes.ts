@@ -41,6 +41,7 @@ export interface AllHeadersSectionProps {
 
 export interface AllHeaderCardProps {
   header: AllResponseHeader;
+  linkGuides?: boolean;
 }
 
 /**

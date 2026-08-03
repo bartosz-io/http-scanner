@@ -1,3 +1,21 @@
+---
+import { getHeaderCatalogEntry } from '@/lib/headerCatalog';
+
+const popularHeaderSlugs = [
+  'cache-control',
+  'content-type',
+  'set-cookie',
+  'content-security-policy',
+  'server-timing',
+  'access-control-allow-origin',
+] as const;
+const popularHeaders = popularHeaderSlugs.map((slug) => {
+  const entry = getHeaderCatalogEntry(slug);
+  if (!entry) throw new Error(`Missing popular header catalog entry: ${slug}`);
+  return entry;
+});
+---
+
 <section aria-labelledby="response-headers" class="site-container mx-auto px-4 py-14 sm:py-16">
   <div class="mx-auto max-w-3xl">
     <h2 id="response-headers" class="text-3xl font-semibold tracking-tight">
@@ -14,6 +32,36 @@
         content details, cookies, cross-origin rules, timing data and security
         instructions through its headers before the browser renders the body.
       </p>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="header-reference" class="border-y border-border/60 bg-muted/30">
+  <div class="site-container px-4 py-14 sm:py-16">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 id="header-reference" class="text-3xl font-semibold tracking-tight">
+        Understand the headers you find
+      </h2>
+      <p class="mt-4 leading-7 text-muted-foreground">
+        Open the complete <a
+          class="font-semibold underline underline-offset-4"
+          href="/headers/"
+          data-analytics-event="checker to guide clicked"
+        >HTTP Header Reference</a>, or start with a commonly observed field.
+      </p>
+    </div>
+    <div class="mx-auto mt-8 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {popularHeaders.map((entry) => (
+        <a
+          class="rounded-lg border border-border bg-card p-5 underline-offset-4 hover:underline"
+          href={`/headers/${entry.slug}/`}
+          data-analytics-event="checker to guide clicked"
+          data-analytics-header-name={entry.displayName}
+        >
+          <span class="font-semibold">{entry.displayName}</span>
+          <span class="mt-2 block text-sm leading-6 text-muted-foreground">{entry.summary}</span>
+        </a>
+      ))}
     </div>
   </div>
 </section>

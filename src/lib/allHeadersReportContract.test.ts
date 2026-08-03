@@ -67,7 +67,11 @@ describe('report view switching integration', () => {
     expect(reportSource.match(/useReportData\(/g)).toHaveLength(1);
     expect(reportSource).toContain('report_view: initialReportView.current');
     expect(reportSource).toContain('selectAllResponseHeaders');
-    expect(reportSource).toContain('linkGuides={false}');
+    expect(reportSource).toContain('linkGuides');
+    expect(reportSource).toContain('linkGuides={true}');
+    expect(readSource('src/components/report/AllHeaderCard.tsx')).toContain(
+      "capturePostHogEvent('report to guide clicked'"
+    );
   });
 
   it('keeps report viewed eligible only when the report initially loads', () => {

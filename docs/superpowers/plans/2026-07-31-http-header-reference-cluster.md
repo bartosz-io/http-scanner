@@ -469,7 +469,7 @@ Expected: `dist/headers/index.html` plus 45 guide directories and sitemap entrie
 - Produces `TrackedLinkEvent` and `bindAnalyticsLinks(root: ParentNode = document): () => void`
 - Enables report guide links only now that all guide pages exist
 
-- [ ] **Step 1: Write RED bounded-event tests**
+- [x] **Step 1: Write RED bounded-event tests**
 
 Define and test:
 
@@ -486,11 +486,11 @@ export function readTrackedLink(
 
 Allowed events return only optional `header_name`; unknown events return `null`; arbitrary dataset keys are ignored. Delegated click handling finds the closest tracked anchor and calls `capturePostHogEvent` once.
 
-- [ ] **Step 2: Implement one static-link binding**
+- [x] **Step 2: Implement one static-link binding**
 
 Initialize `bindAnalyticsLinks()` in the existing BaseLayout analytics branch after `initializePostHog()`. Do not initialize PostHog twice.
 
-- [ ] **Step 3: Add the exact internal-link graph**
+- [x] **Step 3: Add the exact internal-link graph**
 
 - checker → index and popular guides `cache-control`, `content-type`, `set-cookie`, `content-security-policy`, `server-timing`, `access-control-allow-origin`;
 - index → checker and every guide;
@@ -502,7 +502,7 @@ Initialize `bindAnalyticsLinks()` in the existing BaseLayout analytics branch af
 
 Static anchors use the two bounded events. React report links capture `report to guide clicked` with only `header_name` and `report_view: 'all-headers'`; never send values, scanned URLs, arbitrary custom names, or tokens.
 
-- [ ] **Step 4: Run contracts, check, and commit**
+- [x] **Step 4: Run contracts, check, and commit**
 
 ```bash
 npm test -- src/lib/analyticsLinks.test.ts src/lib/httpHeadersCheckerSeoContract.test.ts src/lib/headerReferenceSeoContract.test.ts src/lib/allHeadersReportContract.test.ts

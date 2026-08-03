@@ -14,6 +14,7 @@ const categoryOrder: Exclude<CategoryFilter, 'all'>[] = [
 
 export const AllHeadersSection: React.FC<AllHeadersSectionProps> = ({
   headers,
+  linkGuides = false,
 }) => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
@@ -116,7 +117,11 @@ export const AllHeadersSection: React.FC<AllHeadersSectionProps> = ({
           ) : (
             <div className="grid gap-4">
               {filteredHeaders.map((header) => (
-                <AllHeaderCard key={header.name} header={header} />
+                <AllHeaderCard
+                  key={header.name}
+                  header={header}
+                  linkGuides={linkGuides}
+                />
               ))}
             </div>
           )}

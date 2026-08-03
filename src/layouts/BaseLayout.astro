@@ -43,6 +43,7 @@ const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
 
     <script>
       import { getLegacyHashRedirect } from '@/lib/legacyHashRoute';
+      import { bindAnalyticsLinks } from '@/lib/analyticsLinks';
       import { initializePostHog } from '@/lib/posthogClient';
 
       const redirect = getLegacyHashRedirect(window.location.hash);
@@ -50,6 +51,7 @@ const canonicalUrl = new URL(canonicalPath, Astro.site ?? Astro.url.origin);
         window.location.replace(redirect);
       } else if (document.body.dataset.initializeAnalytics === 'true') {
         initializePostHog();
+        bindAnalyticsLinks();
       }
     </script>
   </body>
