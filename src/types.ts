@@ -1,5 +1,10 @@
 // Auto-generated TypeScript types based on sql/init-db.sql schema
 
+export type {
+  LeadSubmissionRequestDTO,
+  LeadSubmissionResponseDTO,
+} from '../shared/leadSubmission';
+
 export interface HeaderEntry {
   name: string;
   value?: string;
