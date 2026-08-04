@@ -31,4 +31,10 @@ describe('security header guides', () => {
   it('looks up names case-insensitively through the renamed API', () => {
     expect(getHeaderSecurityGuide('Content-Security-Policy')?.risk).toBeTruthy();
   });
+
+  it('recommends a restrictive CSP base without unsafe inline fallbacks or placeholders', () => {
+    expect(getHeaderSecurityGuide('Content-Security-Policy')?.recommendedValue).toBe(
+      "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none';",
+    );
+  });
 });

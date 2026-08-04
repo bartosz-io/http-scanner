@@ -31,8 +31,8 @@ const headerSecurityGuides: HeaderSecurityGuideRegistry = {
     tags: ['XSS', 'Script Injection', 'Data Exfiltration'],
     recommendedValue: [
       "default-src 'self';",
-      "script-src 'self' https://analytics.example.com 'unsafe-inline' 'nonce-<random>';",
-      "style-src 'self' 'unsafe-inline';",
+      "script-src 'self';",
+      "style-src 'self';",
       "object-src 'none';",
       'base-uri \'none\';',
       'frame-ancestors \'none\';',
