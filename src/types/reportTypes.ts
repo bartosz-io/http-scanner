@@ -3,6 +3,8 @@ import type {
   AllResponseHeader,
   ScannerResultView,
 } from '../lib/reportView';
+import type { submitLeadSubmission } from '../lib/leadSubmissions';
+import type { capturePostHogEvent } from '../lib/posthogClient';
 
 /**
  * Enum representing the different types of header tabs in the Report View
@@ -94,6 +96,13 @@ export interface SharingSectionProps {
   score: number;
   hash: string;
   shareImageUrl: string | null;
+}
+
+export interface LeadFormProps {
+  hash: string;
+  score: number;
+  submit?: typeof submitLeadSubmission;
+  capture?: typeof capturePostHogEvent;
 }
 
 /**
