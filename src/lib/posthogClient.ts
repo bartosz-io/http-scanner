@@ -37,3 +37,10 @@ export function capturePostHogEvent(
     ...(attribution ?? {}),
   });
 }
+
+export function capturePostHogEventWithoutAttribution(
+  eventName: string,
+  properties?: EventProperties
+): void {
+  initializePostHog()?.capture(eventName, properties ?? {});
+}

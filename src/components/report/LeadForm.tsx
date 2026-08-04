@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { submitLeadSubmission } from '@/lib/leadSubmissions';
-import { capturePostHogEvent } from '@/lib/posthogClient';
+import { capturePostHogEventWithoutAttribution } from '@/lib/posthogClient';
 import type { LeadFormProps } from '@/types/reportTypes';
 
 type LeadFormInput = z.input<typeof leadSubmissionSchema>;
@@ -29,9 +29,10 @@ export function LeadForm({
   hash,
   score,
   submit = submitLeadSubmission,
-  capture = capturePostHogEvent,
+  capture = capturePostHogEventWithoutAttribution,
 }: LeadFormProps) {
   const [submissionState, setSubmissionState] = useState<SubmissionState>('idle');
+  const submissionInFlight = useRef(false);
   const form = useForm<LeadFormInput, unknown, LeadSubmissionRequestDTO>({
     resolver: zodResolver(leadSubmissionSchema),
     defaultValues: {
@@ -49,6 +50,11 @@ export function LeadForm({
   }, [capture, hash, score]);
 
   const handleSubmit = async (values: LeadSubmissionRequestDTO) => {
+    if (submissionInFlight.current) {
+      return;
+    }
+
+    submissionInFlight.current = true;
     setSubmissionState('idle');
 
     try {
@@ -58,6 +64,8 @@ export function LeadForm({
     } catch {
       capture('lead submission failed', { hash, score });
       setSubmissionState('error');
+    } finally {
+      submissionInFlight.current = false;
     }
   };
 

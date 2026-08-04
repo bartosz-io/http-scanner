@@ -68,6 +68,24 @@ describe('LeadForm', () => {
     expect(await screen.findByText('Your request has been received.')).not.toBeNull();
   });
 
+  it('rejects two submit events dispatched before pending state renders', async () => {
+    let resolveSubmission!: (value: LeadSubmissionResponseDTO) => void;
+    const submit = vi.fn(() => new Promise<LeadSubmissionResponseDTO>((resolve) => {
+      resolveSubmission = resolve;
+    }));
+    render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={vi.fn()} />);
+    await fillValidForm();
+    const form = screen.getByRole('form');
+
+    act(() => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+
+    await waitFor(() => expect(submit).toHaveBeenCalledOnce());
+    await act(async () => resolveSubmission(ACCEPTED));
+  });
+
   it('replaces the form after success and captures only report context', async () => {
     const capture = vi.fn();
     const submit = vi.fn().mockResolvedValue(ACCEPTED);

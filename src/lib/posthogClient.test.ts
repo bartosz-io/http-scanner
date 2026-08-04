@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { sanitizePostHogCapture } from './analyticsPrivacy';
-import { capturePostHogEvent, initializePostHog } from './posthogClient';
+import {
+  capturePostHogEvent,
+  capturePostHogEventWithoutAttribution,
+  initializePostHog,
+} from './posthogClient';
 
 const { posthogMock } = vi.hoisted(() => ({
   posthogMock: {
@@ -88,6 +92,28 @@ describe('initializePostHog', () => {
       landing_path: '/security-headers-checker',
       referrer: 'https://www.google.com/search',
       url: 'https://example.com',
+    });
+  });
+
+  it('captures privacy-bounded events without landing attribution', () => {
+    vi.stubEnv('PUBLIC_POSTHOG_PROJECT_TOKEN', 'project-token');
+    vi.stubGlobal('window', {
+      location: new URL('https://httpscanner.com/report/9249232fefb9a1c0455ba007d7784f6c'),
+    });
+    vi.stubGlobal('document', { referrer: '' });
+    vi.stubGlobal('sessionStorage', {
+      getItem: vi.fn(() => null),
+      setItem: vi.fn(),
+    });
+
+    capturePostHogEventWithoutAttribution('lead form viewed', {
+      hash: '9249232fefb9a1c0455ba007d7784f6c',
+      score: 47.5,
+    });
+
+    expect(posthogMock.capture).toHaveBeenCalledWith('lead form viewed', {
+      hash: '9249232fefb9a1c0455ba007d7784f6c',
+      score: 47.5,
     });
   });
 });
