@@ -38,6 +38,7 @@ describe('M5 analytics source contract', () => {
       'src/components/report/DeleteConfirmationModal.tsx',
       'src/components/report/ReportHeader.tsx',
       'src/components/report/TokenWarningAlert.tsx',
+      'src/components/report/LeadForm.tsx',
     ];
 
     for (const file of files) {
@@ -54,6 +55,7 @@ describe('M5 analytics source contract', () => {
       'src/components/report/ReportView.tsx',
       'src/components/report/DeleteSection.tsx',
       'src/components/report/SharingSection.tsx',
+      'src/components/report/LeadForm.tsx',
       'worker/impl/controllers/ScanController.ts',
       'worker/impl/controllers/DeleteReportController.ts',
     ];
@@ -71,8 +73,26 @@ describe('M5 analytics source contract', () => {
       'delete report failed',
       'scan rate limited',
       'report deleted',
+      'lead form viewed',
+      'lead submitted',
+      'lead submission failed',
     ]) {
       expect(source.includes(`'${eventName}'`), eventName).toBe(true);
+    }
+  });
+
+  it('keeps lead analytics free of submitted contact details', () => {
+    const source = readFileSync(new URL('src/components/report/LeadForm.tsx', PROJECT_ROOT), 'utf8');
+    const capturePayloads = Array.from(
+      source.matchAll(/capture\(\s*'lead [^']+'\s*,\s*\{([^}]*)\}\s*\)/g),
+      (match) => match[1]
+    );
+
+    expect(capturePayloads).toHaveLength(3);
+    for (const payload of capturePayloads) {
+      for (const property of ['name', 'email', 'message', 'consent', 'url', 'report_url']) {
+        expect(payload).not.toMatch(new RegExp(`\\b${property}\\b`));
+      }
     }
   });
 });

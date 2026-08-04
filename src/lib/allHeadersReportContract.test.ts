@@ -37,7 +37,7 @@ describe('all response headers report presentation', () => {
   it('keeps security-only and neutral report sections in distinct branches', () => {
     const source = readSource('src/components/report/ReportView.tsx');
     const securityBranch = source.match(
-      /view === 'security-analysis'[\s\S]*?ScoreSection[\s\S]*?SharingSection[\s\S]*?HeadersSection/
+      /view === 'security-analysis'[\s\S]*?ScoreSection[\s\S]*?ReportActionSection[\s\S]*?HeadersSection/
     );
     const allHeadersBranch = source.match(
       /view === 'all-headers'[\s\S]*?AllHeadersSection/
@@ -46,7 +46,7 @@ describe('all response headers report presentation', () => {
     expect(securityBranch).not.toBeNull();
     expect(allHeadersBranch).not.toBeNull();
     expect(source.match(/<ScoreSection/g)).toHaveLength(1);
-    expect(source.match(/<SharingSection/g)).toHaveLength(1);
+    expect(source.match(/<ReportActionSection/g)).toHaveLength(1);
     expect(source.match(/<HeadersSection/g)).toHaveLength(1);
     expect(source.match(/<AllHeadersSection/g)).toHaveLength(1);
   });

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -69,6 +69,10 @@ export function LeadForm({
     }
   };
 
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    void form.handleSubmit(handleSubmit)(event);
+  };
+
   return (
     <div className="ph-no-capture ph-mask h-full">
       <div className="flex h-full flex-col overflow-hidden rounded-md border">
@@ -92,7 +96,7 @@ export function LeadForm({
                 <form
                   aria-label="Paid security help request"
                   className="space-y-4"
-                  onSubmit={form.handleSubmit(handleSubmit)}
+                  onSubmit={onSubmit}
                 >
                   <input type="hidden" {...form.register('hash')} />
                   <input type="hidden" {...form.register('website')} />

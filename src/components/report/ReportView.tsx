@@ -12,7 +12,7 @@ import { ReportHeader } from './ReportHeader';
 import { ReportViewSwitch } from './ReportViewSwitch';
 import { ScoreSection } from './ScoreSection';
 import { HeadersSection } from './HeadersSection';
-import { SharingSection } from './SharingSection';
+import { ReportActionSection } from './ReportActionSection';
 import { DeleteSection } from './DeleteSection';
 import { TokenWarningAlert } from './TokenWarningAlert';
 import { AllHeadersSection } from './AllHeadersSection';
@@ -134,7 +134,7 @@ export const ReportView: React.FC<ReportViewProps> = ({
                 {/* Right column: Sharing options */}
                 <div className="flex h-full">
                   <div className="flex-grow">
-                    <SharingSection
+                    <ReportActionSection
                       url={report.url}
                       score={report.score}
                       hash={report.hash}
