@@ -92,4 +92,44 @@ describe('sanitizePostHogCapture', () => {
   it('preserves a dropped event', () => {
     expect(sanitizePostHogCapture(null)).toBeNull();
   });
+
+  it.each([
+    'lead form viewed',
+    'lead submitted',
+    'lead submission failed',
+  ])('removes PostHog-enriched report location data from %s', (eventName) => {
+    const event: CaptureResult = {
+      uuid: 'lead-event-uuid',
+      event: eventName,
+      properties: {
+        token: 'public-project-token',
+        distinct_id: 'anonymous-user-id',
+        $lib: 'web',
+        $lib_version: '1.2.3',
+        $current_url:
+          'https://httpscanner.com/report/9249232fefb9a1c0455ba007d7784f6c',
+        $pathname: '/report/9249232fefb9a1c0455ba007d7784f6c',
+        $session_entry_url:
+          'https://httpscanner.com/report/9249232fefb9a1c0455ba007d7784f6c',
+        landing_page:
+          'https://httpscanner.com/report/9249232fefb9a1c0455ba007d7784f6c',
+        landing_path: '/report/9249232fefb9a1c0455ba007d7784f6c',
+        hash: '9249232fefb9a1c0455ba007d7784f6c',
+        score: 47.5,
+      },
+    };
+
+    expect(sanitizePostHogCapture(event)).toEqual({
+      uuid: 'lead-event-uuid',
+      event: eventName,
+      properties: {
+        token: 'public-project-token',
+        distinct_id: 'anonymous-user-id',
+        $lib: 'web',
+        $lib_version: '1.2.3',
+        hash: '9249232fefb9a1c0455ba007d7784f6c',
+        score: 47.5,
+      },
+    });
+  });
 });

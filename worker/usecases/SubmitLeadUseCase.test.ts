@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LEAD_CONSENT_VERSION, type LeadSubmissionRequestDTO } from '../../shared/leadSubmission';
 import type { Lead } from '../entities/Lead';
 import { Report } from '../entities/Report';
@@ -58,7 +58,9 @@ class InMemoryLeadRepository implements LeadRepository {
 
   constructor(
     private readonly events: string[],
-    private readonly saveError?: Error
+    private readonly saveError?: Error,
+    private readonly markSentError?: Error,
+    private readonly markFailedError?: Error
   ) {}
 
   async save(lead: Lead): Promise<void> {
@@ -69,11 +71,13 @@ class InMemoryLeadRepository implements LeadRepository {
 
   async markEmailSent(id: string): Promise<void> {
     this.events.push('lead:sent');
+    if (this.markSentError) throw this.markSentError;
     this.sentLeadId = id;
   }
 
   async markEmailFailed(id: string, code: string): Promise<void> {
     this.events.push('lead:failed');
+    if (this.markFailedError) throw this.markFailedError;
     this.failedEmail = { id, code };
   }
 }
@@ -95,11 +99,21 @@ class InMemoryNotificationService implements LeadNotificationService {
 
 function createUseCase(
   report: Report | null = valid,
-  options: { saveError?: Error; sendError?: Error } = {}
+  options: {
+    saveError?: Error;
+    sendError?: Error;
+    markSentError?: Error;
+    markFailedError?: Error;
+  } = {}
 ) {
   const events: string[] = [];
   const reports = new InMemoryReportRepository(report, events);
-  const leads = new InMemoryLeadRepository(events, options.saveError);
+  const leads = new InMemoryLeadRepository(
+    events,
+    options.saveError,
+    options.markSentError,
+    options.markFailedError
+  );
   const notifications = new InMemoryNotificationService(events, options.sendError);
   const useCase = new SubmitLeadUseCase(
     reports,
@@ -114,6 +128,10 @@ function createUseCase(
 }
 
 describe('SubmitLeadUseCase', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('persists an eligible lead before notifying and marking the notification sent', async () => {
     const { events, leads, useCase } = createUseCase();
 
@@ -162,6 +180,7 @@ describe('SubmitLeadUseCase', () => {
   });
 
   it('records delivery failure and accepts the already-persisted lead', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { events, leads, useCase } = createUseCase(valid, {
       sendError: new Error('E_DELIVERY_FAILED'),
     });
@@ -170,5 +189,67 @@ describe('SubmitLeadUseCase', () => {
 
     expect(events).toEqual(['report:find', 'lead:save', 'email:send', 'lead:failed']);
     expect(leads.failedEmail).toEqual({ id: 'lead-123', code: 'E_DELIVERY_FAILED' });
+    expect(log).toHaveBeenCalledWith({
+      leadId: 'lead-123',
+      operation: 'send_email',
+      errorCode: 'E_DELIVERY_FAILED',
+    });
+  });
+
+  it('normalizes an arbitrary notification error before recording delivery failure', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { leads, useCase } = createUseCase(valid, {
+      sendError: new Error('provider rejected ada@example.com'),
+    });
+
+    await expect(useCase.execute(input)).resolves.toEqual({ leadId: 'lead-123' });
+
+    expect(leads.failedEmail).toEqual({ id: 'lead-123', code: 'EMAIL_SEND_FAILED' });
+    expect(log).toHaveBeenCalledWith({
+      leadId: 'lead-123',
+      operation: 'send_email',
+      errorCode: 'EMAIL_SEND_FAILED',
+    });
+  });
+
+  it('accepts a delivered lead when marking it sent fails without marking it failed', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { events, leads, useCase } = createUseCase(valid, {
+      markSentError: new Error('D1 status failure for ada@example.com'),
+    });
+
+    await expect(useCase.execute(input)).resolves.toEqual({ leadId: 'lead-123' });
+
+    expect(events).toEqual(['report:find', 'lead:save', 'email:send', 'lead:sent']);
+    expect(leads.failedEmail).toBeUndefined();
+    expect(log).toHaveBeenCalledWith({
+      leadId: 'lead-123',
+      operation: 'mark_email_sent',
+      errorCode: 'EMAIL_STATUS_UPDATE_FAILED',
+    });
+  });
+
+  it('accepts a persisted lead when recording a failed notification also fails', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const { events, useCase } = createUseCase(valid, {
+      sendError: new Error('E_DELIVERY_FAILED'),
+      markFailedError: new Error('D1 status failure for ada@example.com'),
+    });
+
+    await expect(useCase.execute(input)).resolves.toEqual({ leadId: 'lead-123' });
+
+    expect(events).toEqual(['report:find', 'lead:save', 'email:send', 'lead:failed']);
+    expect(log.mock.calls).toEqual([
+      [{
+        leadId: 'lead-123',
+        operation: 'send_email',
+        errorCode: 'E_DELIVERY_FAILED',
+      }],
+      [{
+        leadId: 'lead-123',
+        operation: 'mark_email_failed',
+        errorCode: 'EMAIL_STATUS_UPDATE_FAILED',
+      }],
+    ]);
   });
 });

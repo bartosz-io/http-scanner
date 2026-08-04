@@ -4,6 +4,20 @@ import type { LeadRepository } from '../interfaces/repositories/LeadRepository';
 import type { ReportRepository } from '../interfaces/repositories/ReportRepository';
 import type { LeadNotificationService } from '../interfaces/services/LeadNotificationService';
 
+function normalizeEmailError(error: unknown): string {
+  return error instanceof Error && /^E_[A-Z_]+$/.test(error.message)
+    ? error.message
+    : 'EMAIL_SEND_FAILED';
+}
+
+function logLeadOperationFailure(
+  leadId: string,
+  operation: 'send_email' | 'mark_email_sent' | 'mark_email_failed',
+  errorCode: string
+): void {
+  console.error({ leadId, operation, errorCode });
+}
+
 export class SubmitLeadUseCase {
   constructor(
     private readonly reports: ReportRepository,
@@ -37,12 +51,29 @@ export class SubmitLeadUseCase {
 
     try {
       await this.notifications.send(lead);
-      await this.leads.markEmailSent(lead.id);
     } catch (error) {
-      const code = error instanceof Error && /^E_[A-Z_]+$/.test(error.message)
-        ? error.message
-        : 'EMAIL_SEND_FAILED';
-      await this.leads.markEmailFailed(lead.id, code);
+      const errorCode = normalizeEmailError(error);
+      logLeadOperationFailure(lead.id, 'send_email', errorCode);
+      try {
+        await this.leads.markEmailFailed(lead.id, errorCode);
+      } catch {
+        logLeadOperationFailure(
+          lead.id,
+          'mark_email_failed',
+          'EMAIL_STATUS_UPDATE_FAILED'
+        );
+      }
+      return { leadId: lead.id };
+    }
+
+    try {
+      await this.leads.markEmailSent(lead.id);
+    } catch {
+      logLeadOperationFailure(
+        lead.id,
+        'mark_email_sent',
+        'EMAIL_STATUS_UPDATE_FAILED'
+      );
     }
 
     return { leadId: lead.id };

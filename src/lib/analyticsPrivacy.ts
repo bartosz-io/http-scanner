@@ -1,6 +1,18 @@
 import type { CaptureResult } from 'posthog-js';
 
 const SECRET_KEY_PATTERN = /token/i;
+const LEAD_EVENTS = new Set([
+  'lead form viewed',
+  'lead submitted',
+  'lead submission failed',
+]);
+const LEAD_LOCATION_PROPERTIES = new Set([
+  '$current_url',
+  '$pathname',
+  '$session_entry_url',
+  'landing_page',
+  'landing_path',
+]);
 
 function sanitizeUrlString(value: string): string {
   const isRelativeUrl = value.startsWith('/') && !value.startsWith('//');
@@ -63,7 +75,17 @@ export function sanitizePostHogCapture(
     return null;
   }
 
-  const sanitizedCapture = sanitizeAnalyticsValue(capture) as CaptureResult;
+  let sanitizedCapture = sanitizeAnalyticsValue(capture) as CaptureResult;
+  if (LEAD_EVENTS.has(capture.event)) {
+    sanitizedCapture = {
+      ...sanitizedCapture,
+      properties: Object.fromEntries(
+        Object.entries(sanitizedCapture.properties).filter(
+          ([key]) => !LEAD_LOCATION_PROPERTIES.has(key)
+        )
+      ),
+    };
+  }
   const transportToken = capture.properties.token;
 
   if (transportToken === undefined) {
