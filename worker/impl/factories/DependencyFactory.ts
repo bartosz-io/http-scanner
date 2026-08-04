@@ -1,4 +1,5 @@
 import { D1ReportRepository } from '../repositories/D1ReportRepository';
+import { D1LeadRepository } from '../repositories/D1LeadRepository';
 import { R2ImageRepository } from '../repositories/R2ImageRepository';
 import { D1StatsRepository } from '../repositories/D1StatsRepository';
 import { FetchHttpService } from '../services/FetchHttpService';
@@ -12,12 +13,14 @@ import { DeleteReportController } from '../controllers/DeleteReportController';
 import { AdminStatsController } from '../controllers/AdminStatsController';
 import { ReportsController } from '../controllers/ReportsController';
 import { ReportShellController } from '../controllers/ReportShellController';
+import { LeadController } from '../controllers/LeadController';
 import { ScanUrlUseCase } from '../../usecases/ScanUrlUseCase';
 import { FetchReportUseCase } from '../../usecases/FetchReportUseCase';
 import { FetchReportShellUseCase } from '../../usecases/FetchReportShellUseCase';
 import { DeleteReportUseCase } from '../../usecases/DeleteReportUseCase';
 import { FetchStatsUseCase } from '../../usecases/FetchStatsUseCase';
 import { FetchReportsUseCase } from '../../usecases/FetchReportsUseCase';
+import { SubmitLeadUseCase } from '../../usecases/SubmitLeadUseCase';
 import { ReportRepository } from '../../interfaces/repositories/ReportRepository';
 import { ImageRepository } from '../../interfaces/repositories/ImageRepository';
 import { StatsRepository } from '../../interfaces/repositories/StatsRepository';
@@ -25,6 +28,7 @@ import { createPostHogClient } from '../../lib/posthog';
 import { PostHog } from 'posthog-node';
 import { CloudflareReportShellGateway } from '../gateways/CloudflareReportShellGateway';
 import type { ReportShellGateway } from '../../interfaces/gateways/ReportShellGateway';
+import { CloudflareLeadNotificationService } from '../services/CloudflareLeadNotificationService';
 
 /**
  * Factory class for creating application dependencies
@@ -121,6 +125,32 @@ export class DependencyFactory {
     const fetchReportShellUseCase = new FetchReportShellUseCase(reportShellGateway);
 
     return new ReportShellController(fetchReportShellUseCase);
+  }
+
+  /**
+   * Create all dependencies needed for the lead submission endpoint.
+   */
+  static createLeadController(
+    env: Pick<
+      Env,
+      'DB' | 'EMAIL' | 'CDN_DOMAIN' | 'LEAD_NOTIFICATION_TO' | 'LEAD_NOTIFICATION_FROM'
+    >
+  ): LeadController {
+    const reportRepository = this.createReportRepository(env.DB);
+    const leadRepository = new D1LeadRepository(env.DB);
+    const notificationService = new CloudflareLeadNotificationService(env.EMAIL, {
+      to: env.LEAD_NOTIFICATION_TO,
+      from: env.LEAD_NOTIFICATION_FROM,
+      fromName: 'HTTP Scanner',
+    });
+    const submitLeadUseCase = new SubmitLeadUseCase(
+      reportRepository,
+      leadRepository,
+      notificationService,
+      `https://${env.CDN_DOMAIN}`
+    );
+
+    return new LeadController(submitLeadUseCase);
   }
   
   /**

@@ -1,4 +1,4 @@
-import { MiddlewareHandler } from 'hono';
+import type { Context, MiddlewareHandler } from 'hono';
 
 export interface ErrorResponse {
   error: string;
@@ -15,6 +15,9 @@ export const ERROR_MAP: Record<string, { status: number; message: string }> = {
   RATE_LIMIT_EXCEEDED: { status: 429, message: 'Rate limit exceeded: This domain was scanned in the last minute' },
   SCAN_TIMEOUT: { status: 504, message: 'Scan timed out after 45 seconds' },
   INTERNAL_ERROR: { status: 500, message: 'An internal error occurred' },
+  INVALID_LEAD_SUBMISSION: { status: 400, message: 'Check the lead form fields and try again' },
+  LEAD_NOT_ELIGIBLE: { status: 400, message: 'Paid help requests are available for reports scoring below 80' },
+  DATABASE_ERROR: { status: 500, message: 'An internal error occurred' },
   // Admin stats specific error codes
   UNAUTHORIZED: { status: 401, message: 'Authentication required to access this resource' },
   INVALID_FROM_TIMESTAMP: { status: 400, message: 'Invalid from timestamp. Must be a positive integer' },
@@ -31,21 +34,24 @@ export const errorHandler = (): MiddlewareHandler => async (c, next) => {
     await next();
   } catch (error) {
     console.error('API Error:', error);
-    
-    const errorCode = error instanceof Error ? error.message : 'INTERNAL_ERROR';
-    const errorInfo = ERROR_MAP[errorCode] || ERROR_MAP.INTERNAL_ERROR;
-    
-    // Explicitly set content type to ensure proper JSON response
-    c.header('Content-Type', 'application/json');
-    
-    const response: ErrorResponse = {
-      error: errorInfo.message,
-      code: errorCode
-    };
-    
-    return c.json(response, errorInfo.status as 400 | 401 | 403 | 404 | 429 | 500 | 504);
+
+    return mapErrorResponse(error, c);
   }
 };
+
+export function mapErrorResponse(error: unknown, c: Context): Response {
+  const requestedCode = error instanceof Error ? error.message : 'INTERNAL_ERROR';
+  const errorCode = Object.hasOwn(ERROR_MAP, requestedCode)
+    ? requestedCode
+    : 'INTERNAL_ERROR';
+  const errorInfo = ERROR_MAP[errorCode] || ERROR_MAP.INTERNAL_ERROR;
+  const response: ErrorResponse = {
+    error: errorInfo.message,
+    code: errorCode,
+  };
+
+  return c.json(response, errorInfo.status as 400 | 401 | 403 | 404 | 429 | 500 | 504);
+}
 
 /**
  * Helper function to create a standardized error response

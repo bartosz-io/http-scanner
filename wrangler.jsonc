@@ -35,8 +35,17 @@
 			"bucket_name": "http-scanner-images"
 		}
 	],
+	"send_email": [
+		{
+			"name": "EMAIL",
+			"destination_address": "pietrucha.bartosz+scanner@gmail.com",
+			"allowed_sender_addresses": ["scanner@httpscanner.com"]
+		}
+	],
 	"vars": {
 		"CDN_DOMAIN": "httpscanner.com",
+		"LEAD_NOTIFICATION_TO": "pietrucha.bartosz+scanner@gmail.com",
+		"LEAD_NOTIFICATION_FROM": "scanner@httpscanner.com",
 		"POSTHOG_PROJECT_TOKEN": "phc_yMpV3BKPAbPgsHvKcEZ9Ts82pJgSJzyxJyvhqzDy3jnj",
 		"POSTHOG_HOST": "https://eu.i.posthog.com"
 	}

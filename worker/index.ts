@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { DependencyFactory } from './impl/factories/DependencyFactory';
-import { ERROR_MAP, ErrorResponse, createErrorResponse } from './impl/middleware/errorHandler';
+import { ERROR_MAP, createErrorResponse, mapErrorResponse } from './impl/middleware/errorHandler';
 import { cloudflareAccessAuth } from './impl/middleware/cloudflareAccessAuth';
 import { shareRoute } from './routes/shareRoute';
 import { createReportShellRoute } from './routes/reportShellRoute';
+import { createLeadRoute } from './routes/leadRoute';
 import { createPostHogClient, getDistinctId } from './lib/posthog';
 
 // Create Hono app
@@ -26,6 +27,10 @@ app.route('/report', reportShellRoute);
 const api = new Hono<{ Bindings: Env }>();
 
 // Set up API routes
+api.route('/leads', createLeadRoute((env: Env) =>
+  DependencyFactory.createLeadController(env)
+));
+
 api.post('/scan', async (c) => {
   // Create controller using factory
   const scanController = DependencyFactory.createScanController(c.env);
@@ -122,25 +127,20 @@ api.get('/images/:key', async (c) => {
   }
 });
 
-app.onError((err, c) => {
-  console.error('Application error:', err);
+app.onError((error, c) => {
+  console.error('Application error:', error);
 
-  const errorCode = err instanceof Error ? err.message : 'INTERNAL_ERROR';
+  const errorCode = error instanceof Error ? error.message : 'INTERNAL_ERROR';
   const errorInfo = ERROR_MAP[errorCode] || ERROR_MAP.INTERNAL_ERROR;
 
   if (errorInfo.status >= 500 && c.env.POSTHOG_PROJECT_TOKEN && c.env.POSTHOG_HOST) {
     const posthog = createPostHogClient(c.env.POSTHOG_PROJECT_TOKEN, c.env.POSTHOG_HOST);
     const distinctId = getDistinctId(c.req);
-    posthog.captureException(err, distinctId);
+    posthog.captureException(error, distinctId);
     void posthog.shutdown();
   }
 
-  const response: ErrorResponse = {
-    error: errorInfo.message,
-    code: errorCode
-  };
-
-  return c.json(response, errorInfo.status as 400 | 401 | 403 | 404 | 429 | 500 | 504);
+  return mapErrorResponse(error, c);
 });
 
 // Add API routes to main app with /api prefix

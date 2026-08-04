@@ -20,6 +20,7 @@ A modern web application for scanning and analyzing HTTP security headers of web
 ### Backend
 - Cloudflare Workers (TypeScript)
 - Cloudflare Workers Static Assets
+- Cloudflare Email Service for transactional lead notifications
 - Clean Architecture principles
 
 ### Storage
@@ -74,6 +75,23 @@ npm run deploy
 The final Astro build is emitted to `dist`. Wrangler serves those assets
 directly and invokes the Hono Worker first for `/api/*`, `/share/*`, and
 `/report/*`.
+
+### Production prerequisites
+
+The `httpscanner.com` zone must use Cloudflare DNS. Before deploying lead
+submissions, onboard `httpscanner.com` for Email Sending and verify
+`pietrucha.bartosz+scanner@gmail.com` as a destination address in the
+Cloudflare account. Apply the D1 migration separately after reviewing it.
+
+Run these production operations manually; local development and builds do not
+run them:
+
+```bash
+npx wrangler email sending list
+npx wrangler email sending enable httpscanner.com
+npx wrangler email sending dns get httpscanner.com
+npx wrangler d1 migrations apply http_scanner_db --remote
+```
 
 ## 🧪 Testing
 
