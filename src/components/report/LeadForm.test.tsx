@@ -21,11 +21,17 @@ async function fillValidForm() {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText('Name'), 'Ada Lovelace');
   await user.type(screen.getByLabelText('Email'), 'ada@example.com');
-  await user.type(screen.getByLabelText('Message'), 'Help with CSP');
+  const message = await revealMessage(user);
+  await user.type(message, 'Help with CSP');
   await user.click(screen.getByRole('checkbox', {
     name: 'I agree to be contacted about paid security configuration support.',
   }));
   return user;
+}
+
+async function revealMessage(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('checkbox', { name: 'Add custom message' }));
+  return screen.getByLabelText('Message') as HTMLTextAreaElement;
 }
 
 describe('LeadForm', () => {
@@ -42,12 +48,52 @@ describe('LeadForm', () => {
     expect(submit).not.toHaveBeenCalled();
   });
 
-  it('enforces the field limits in the rendered controls', () => {
+  it('enforces the field limits in the rendered controls', async () => {
+    const user = userEvent.setup();
     render(<LeadForm hash={HASH} score={SCORE} submit={vi.fn()} capture={vi.fn()} />);
 
     expect((screen.getByLabelText('Name') as HTMLInputElement).maxLength).toBe(100);
     expect((screen.getByLabelText('Email') as HTMLInputElement).maxLength).toBe(254);
-    expect((screen.getByLabelText('Message') as HTMLTextAreaElement).maxLength).toBe(2000);
+    expect((await revealMessage(user)).maxLength).toBe(2000);
+  });
+
+  it('starts compact with name and email in a responsive row', () => {
+    render(<LeadForm hash={HASH} score={SCORE} submit={vi.fn()} capture={vi.fn()} />);
+
+    expect(screen.getByRole('checkbox', { name: 'Add custom message' })).not.toBeNull();
+    expect(screen.queryByLabelText('Message')).toBeNull();
+
+    const identityFields = screen.getByTestId('lead-identity-fields');
+    expect(identityFields.classList.contains('md:grid-cols-2')).toBe(true);
+  });
+
+  it('reveals the optional message and clears it when collapsed', async () => {
+    const user = userEvent.setup();
+    render(<LeadForm hash={HASH} score={SCORE} submit={vi.fn()} capture={vi.fn()} />);
+
+    const message = await revealMessage(user);
+    await user.type(message, 'Help with CSP');
+    await user.click(screen.getByRole('checkbox', { name: 'Add custom message' }));
+    expect(screen.queryByLabelText('Message')).toBeNull();
+
+    const reopenedMessage = await revealMessage(user);
+    expect(reopenedMessage.value).toBe('');
+  });
+
+  it('submits an empty message when custom message is not enabled', async () => {
+    const submit = vi.fn().mockResolvedValue(ACCEPTED);
+    const user = userEvent.setup();
+    render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={vi.fn()} />);
+    await user.type(screen.getByLabelText('Name'), 'Ada Lovelace');
+    await user.type(screen.getByLabelText('Email'), 'ada@example.com');
+    await user.click(screen.getByRole('checkbox', {
+      name: 'I agree to be contacted about paid security configuration support.',
+    }));
+    await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+
+    await waitFor(() => expect(submit).toHaveBeenCalledWith(expect.objectContaining({
+      message: '',
+    })));
   });
 
   it('allows only one submission while the request is pending', async () => {

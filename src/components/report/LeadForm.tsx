@@ -32,6 +32,7 @@ export function LeadForm({
   capture = capturePostHogEventWithoutAttribution,
 }: LeadFormProps) {
   const [submissionState, setSubmissionState] = useState<SubmissionState>('idle');
+  const [showMessage, setShowMessage] = useState(false);
   const submissionInFlight = useRef(false);
   const form = useForm<LeadFormInput, unknown, LeadSubmissionRequestDTO>({
     resolver: zodResolver(leadSubmissionSchema),
@@ -79,7 +80,7 @@ export function LeadForm({
         <div className="bg-muted px-6 py-3">
           <h2 className="text-xl font-semibold">Need help fixing your security headers?</h2>
         </div>
-        <div className="flex-grow p-6">
+        <div className="flex-grow p-4 sm:p-5">
           {submissionState === 'success' ? (
             <div role="status" className="space-y-2">
               <p className="font-medium">Your request has been received.</p>
@@ -89,74 +90,100 @@ export function LeadForm({
             </div>
           ) : (
             <>
-              <p className="text-muted-foreground mb-5 text-sm">
+              <p className="text-muted-foreground mb-3 text-sm">
                 Request paid help configuring your site&apos;s HTTP security headers.
               </p>
               <Form {...form}>
                 <form
                   aria-label="Paid security help request"
-                  className="space-y-4"
+                  className="space-y-3"
                   onSubmit={onSubmit}
                 >
                   <input type="hidden" {...form.register('hash')} />
                   <input type="hidden" {...form.register('website')} />
 
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            autoComplete="name"
-                            maxLength={LEAD_FIELD_LIMITS.name}
-                            aria-required="true"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div
+                    data-testid="lead-identity-fields"
+                    className="grid gap-3 md:grid-cols-2"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              autoComplete="name"
+                              maxLength={LEAD_FIELD_LIMITS.name}
+                              aria-required="true"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            autoComplete="email"
-                            maxLength={LEAD_FIELD_LIMITS.email}
-                            aria-required="true"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              autoComplete="email"
+                              maxLength={LEAD_FIELD_LIMITS.email}
+                              aria-required="true"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            maxLength={LEAD_FIELD_LIMITS.message}
-                            placeholder="What would you like help with?"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="size-4"
+                      checked={showMessage}
+                      onChange={(event) => {
+                        const checked = event.target.checked;
+                        setShowMessage(checked);
+                        if (!checked) {
+                          form.setValue('message', '', {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }
+                      }}
+                    />
+                    <span>Add custom message</span>
+                  </label>
+
+                  {showMessage && (
+                    <FormField
+                      control={form.control}
+                      name="message"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Message</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              maxLength={LEAD_FIELD_LIMITS.message}
+                              placeholder="What would you like help with?"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
