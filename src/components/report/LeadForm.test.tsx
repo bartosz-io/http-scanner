@@ -40,7 +40,7 @@ describe('LeadForm', () => {
     const submit = vi.fn().mockResolvedValue(ACCEPTED);
 
     render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={vi.fn()} />);
-    await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+    await user.click(screen.getByRole('button', { name: 'Request help' }));
 
     expect(await screen.findByText('Enter your name.')).not.toBeNull();
     expect(await screen.findByText('Enter a valid email address.')).not.toBeNull();
@@ -100,7 +100,7 @@ describe('LeadForm', () => {
     await user.click(screen.getByRole('checkbox', {
       name: 'I agree to be contacted about paid security configuration support.',
     }));
-    await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+    await user.click(screen.getByRole('button', { name: 'Request help' }));
 
     await waitFor(() => expect(submit).toHaveBeenCalledWith(expect.objectContaining({
       message: '',
@@ -149,7 +149,7 @@ describe('LeadForm', () => {
     render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={capture} />);
 
     const user = await fillValidForm();
-    await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+    await user.click(screen.getByRole('button', { name: 'Request help' }));
 
     expect(await screen.findByText('Your request has been received.')).not.toBeNull();
     expect(screen.queryByRole('form')).toBeNull();
@@ -175,7 +175,7 @@ describe('LeadForm', () => {
     render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={capture} />);
 
     const user = await fillValidForm();
-    await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+    await user.click(screen.getByRole('button', { name: 'Request help' }));
 
     expect(await screen.findByText('We could not submit your request. Please try again.')).not.toBeNull();
     expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe('Ada Lovelace');
@@ -212,7 +212,7 @@ async function fillValidFormAfterRender(
 ) {
   render(<LeadForm hash={HASH} score={SCORE} submit={submit} capture={vi.fn()} />);
   const user = await fillValidForm();
-  await user.click(screen.getByRole('button', { name: 'Request paid help' }));
+  await user.click(screen.getByRole('button', { name: 'Request help' }));
   await waitFor(() => expect(submit).toHaveBeenCalledOnce());
   return user;
 }
