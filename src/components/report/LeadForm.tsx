@@ -91,7 +91,7 @@ export function LeadForm({
           ) : (
             <>
               <p className="text-muted-foreground mb-3 text-sm">
-                Request paid help configuring your site&apos;s HTTP security headers.
+                Request help configuring your site&apos;s HTTP security headers.
               </p>
               <Form {...form}>
                 <form
@@ -223,7 +223,7 @@ export function LeadForm({
                       ? 'Requesting help…'
                       : submissionState === 'error'
                         ? 'Try again'
-                        : 'Request paid help'}
+                        : 'Request help'}
                   </Button>
                 </form>
               </Form>
