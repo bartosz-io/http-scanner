@@ -8,8 +8,7 @@ import {
   selectAllResponseHeaders,
   type ReportHeaderGroups,
 } from '../../lib/reportView';
-import { ReportHeader } from './ReportHeader';
-import { ReportViewSwitch } from './ReportViewSwitch';
+import { ReportSummaryBar } from './ReportSummaryBar';
 import { ScoreSection } from './ScoreSection';
 import { HeadersSection } from './HeadersSection';
 import { ReportActionSection } from './ReportActionSection';
@@ -105,20 +104,18 @@ export const ReportView: React.FC<ReportViewProps> = ({
   return (
     <div className="site-container mx-auto space-y-8 px-4 py-8">
       {report && (
-        <div className="space-y-8">
-          {/* Report header with URL and timestamp */}
-          <ReportHeader
+        <div className="space-y-6">
+          <ReportSummaryBar
             url={report.url}
             createdAt={report.created_at}
-            /* deleteToken is only available during initial scan, not in fetch report */
+            value={view}
+            onChange={onViewChange}
           />
 
           {/* Display token warning when URL has a token parameter */}
           {token && (
             <TokenWarningAlert deleteToken={token} />
           )}
-
-          <ReportViewSwitch value={view} onChange={onViewChange} />
 
           {view === 'security-analysis' && (
             <>

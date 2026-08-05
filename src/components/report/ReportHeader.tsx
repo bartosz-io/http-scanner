@@ -11,14 +11,19 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({ url, createdAt, dele
   const formattedDate = new Date(createdAt * 1000).toLocaleString();
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className="min-w-0 space-y-4">
+      <div className="min-w-0 space-y-1.5">
         <h1 className="text-2xl font-bold">Security Scan Report</h1>
-        <div className="text-lg">
-          <span className="font-medium">URL:</span> {url}
-        </div>
-        <div className="text-sm text-muted-foreground">
-          Scanned on {formattedDate}
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-1">
+          <div
+            className="min-w-0 max-w-full truncate font-medium"
+            title={url}
+          >
+            {url}
+          </div>
+          <div className="text-sm whitespace-nowrap text-muted-foreground">
+            Scanned {formattedDate}
+          </div>
         </div>
       </div>
 
