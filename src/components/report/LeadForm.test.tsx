@@ -67,6 +67,17 @@ describe('LeadForm', () => {
     expect(identityFields.classList.contains('md:grid-cols-2')).toBe(true);
   });
 
+  it('uses content height instead of filling the adjacent card row', () => {
+    const { container } = render(
+      <LeadForm hash={HASH} score={SCORE} submit={vi.fn()} capture={vi.fn()} />
+    );
+
+    const root = container.firstElementChild;
+    const card = root?.firstElementChild;
+    expect(root?.classList.contains('h-full')).toBe(false);
+    expect(card?.classList.contains('h-full')).toBe(false);
+  });
+
   it('reveals the optional message and clears it when collapsed', async () => {
     const user = userEvent.setup();
     render(<LeadForm hash={HASH} score={SCORE} submit={vi.fn()} capture={vi.fn()} />);

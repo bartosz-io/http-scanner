@@ -75,8 +75,8 @@ export function LeadForm({
   };
 
   return (
-    <div className="ph-no-capture ph-mask h-full">
-      <div className="flex h-full flex-col overflow-hidden rounded-md border">
+    <div className="ph-no-capture ph-mask">
+      <div className="flex flex-col overflow-hidden rounded-md border">
         <div className="bg-muted px-6 py-3">
           <h2 className="text-xl font-semibold">Need help fixing your security headers?</h2>
         </div>
