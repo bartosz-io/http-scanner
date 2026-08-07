@@ -106,6 +106,45 @@ Configure the header at the response boundary.
 }
 
 describe('HTTP header guide source contract', () => {
+  it('keeps Content-Type guide aligned with high-intent search topics', () => {
+    const source = readFileSync(
+      new URL('src/content/headers/content-type.md', PROJECT_ROOT),
+      'utf8'
+    );
+
+    for (const phrase of [
+      'MIME type',
+      'text/html',
+      'charset=utf-8',
+      'X-Content-Type-Options: nosniff',
+      'HTTP Headers Checker',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
+  it('keeps Set-Cookie guide aligned with high-intent security topics', () => {
+    const source = readFileSync(
+      new URL('src/content/headers/set-cookie.md', PROJECT_ROOT),
+      'utf8'
+    );
+
+    for (const phrase of [
+      'Secure',
+      'HttpOnly',
+      'SameSite',
+      'Max-Age',
+      'Expires',
+      '__Host-',
+      'CORS',
+      'credentials mode',
+      'CORS primarily controls whether browser JavaScript may read the response',
+      'a cookie can still be sent when CORS rejects response exposure',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });

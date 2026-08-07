@@ -34,3 +34,11 @@ The field describes representation data after any content coding is decoded. Con
 ## Implementation notes
 
 Map every generated and static format to a registered or appropriate vendor media type. Configure object storage metadata, CDN overrides, error handlers, uploads, and fallback routes as carefully as the main application. Include a charset only where its meaning is defined and ensure the bytes use that encoding. Test downloads and inline rendering in browsers, API clients, and caches. For user-controlled files, validate content and serve it from an appropriate trust boundary; changing the label alone does not make malicious bytes safe. Inspect final responses after compression and proxy transformations, because intermediaries can rewrite metadata.
+
+## Common Content-Type values
+
+The `Content-Type` HTTP header is often called the MIME type header. For an HTML document, a typical response is `Content-Type: text/html; charset=utf-8`; for a JSON API it is commonly `Content-Type: application/json`. Stylesheets, JavaScript modules, images, fonts, and downloads each need a media type that matches the bytes being served. A correct `charset=utf-8` parameter helps clients decode text consistently, but it does not repair content that was generated in a different encoding.
+
+When debugging a response, inspect the final headers rather than relying on the file extension or the browser’s guess. The HTTP Headers Checker can show the value returned by a public URL, while `Content-Encoding` describes compression separately. A response may therefore be `Content-Type: text/html; charset=utf-8` and `Content-Encoding: br` at the same time. If a browser refuses a script or stylesheet after `X-Content-Type-Options: nosniff` is enabled, verify the declared media type and the resource bytes instead of disabling the protection.
+
+For uploads and user-controlled files, validate the content independently and serve untrusted data from an appropriate origin or download context. A MIME type is metadata, not a security boundary. Recheck the response after a CDN, reverse proxy, object store, or framework error handler has processed it, because any intermediary can add, remove, or rewrite the header.
