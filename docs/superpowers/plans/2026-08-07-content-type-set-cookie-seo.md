@@ -20,15 +20,15 @@
 **Files:**
 - Modify: `src/lib/headerContentContract.test.ts`
 
-- [ ] **Step 1: Write assertions for required Content-Type topics**
+- [x] **Step 1: Write assertions for required Content-Type topics**
 
 Assert the source contains `text/html`, `charset=utf-8`, `MIME type`, `nosniff`, and a concrete response example.
 
-- [ ] **Step 2: Write assertions for required Set-Cookie topics**
+- [x] **Step 2: Write assertions for required Set-Cookie topics**
 
 Assert the source contains `Secure`, `HttpOnly`, `SameSite`, `Max-Age`, `Expires`, `__Host-`, and CORS credentials guidance.
 
-- [ ] **Step 3: Run the focused test and verify RED**
+- [x] **Step 3: Run the focused test and verify RED**
 
 Run `npm test -- src/lib/headerContentContract.test.ts`.
 Expected: failure because the current guide sources do not contain all required topic phrases.
@@ -38,11 +38,11 @@ Expected: failure because the current guide sources do not contain all required 
 **Files:**
 - Modify: `src/content/headers/content-type.md`
 
-- [ ] **Step 1: Add practical query-aligned explanations**
+- [x] **Step 1: Add practical query-aligned explanations**
 
 Cover media type vs charset, common HTML/JSON responses, MIME sniffing, `X-Content-Type-Options: nosniff`, upload/download behavior, and debugging through the HTTP Headers Checker.
 
-- [ ] **Step 2: Preserve security boundaries**
+- [x] **Step 2: Preserve security boundaries**
 
 Explain that changing Content-Type does not sanitize untrusted bytes and that final headers must be checked after CDN/proxy transformations.
 
@@ -51,11 +51,11 @@ Explain that changing Content-Type does not sanitize untrusted bytes and that fi
 **Files:**
 - Modify: `src/content/headers/set-cookie.md`
 
-- [ ] **Step 1: Add practical cookie-attribute explanations**
+- [x] **Step 1: Add practical cookie-attribute explanations**
 
 Cover `Secure`, `HttpOnly`, `SameSite`, `Max-Age`, `Expires`, host-only scope, `__Host-`, and deletion with matching scope.
 
-- [ ] **Step 2: Add cross-origin and session guidance**
+- [x] **Step 2: Add cross-origin and session guidance**
 
 Explain CORS credential interactions, session rotation/fixation, and why cookie attributes do not replace server-side authorization.
 
@@ -64,14 +64,14 @@ Explain CORS credential interactions, session rotation/fixation, and why cookie 
 **Files:**
 - No additional files.
 
-- [ ] **Step 1: Run focused tests and then the full test suite**
+- [x] **Step 1: Run focused tests and then the full test suite**
 
 Run `npm test -- src/lib/headerContentContract.test.ts`, then `npm test`.
 
-- [ ] **Step 2: Run lint and production build**
+- [x] **Step 2: Run lint and production build**
 
 Run `npm run lint` and `npm run build`.
 
-- [ ] **Step 3: Inspect the diff**
+- [x] **Step 3: Inspect the diff**
 
 Confirm only the two guides, their source contract test, and the design/plan documents changed; verify no URL or frontmatter contract was unintentionally altered.
