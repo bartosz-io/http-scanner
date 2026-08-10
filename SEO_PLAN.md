@@ -71,8 +71,8 @@ One task should normally cover one header. A task may cover two tightly coupled 
 |---:|---|---|---|---|---|---|
 | 1 | Content-Type | `DONE` | P0 | 221 impressions, position 31.95 | Largest reference-page opportunity in the export. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
 | 2 | Set-Cookie | `DONE` | P0 | 87 impressions, position 26.76 | Existing demand and security-focused implementation intent. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
-| 3 | Access-Control-Allow-Origin | `NEXT` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | Planned: `2026-08-10-cors-origin-max-age-seo-design.md` |
-| 4 | Access-Control-Max-Age | `NEXT` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | Planned: `2026-08-10-cors-origin-max-age-seo-design.md` |
+| 3 | Access-Control-Allow-Origin | `NEXT` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
+| 4 | Access-Control-Max-Age | `NEXT` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
 
 The next deliverable after approval of this document is the combined CORS design spec. It must define independent search intent, content requirements, internal links, tests, and acceptance criteria for both headers.
 
@@ -236,7 +236,7 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 
 ## 12. Next task
 
-Create and approve `docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md` for:
+Review and approve `docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md` for:
 
 - `Access-Control-Allow-Origin`;
 - `Access-Control-Max-Age`.
