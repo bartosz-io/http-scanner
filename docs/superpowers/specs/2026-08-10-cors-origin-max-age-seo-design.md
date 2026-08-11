@@ -2,7 +2,7 @@
 
 Date: 2026-08-10  
 Parent roadmap: [`SEO_PLAN.md`](../../../SEO_PLAN.md)  
-Status: proposed for approval
+Status: approved on 2026-08-11
 
 ## 1. Goal
 
@@ -374,6 +374,6 @@ At day 21, record one decision per URL: `HOLD`, `ITERATE`, `PROMOTE CLUSTER`, or
 - Modify: `src/content/headers/access-control-max-age.md`
 - Modify: `src/lib/headerContentContract.test.ts`
 - Modify after successful implementation: `SEO_PLAN.md`
-- Create after spec approval: `docs/superpowers/plans/2026-08-10-cors-origin-max-age-seo.md`
+- Created after spec approval: `docs/superpowers/plans/2026-08-10-cors-origin-max-age-seo.md`
 
 No other production file is expected to change.

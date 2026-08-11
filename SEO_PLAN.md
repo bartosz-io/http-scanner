@@ -236,7 +236,7 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 
 ## 12. Next task
 
-Review and approve `docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md` for:
+Execute `docs/superpowers/plans/2026-08-10-cors-origin-max-age-seo.md` for:
 
 - `Access-Control-Allow-Origin`;
 - `Access-Control-Max-Age`.
