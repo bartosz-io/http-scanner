@@ -145,6 +145,31 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Access-Control-Allow-Origin aligned with CORS troubleshooting intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-allow-origin.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+
+    for (const phrase of [
+      '## Access-Control-Allow-Origin values',
+      '## Common CORS origin errors',
+      '## Credentials, dynamic origins, and caching',
+      'Access-Control-Allow-Origin: *',
+      'Access-Control-Allow-Credentials: true',
+      'Vary: Origin',
+      'serialized `null` origin',
+      'comma-separated list',
+      'request can reach the server even when browser script cannot read the response',
+      'exact allowlist',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });

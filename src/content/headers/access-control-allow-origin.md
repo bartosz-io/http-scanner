@@ -16,6 +16,7 @@ securityConsiderations: A permissive value can expose sensitive response data to
 relatedHeaders:
   - access-control-allow-credentials
   - access-control-allow-methods
+  - access-control-max-age
   - vary
 references:
   - label: Fetch Standard CORS protocol
@@ -32,3 +33,33 @@ CORS is enforced by browsers around response exposure. It is not authentication,
 ## Implementation notes
 
 Maintain an exact allowlist and compare parsed origins, not suffix strings vulnerable to lookalike hosts. When returning a request-specific origin, also send `Vary: Origin` so shared caches do not reuse permission across origins. Use `*` only for data intentionally public without credentials. Test allowed, denied, null, malformed, and attacker-controlled origins plus both simple and preflighted requests. Check redirects, errors, CDN caching, and framework middleware order. If cookies or HTTP authentication are required, coordinate with Access-Control-Allow-Credentials and never treat a successful CORS check as proof the user is authorized.
+
+## Access-Control-Allow-Origin values
+
+`Access-Control-Allow-Origin` accepts one serialized origin, the wildcard `*`, or the serialized `null` origin. An explicit origin contains a scheme, host, and non-default port when one is present. The field is not a comma-separated list and does not support a standard subdomain pattern such as `https://*.example.com`. A server that supports several trusted callers must validate the request `Origin` against an exact allowlist and return the one permitted origin for that response.
+
+Use the wildcard only when the response is intentionally public and browser code does not need credentials:
+
+```http
+Access-Control-Allow-Origin: *
+```
+
+Avoid using `Access-Control-Allow-Origin: null` as a general trust rule. Sandboxed documents and resources using some non-hierarchical schemes can have a serialized `null` origin, so an attacker may be able to create a document that matches it.
+
+## Common CORS origin errors
+
+The browser error “No 'Access-Control-Allow-Origin' header is present” means the response did not grant the requesting page access to read it. Check the final response returned for the failing route, including redirects and errors, and compare the page's complete origin—scheme, host, and port—with the server allowlist.
+
+CORS governs browser response exposure. A simple cross-origin request can reach the server even when browser script cannot read the response, and the server may already have processed a state-changing operation. Authentication, authorization, input validation, and CSRF protection must therefore run independently of the CORS result.
+
+## Credentials, dynamic origins, and caching
+
+A credentialed response cannot be shared with browser code through the wildcard. Return a validated explicit origin and opt into credentials deliberately:
+
+```http
+Access-Control-Allow-Origin: https://app.example
+Access-Control-Allow-Credentials: true
+Vary: Origin
+```
+
+Do not copy the incoming `Origin` into the response before exact allowlist validation. When the selected `Access-Control-Allow-Origin` value changes with the request origin, include `Vary: Origin` and configure shared caches or CDNs with an equivalent cache-key dimension. CORS permission still does not prove that the caller is authenticated or allowed to access the requested object.
