@@ -71,8 +71,8 @@ One task should normally cover one header. A task may cover two tightly coupled 
 |---:|---|---|---|---|---|---|
 | 1 | Content-Type | `DONE` | P0 | 221 impressions, position 31.95 | Largest reference-page opportunity in the export. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
 | 2 | Set-Cookie | `DONE` | P0 | 87 impressions, position 26.76 | Existing demand and security-focused implementation intent. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
-| 3 | Access-Control-Allow-Origin | `NEXT` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
-| 4 | Access-Control-Max-Age | `NEXT` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
+| 3 | Access-Control-Allow-Origin | `DONE` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
+| 4 | Access-Control-Max-Age | `DONE` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
 
 The next deliverable after approval of this document is the combined CORS design spec. It must define independent search intent, content requirements, internal links, tests, and acceptance criteria for both headers.
 
@@ -233,12 +233,12 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 | Task | Status | Commit | Observation state |
 |---|---|---|---|
 | Content-Type and Set-Cookie SEO expansion | `DONE` | `3399646` | Awaiting post-deployment GSC comparison. |
+| Access-Control-Allow-Origin and Access-Control-Max-Age SEO expansion | `DONE` | `9272e99`, `e9bbe6c` | Awaiting deployment and URL-filtered GSC baseline. |
 
 ## 12. Next task
 
-Execute `docs/superpowers/plans/2026-08-10-cors-origin-max-age-seo.md` for:
+No newer GSC export is available after the 2026-08-07 baseline. Execute the next eligible roadmap task for:
 
-- `Access-Control-Allow-Origin`;
-- `Access-Control-Max-Age`.
+- `Access-Control-Allow-Credentials`.
 
-The spec must keep the two pages distinct: origin permission and browser response exposure belong to the first page; preflight-cache duration and revocation trade-offs belong to the second.
+The task should cover credentialed CORS, cookies, explicit origins, and common wildcard errors.

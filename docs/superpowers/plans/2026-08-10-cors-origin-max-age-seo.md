@@ -32,7 +32,7 @@
 - Consumes: `validateHeaderGuideSource(slug: string, source: string): string[]` and the existing Markdown frontmatter contract.
 - Produces: an expanded `access-control-allow-origin.md` guide with four related headers and a focused source-contract regression test.
 
-- [ ] **Step 1: Add the failing source-contract test**
+- [x] **Step 1: Add the failing source-contract test**
 
 Insert this test inside `describe('HTTP header guide source contract', ...)`, after the existing Set-Cookie SEO test:
 
@@ -63,7 +63,7 @@ it('keeps Access-Control-Allow-Origin aligned with CORS troubleshooting intent',
 });
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -73,7 +73,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "Access-Control-Allow-Origi
 
 Expected: FAIL because the three new headings and required troubleshooting phrases are absent from the current guide.
 
-- [ ] **Step 3: Add the related-header link**
+- [x] **Step 3: Add the related-header link**
 
 Extend the existing frontmatter block to this exact set without removing current neighbors:
 
@@ -85,7 +85,7 @@ relatedHeaders:
   - vary
 ```
 
-- [ ] **Step 4: Add the intent-specific Markdown sections**
+- [x] **Step 4: Add the intent-specific Markdown sections**
 
 Append the following content after the existing `Implementation notes` paragraph:
 
@@ -121,7 +121,7 @@ Vary: Origin
 Do not copy the incoming `Origin` into the response before exact allowlist validation. When the selected `Access-Control-Allow-Origin` value changes with the request origin, include `Vary: Origin` and configure shared caches or CDNs with an equivalent cache-key dimension. CORS permission still does not prove that the caller is authenticated or allowed to access the requested object.
 ````
 
-- [ ] **Step 5: Run the focused and category contract tests and verify GREEN**
+- [x] **Step 5: Run the focused and category contract tests and verify GREEN**
 
 Run:
 
@@ -132,7 +132,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "validates every CORS guide
 
 Expected: both commands PASS.
 
-- [ ] **Step 6: Review Task 1 technical boundaries**
+- [x] **Step 6: Review Task 1 technical boundaries**
 
 Confirm from the rendered source and test that:
 
@@ -151,7 +151,7 @@ git diff -- src/content/headers/access-control-allow-origin.md src/lib/headerCon
 
 Expected: no whitespace errors and no unrelated changes.
 
-- [ ] **Step 7: Commit Task 1**
+- [x] **Step 7: Commit Task 1**
 
 ```bash
 git add src/content/headers/access-control-allow-origin.md src/lib/headerContentContract.test.ts
@@ -170,7 +170,7 @@ git commit -m "feat: expand Access-Control-Allow-Origin guide"
 - Consumes: the source-contract test structure established in Task 1 and the existing Markdown frontmatter contract.
 - Produces: an expanded `access-control-max-age.md` guide with four related headers and a focused source-contract regression test.
 
-- [ ] **Step 1: Add the failing source-contract test**
+- [x] **Step 1: Add the failing source-contract test**
 
 Insert this test immediately after the Access-Control-Allow-Origin SEO test:
 
@@ -202,7 +202,7 @@ it('keeps Access-Control-Max-Age aligned with preflight-cache intent', () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -212,7 +212,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "Access-Control-Max-Age"
 
 Expected: FAIL because the new headings, complete preflight exchange, default behavior, and cache distinction are absent.
 
-- [ ] **Step 3: Add the related-header link**
+- [x] **Step 3: Add the related-header link**
 
 Extend the existing frontmatter block to this exact set:
 
@@ -224,7 +224,7 @@ relatedHeaders:
   - cache-control
 ```
 
-- [ ] **Step 4: Add the preflight-cache Markdown sections**
+- [x] **Step 4: Add the preflight-cache Markdown sections**
 
 Append the following content after the existing `Implementation notes` paragraph:
 
@@ -262,7 +262,7 @@ The CORS preflight cache is separate from the general HTTP cache. `Access-Contro
 Changing or purging CDN caching does not guarantee that a user's preflight entry disappears. Test policy changes in real browsers and monitor `OPTIONS` volume instead of treating the two cache mechanisms as interchangeable.
 ````
 
-- [ ] **Step 5: Run the focused and category contract tests and verify GREEN**
+- [x] **Step 5: Run the focused and category contract tests and verify GREEN**
 
 Run:
 
@@ -273,7 +273,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "validates every CORS guide
 
 Expected: both commands PASS.
 
-- [ ] **Step 6: Review Task 2 technical boundaries**
+- [x] **Step 6: Review Task 2 technical boundaries**
 
 Confirm that:
 
@@ -292,7 +292,7 @@ git diff -- src/content/headers/access-control-max-age.md src/lib/headerContentC
 
 Expected: no whitespace errors and no unrelated changes.
 
-- [ ] **Step 7: Commit Task 2**
+- [x] **Step 7: Commit Task 2**
 
 ```bash
 git add src/content/headers/access-control-max-age.md src/lib/headerContentContract.test.ts
@@ -311,7 +311,7 @@ git commit -m "feat: expand Access-Control-Max-Age guide"
 - Consumes: the two verified guide commits from Tasks 1 and 2.
 - Produces: complete repository verification, reviewed changes, updated roadmap statuses, exact implementation commit references, and a checked implementation plan.
 
-- [ ] **Step 1: Run the complete verification suite**
+- [x] **Step 1: Run the complete verification suite**
 
 Run all commands from a clean command prompt after Task 2:
 
@@ -330,7 +330,7 @@ Expected:
 - Astro builds both `/headers/access-control-allow-origin/` and `/headers/access-control-max-age/`;
 - `git diff --check` prints no errors.
 
-- [ ] **Step 2: Request technical code review**
+- [x] **Step 2: Request technical code review**
 
 Use `superpowers:requesting-code-review` with:
 
@@ -341,7 +341,7 @@ Use `superpowers:requesting-code-review` with:
 
 Resolve every critical or important finding. If review changes production content, rerun the complete verification suite from Step 1.
 
-- [ ] **Step 3: Capture exact implementation commits**
+- [x] **Step 3: Capture exact implementation commits**
 
 Run:
 
@@ -351,7 +351,7 @@ git log -2 --format='%h %s'
 
 Expected: the two most recent feature commits are the exact Task 2 and Task 1 commits. Record only the concrete short SHAs returned by the command.
 
-- [ ] **Step 4: Update SEO_PLAN.md**
+- [x] **Step 4: Update SEO_PLAN.md**
 
 Apply these factual changes using the exact SHAs returned in Step 3:
 
@@ -362,7 +362,7 @@ Apply these factual changes using the exact SHAs returned in Step 3:
 - set observation state to `Awaiting deployment and URL-filtered GSC baseline.`;
 - replace section 12 with the next eligible task from the roadmap only after checking whether a newer GSC export exists; otherwise select `Access-Control-Allow-Credentials`.
 
-- [ ] **Step 5: Verify roadmap documentation**
+- [x] **Step 5: Verify roadmap documentation**
 
 Run:
 
@@ -377,7 +377,7 @@ Expected:
 - both roadmap rows show `DONE`;
 - the completed log contains both exact implementation SHAs.
 
-- [ ] **Step 6: Mark succeeded plan steps complete**
+- [x] **Step 6: Mark succeeded plan steps complete**
 
 Change each checkbox for Tasks 1–2 and Task 3 Steps 1–6 from `[ ]` to `[x]` only after its action has succeeded. Leave a failed or externally blocked step unchecked and document it in the final handoff.
 
@@ -389,7 +389,7 @@ rg -n '\[ \]' docs/superpowers/plans/2026-08-10-cors-origin-max-age-seo.md
 
 Expected: only the final roadmap commit step remains unchecked.
 
-- [ ] **Step 7: Commit roadmap completion**
+- [x] **Step 7: Commit roadmap completion**
 
 Immediately before staging, mark this Step 7 checkbox complete so the commit records the final plan state. Then run:
 
