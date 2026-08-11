@@ -170,6 +170,32 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Access-Control-Max-Age aligned with preflight-cache intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-max-age.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+
+    for (const phrase of [
+      '## How the CORS preflight cache works',
+      '## Choosing an Access-Control-Max-Age value',
+      '## Access-Control-Max-Age vs Cache-Control',
+      'OPTIONS /api/items HTTP/1.1',
+      'Access-Control-Max-Age: 600',
+      'default is five seconds',
+      'browser-imposed cap',
+      'separate from the general HTTP cache',
+      'delay browser adoption of a tightened preflight policy',
+      'authorization on every actual request',
+      'Cache-Control: max-age',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });
