@@ -196,6 +196,37 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Access-Control-Allow-Credentials aligned with credentialed CORS troubleshooting intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-allow-credentials.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+
+    for (const phrase of [
+      '## Credentialed CORS request and response',
+      '## Common Access-Control-Allow-Credentials errors',
+      '## Cookies, SameSite, CSRF, and authorization',
+      "credentials: 'include'",
+      'Access-Control-Allow-Origin: https://app.example',
+      'Access-Control-Allow-Credentials: true',
+      'Vary: Origin',
+      'SameSite=None',
+      'case-sensitive token `true`',
+      'omit the field rather than sending `false`',
+      '`Access-Control-Allow-Origin: *`',
+      'preflight itself does not include credentials',
+      'simple credentialed request can be sent without a preflight',
+      'third-party cookie',
+      'CSRF protection',
+      'object-level authorization',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });
