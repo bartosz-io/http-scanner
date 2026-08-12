@@ -235,6 +235,25 @@ describe('HTTP header guide source contract', () => {
       ),
       'utf8'
     );
+    const frontmatter = source.match(
+      /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/
+    )?.[1];
+    const relatedHeadersBlock = frontmatter?.match(
+      /^relatedHeaders:\r?\n((?:[ ]{2}- [^\r\n]+\r?\n?)*)/m
+    )?.[1];
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(
+      relatedHeadersBlock
+        ?.match(/^[ ]{2}- (.+)$/gm)
+        ?.map((line) => line.replace(/^[ ]{2}- /, ''))
+    ).toEqual([
+      'access-control-allow-origin',
+      'access-control-allow-headers',
+      'access-control-allow-credentials',
+      'access-control-max-age',
+    ]);
 
     for (const phrase of [
       '## CORS preflight method exchange',
@@ -260,7 +279,13 @@ describe('HTTP header guide source contract', () => {
       'object-level authorization',
       'CSRF protection',
       '`Access-Control-Max-Age`',
-      '  - access-control-allow-origin\n  - access-control-allow-headers\n  - access-control-allow-credentials\n  - access-control-max-age',
+      'A proposed non-safelisted method must appear in `Access-Control-Allow-Methods`.',
+      'A CORS-safelisted proposed method does not need to be listed, even when the request preflights because another CORS dimension is not safelisted.',
+      'After a successful preflight, the browser can send the actual `PUT`. That route must still authenticate the caller, authorize the target object, validate the body, and enforce any CSRF protection appropriate to its credential model.',
+      'A failed preflight prevents a conforming browser from sending this non-simple actual request, but it does not constrain non-browser clients.',
+      'If a changed policy appears stale, inspect `Access-Control-Max-Age` because the browser may reuse an earlier preflight grant.',
+      'A CORS grant also does not prove that the route exists or that the caller may perform the operation.',
+      'Apply authentication, object-level authorization, input validation, rate limits, and CSRF protection to the actual method just as you would for a same-origin or non-browser client.',
     ]) {
       expect(source).toContain(phrase);
     }
