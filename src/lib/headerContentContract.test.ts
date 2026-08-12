@@ -366,15 +366,40 @@ describe('HTTP header guide source contract', () => {
     expect(headingOffsets.every((offset) => offset >= 0)).toBe(true);
     expect(headingOffsets).toEqual([...headingOffsets].sort((a, b) => a - b));
 
+    const javascriptBlocks = [...source.matchAll(/```js\r?\n([\s\S]*?)\r?\n```/g)];
+    const httpBlocks = [...source.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g)];
+
+    expect(javascriptBlocks).toHaveLength(1);
+    expect(httpBlocks).toHaveLength(1);
+
+    const javascriptBlock = javascriptBlocks[0]?.[1] ?? '';
+    const httpBlock = httpBlocks[0]?.[1] ?? '';
+    const actualRequest = javascriptBlock.match(
+      /fetch\('https:\/\/api\.example(?<path>\/[^']+)', \{\r?\n\s+method: '(?<method>[A-Z]+)'/
+    );
+    const preflightRequest = httpBlock.match(
+      /^OPTIONS (?<path>\/\S+) HTTP\/1\.1[\s\S]*?^Access-Control-Request-Method: (?<method>[A-Z]+)$/m
+    );
+
+    expect(actualRequest?.groups?.path).toBe('/items');
+    expect(actualRequest?.groups?.method).toBe('POST');
+    expect(javascriptBlock).toContain("Authorization: 'Bearer token'");
+    expect(javascriptBlock).toContain("'Content-Type': 'application/json'");
+    expect(javascriptBlock).toContain(
+      "body: JSON.stringify({ name: 'new item' })"
+    );
+
+    expect(preflightRequest?.groups?.path).toBe('/items');
+    expect(preflightRequest?.groups?.method).toBe('POST');
+    expect(httpBlock).toContain(
+      'Access-Control-Request-Headers: authorization, content-type'
+    );
+    expect(actualRequest?.groups?.path).toBe(preflightRequest?.groups?.path);
+    expect(actualRequest?.groups?.method).toBe(
+      preflightRequest?.groups?.method
+    );
+
     for (const phrase of [
-      "fetch('https://api.example/items', {",
-      "method: 'POST'",
-      "Authorization: 'Bearer token'",
-      "'Content-Type': 'application/json'",
-      "body: JSON.stringify({ name: 'new item' })",
-      'OPTIONS /items HTTP/1.1',
-      'Access-Control-Request-Method: POST',
-      'Access-Control-Request-Headers: authorization, content-type',
       'Access-Control-Allow-Origin: https://app.example',
       'Access-Control-Allow-Methods: POST',
       'Access-Control-Allow-Headers: Authorization, Content-Type',
