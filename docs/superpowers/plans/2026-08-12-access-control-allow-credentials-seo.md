@@ -36,7 +36,7 @@
 - Consumes: the existing Markdown frontmatter contract, `validateHeaderGuideSource(slug: string, source: string): string[]`, the shared `HeaderGuidePage.astro` renderer, and the established source-contract test pattern.
 - Produces: an expanded framework-neutral guide with four related headers and a focused regression contract covering credentialed-CORS behavior and security boundaries.
 
-- [ ] **Step 1: Add the failing source-contract test**
+- [x] **Step 1: Add the failing source-contract test**
 
 Insert this test in `src/lib/headerContentContract.test.ts` immediately after the existing `Access-Control-Max-Age` SEO test:
 
@@ -75,7 +75,7 @@ it('keeps Access-Control-Allow-Credentials aligned with credentialed CORS troubl
 
 The production change that makes this test pass is the presence of the three new sections and their required technical distinctions in `access-control-allow-credentials.md`.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -85,7 +85,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "Access-Control-Allow-Crede
 
 Expected: FAIL because the new headings, `fetch()` example, raw response fields, and troubleshooting phrases are absent. Confirm the failure is an assertion about missing content rather than a syntax or fixture error.
 
-- [ ] **Step 3: Extend the related-header cluster**
+- [x] **Step 3: Extend the related-header cluster**
 
 Replace the current `relatedHeaders` block in `src/content/headers/access-control-allow-credentials.md` with:
 
@@ -99,7 +99,7 @@ relatedHeaders:
 
 Do not change the current `headerName`, description, applicability, syntax, examples, use cases, mistakes, security consideration, or references in frontmatter.
 
-- [ ] **Step 4: Append the credentialed request and response section**
+- [x] **Step 4: Append the credentialed request and response section**
 
 Append this section after the existing `Implementation notes` paragraph:
 
@@ -132,7 +132,7 @@ The cookie attributes above are illustrative, not a universal session policy. A 
 A non-simple request may first trigger an `OPTIONS` exchange. A conforming CORS preflight itself does not include credentials, but its response can state whether the later actual request may use credentials. The preflight response and the actual response must each contain the CORS fields required for their role.
 ````
 
-- [ ] **Step 5: Append the troubleshooting section**
+- [x] **Step 5: Append the troubleshooting section**
 
 Append this section immediately after `Credentialed CORS request and response`:
 
@@ -146,7 +146,7 @@ A request whose credentials mode is `include` cannot share a response through `A
 When the browser reports an expected-`true` or wildcard-with-credentials error, inspect both the browser console and the final public network response. Check redirects, authentication failures, application errors, proxy responses, and CDN-served variants because they may bypass the middleware that adds CORS fields. For a preflighted flow, inspect both `OPTIONS` and the actual response; for a simple request, do not assume an `OPTIONS` request must appear. Test allowed and denied origins separately.
 ````
 
-- [ ] **Step 6: Append the cookie and security-boundary section**
+- [x] **Step 6: Append the cookie and security-boundary section**
 
 Append this section immediately after `Common Access-Control-Allow-Credentials errors`:
 
@@ -158,7 +158,7 @@ Valid CORS fields do not override cookie `SameSite`, `Secure`, domain, path, or 
 Credentialed CORS does not authenticate a caller or grant object-level authorization. Validate the session or other credential and authorize every requested object on the server. A simple state-changing request may reach the application even when the browser later hides its response, so state-changing endpoints still require independent CSRF protection such as an appropriate token strategy, cookie policy, and origin checks. Treat CORS, cookies, authentication, authorization, and CSRF as coordinated but separate controls.
 ````
 
-- [ ] **Step 7: Run focused tests and verify GREEN**
+- [x] **Step 7: Run focused tests and verify GREEN**
 
 Run:
 
@@ -169,7 +169,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "validates every CORS guide
 
 Expected: both commands PASS. If either fails, correct the production Markdown while preserving the approved wording and constraints; do not weaken the test to accommodate missing coverage.
 
-- [ ] **Step 8: Review Task 1 technical boundaries**
+- [x] **Step 8: Review Task 1 technical boundaries**
 
 Read the complete rendered source and confirm:
 
@@ -191,7 +191,7 @@ git diff -- src/content/headers/access-control-allow-credentials.md src/lib/head
 
 Expected: no whitespace errors and no unrelated changes.
 
-- [ ] **Step 9: Run the complete automated verification**
+- [x] **Step 9: Run the complete automated verification**
 
 Run:
 
@@ -210,7 +210,7 @@ Expected:
 - Astro builds `/headers/access-control-allow-credentials/` among the static routes;
 - `git diff --check` prints no errors.
 
-- [ ] **Step 10: Verify the generated and rendered page**
+- [x] **Step 10: Verify the generated and rendered page**
 
 First confirm that the build contains the new content and code blocks:
 
@@ -232,7 +232,7 @@ Start the local site and inspect `/headers/access-control-allow-credentials/` in
 
 Save QA screenshots outside the repository under `/private/tmp/access-control-allow-credentials-desktop.png` and `/private/tmp/access-control-allow-credentials-mobile.png`. Reset any temporary viewport override and stop the local server after verification.
 
-- [ ] **Step 11: Commit Task 1**
+- [x] **Step 11: Commit Task 1**
 
 ```bash
 git add src/content/headers/access-control-allow-credentials.md src/lib/headerContentContract.test.ts
@@ -253,7 +253,7 @@ Record the exact short SHA for Task 2.
 - Consumes: the verified Task 1 implementation commit and the acceptance criteria in `docs/superpowers/specs/2026-08-12-access-control-allow-credentials-seo-design.md`.
 - Produces: an independently reviewed implementation, a factual `DONE` roadmap entry, the next Wave 1 task selection, and a fully checked implementation plan.
 
-- [ ] **Step 1: Request independent technical review of Task 1**
+- [x] **Step 1: Request independent technical review of Task 1**
 
 Prepare a review package comparing the commit immediately before Task 1 with the Task 1 commit. Give the reviewer:
 
@@ -269,13 +269,13 @@ Require two explicit verdicts:
 
 The reviewer must classify findings as Critical, Important, or Minor and cite exact file/line evidence. Resolve every Critical or Important finding. Any production-content correction must use a new failing regression assertion or a demonstrated failure of an existing assertion before editing the Markdown, then rerun Task 1 Steps 7–10.
 
-- [ ] **Step 2: Run final whole-branch review**
+- [x] **Step 2: Run final whole-branch review**
 
 After the task review is clean, request a fresh reviewer for the complete diff from the pre-Task-1 base through current `HEAD`. The reviewer must check technical accuracy, unsafe ambiguity, scope, source-contract quality, internal linking, rendered-code behavior, and compliance with the no-framework/no-deploy constraints.
 
 Expected: no unresolved Critical or Important findings. Resolve real findings through the same RED → GREEN discipline and repeat the affected verification.
 
-- [ ] **Step 3: Run fresh final verification**
+- [x] **Step 3: Run fresh final verification**
 
 After all review changes, run from a clean command prompt:
 
@@ -295,7 +295,7 @@ Expected:
 - `git diff --check` is clean;
 - only the intended roadmap and plan-document updates remain uncommitted.
 
-- [ ] **Step 4: Capture the exact implementation commit**
+- [x] **Step 4: Capture the exact implementation commit**
 
 Run:
 
@@ -305,11 +305,11 @@ git log -1 --format='%h %s'
 
 Expected: the latest implementation commit is `feat: expand Access-Control-Allow-Credentials guide`. Store its exact short SHA for the roadmap update; do not insert a placeholder.
 
-- [ ] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
+- [x] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
 
 In the `Wave 1 — CORS authority` table, change only the `Access-Control-Allow-Credentials` status from `QUEUED` to `DONE`. Keep its order, priority, and strategic role unchanged.
 
-- [ ] **Step 6: Add the completed-task record**
+- [x] **Step 6: Add the completed-task record**
 
 Append one row to `## 11. Completed task log` with these exact cells:
 
@@ -322,7 +322,7 @@ The rendered Markdown row must contain the concrete SHA directly and must not co
 
 Do not claim a deployment date or GSC submission before those actions occur.
 
-- [ ] **Step 7: Advance the next task**
+- [x] **Step 7: Advance the next task**
 
 Replace the body of `## 12. Next task` with:
 
@@ -334,11 +334,11 @@ No newer GSC export is available after the 2026-08-07 baseline. Execute the next
 The task should cover preflight method authorization, `OPTIONS` troubleshooting, exact method matching, and credentialed-request interactions.
 ```
 
-- [ ] **Step 8: Mark this implementation plan complete**
+- [x] **Step 8: Mark this implementation plan complete**
 
 In `docs/superpowers/plans/2026-08-12-access-control-allow-credentials-seo.md`, change every completed task checkbox from `- [ ]` to `- [x]` only after its associated action and verification have actually succeeded.
 
-- [ ] **Step 9: Verify the documentation diff**
+- [x] **Step 9: Verify the documentation diff**
 
 Run:
 
@@ -349,14 +349,14 @@ git diff -- SEO_PLAN.md docs/superpowers/plans/2026-08-12-access-control-allow-c
 
 Expected: the diff contains only the factual status, completed-task row, next-task text, and completed checkboxes described above.
 
-- [ ] **Step 10: Commit the roadmap completion**
+- [x] **Step 10: Commit the roadmap completion**
 
 ```bash
 git add SEO_PLAN.md docs/superpowers/plans/2026-08-12-access-control-allow-credentials-seo.md
 git commit -m "docs: complete Access-Control-Allow-Credentials SEO task"
 ```
 
-- [ ] **Step 11: Confirm clean handoff state**
+- [x] **Step 11: Confirm clean handoff state**
 
 Run:
 
