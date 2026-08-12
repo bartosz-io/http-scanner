@@ -367,8 +367,11 @@ describe('HTTP header guide source contract', () => {
     expect(headingOffsets).toEqual([...headingOffsets].sort((a, b) => a - b));
 
     for (const phrase of [
+      "fetch('https://api.example/items', {",
+      "method: 'POST'",
       "Authorization: 'Bearer token'",
       "'Content-Type': 'application/json'",
+      "body: JSON.stringify({ name: 'new item' })",
       'OPTIONS /items HTTP/1.1',
       'Access-Control-Request-Method: POST',
       'Access-Control-Request-Headers: authorization, content-type',
