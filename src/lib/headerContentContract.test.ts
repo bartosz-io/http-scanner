@@ -227,6 +227,45 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Access-Control-Allow-Methods aligned with CORS method troubleshooting intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-allow-methods.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+
+    for (const phrase of [
+      '## CORS preflight method exchange',
+      '## Common Access-Control-Allow-Methods errors',
+      '## Wildcard, credentials, and safelisted methods',
+      '## Access-Control-Allow-Methods vs Allow and authorization',
+      "method: 'PUT'",
+      'OPTIONS /items/42 HTTP/1.1',
+      'Access-Control-Request-Method: PUT',
+      'Access-Control-Request-Headers: content-type',
+      'Access-Control-Allow-Origin: https://app.example',
+      'Access-Control-Allow-Methods: GET, PUT',
+      'Access-Control-Allow-Headers: Content-Type',
+      'Vary: Origin',
+      'preflight transport method',
+      '`GET`, `HEAD`, and `POST` are CORS-safelisted methods',
+      'non-safelisted request headers or a non-safelisted `Content-Type`',
+      'credentials mode is `include`',
+      'literal method name `*`',
+      'Method matching follows the Fetch rules',
+      '`Allow` describes methods supported by an HTTP resource',
+      '`405 Method Not Allowed`',
+      'object-level authorization',
+      'CSRF protection',
+      '`Access-Control-Max-Age`',
+      '  - access-control-allow-origin\n  - access-control-allow-headers\n  - access-control-allow-credentials\n  - access-control-max-age',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });
