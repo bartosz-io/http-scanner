@@ -105,6 +105,32 @@ Configure the header at the response boundary.
 `;
 }
 
+function getOpeningFrontmatter(source: string): string | undefined {
+  return source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
+}
+
+function parseFrontmatterList(frontmatter: string, field: string): string[] {
+  const lines = frontmatter.split(/\r?\n/);
+  const fieldIndex = lines.findIndex((line) => line === `${field}:`);
+  if (fieldIndex === -1) {
+    return [];
+  }
+
+  const values: string[] = [];
+  for (const line of lines.slice(fieldIndex + 1)) {
+    if (/^[A-Za-z][A-Za-z0-9]*:/.test(line)) {
+      break;
+    }
+
+    const listItem = line.match(/^\s+-\s+([^#]+?)(?:\s+#.*)?$/);
+    if (listItem) {
+      values.push(listItem[1].trim());
+    }
+  }
+
+  return values;
+}
+
 describe('HTTP header guide source contract', () => {
   it('keeps Content-Type guide aligned with high-intent search topics', () => {
     const source = readFileSync(
@@ -235,25 +261,29 @@ describe('HTTP header guide source contract', () => {
       ),
       'utf8'
     );
-    const frontmatter = source.match(
-      /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/
-    )?.[1];
-    const relatedHeadersBlock = frontmatter?.match(
-      /^relatedHeaders:\r?\n((?:[ ]{2}- [^\r\n]+\r?\n?)*)/m
-    )?.[1];
-
-    expect(frontmatter).toBeDefined();
-    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
-    expect(
-      relatedHeadersBlock
-        ?.match(/^[ ]{2}- (.+)$/gm)
-        ?.map((line) => line.replace(/^[ ]{2}- /, ''))
-    ).toEqual([
+    const frontmatter = getOpeningFrontmatter(source);
+    const expectedRelatedHeaders = [
       'access-control-allow-origin',
       'access-control-allow-headers',
       'access-control-allow-credentials',
       'access-control-max-age',
-    ]);
+    ];
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(parseFrontmatterList(frontmatter ?? '', 'relatedHeaders')).toEqual(
+      expectedRelatedHeaders
+    );
+
+    const bypassSource = source.replace(
+      '  - access-control-max-age\nreferences:',
+      '  - access-control-max-age\n\n  # This comment must not hide another item.\n  - set-cookie\nreferences:'
+    );
+    const bypassFrontmatter = getOpeningFrontmatter(bypassSource);
+
+    expect(
+      parseFrontmatterList(bypassFrontmatter ?? '', 'relatedHeaders')
+    ).toEqual([...expectedRelatedHeaders, 'set-cookie']);
 
     for (const phrase of [
       '## CORS preflight method exchange',
@@ -279,7 +309,9 @@ describe('HTTP header guide source contract', () => {
       'object-level authorization',
       'CSRF protection',
       '`Access-Control-Max-Age`',
-      'A proposed non-safelisted method must appear in `Access-Control-Allow-Methods`.',
+      'A proposed non-safelisted method must be authorized by `Access-Control-Allow-Methods`: list it explicitly unless wildcard semantics apply.',
+      'For a request without credentials, `*` can authorize the proposed method; when credentials mode is `include`, `*` is only the literal method name and the proposed method must be listed explicitly.',
+      'If neither an explicit method entry nor wildcard semantics authorize the proposed non-safelisted method, the preflight fails.',
       'A CORS-safelisted proposed method does not need to be listed, even when the request preflights because another CORS dimension is not safelisted.',
       'After a successful preflight, the browser can send the actual `PUT`. That route must still authenticate the caller, authorize the target object, validate the body, and enforce any CSRF protection appropriate to its credential model.',
       'A failed preflight prevents a conforming browser from sending this non-simple actual request, but it does not constrain non-browser clients.',
