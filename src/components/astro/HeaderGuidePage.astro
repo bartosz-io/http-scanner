@@ -160,4 +160,31 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
   .guide-markdown :global(code) {
     overflow-wrap: anywhere;
   }
+
+  .guide-markdown :global(pre.astro-code) {
+    margin-top: 1rem;
+    max-width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 0.625rem;
+    background-color: color-mix(
+      in oklab,
+      var(--muted) 30%,
+      transparent
+    ) !important;
+    padding: 1.25rem;
+    color: var(--foreground) !important;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    white-space: pre;
+  }
+
+  .guide-markdown :global(pre.astro-code span) {
+    color: inherit !important;
+  }
+
+  .guide-markdown :global(pre code) {
+    overflow-wrap: normal;
+    word-break: normal;
+  }
 </style>

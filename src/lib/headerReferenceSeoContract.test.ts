@@ -39,4 +39,37 @@ describe('HTTP header reference SEO contract', () => {
     expect(component).toContain('data-analytics-event="guide to checker clicked"');
     expect(component).not.toContain('client:');
   });
+
+  it('renders fenced guide code as light cards without arbitrary wrapping', () => {
+    const component = readProjectFile(
+      'src/components/astro/HeaderGuidePage.astro'
+    );
+
+    for (const phrase of [
+      '.guide-markdown :global(pre.astro-code)',
+      'margin-top: 1rem;',
+      'max-width: 100%;',
+      'overflow-x: auto;',
+      'border: 1px solid var(--border);',
+      'border-radius: 0.625rem;',
+      'padding: 1.25rem;',
+      'font-size: 0.875rem;',
+      'line-height: 1.25rem;',
+      'white-space: pre;',
+      'background-color: color-mix(',
+      'var(--muted) 30%',
+      'color: var(--foreground) !important;',
+      '.guide-markdown :global(pre.astro-code span)',
+      'color: inherit !important;',
+      '.guide-markdown :global(pre code)',
+      'overflow-wrap: normal;',
+      'word-break: normal;',
+    ]) {
+      expect(component).toContain(phrase);
+    }
+
+    expect(component).toContain(
+      '.guide-markdown :global(code) {\n    overflow-wrap: anywhere;'
+    );
+  });
 });
