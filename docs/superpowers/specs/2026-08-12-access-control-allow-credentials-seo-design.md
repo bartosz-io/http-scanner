@@ -2,7 +2,7 @@
 
 Date: 2026-08-12  
 Parent roadmap: [`SEO_PLAN.md`](../../../SEO_PLAN.md)  
-Status: approved in conversation on 2026-08-12; awaiting written-spec review
+Status: approved on 2026-08-12
 
 ## 1. Goal
 
