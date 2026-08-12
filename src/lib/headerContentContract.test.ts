@@ -323,6 +323,84 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Access-Control-Allow-Headers aligned with CORS request-header troubleshooting intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-allow-headers.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+    const frontmatter = getOpeningFrontmatter(source);
+    const expectedRelatedHeaders = [
+      'access-control-allow-origin',
+      'access-control-allow-methods',
+      'access-control-allow-credentials',
+      'access-control-expose-headers',
+      'access-control-max-age',
+    ];
+    const headings = [
+      '## CORS preflight request-header exchange',
+      '## Fix “Request header field … is not allowed”',
+      '## Wildcard, Authorization, and safelisted value restrictions',
+      '## Allowed names vs trusted values and response exposure',
+    ];
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(parseFrontmatterList(frontmatter ?? '', 'relatedHeaders')).toEqual(
+      expectedRelatedHeaders
+    );
+
+    const bypassSource = source.replace(
+      '  - access-control-max-age\nreferences:',
+      '  - access-control-max-age\n\n  # This comment must not hide another item.\n  - set-cookie\nreferences:'
+    );
+    const bypassFrontmatter = getOpeningFrontmatter(bypassSource);
+
+    expect(
+      parseFrontmatterList(bypassFrontmatter ?? '', 'relatedHeaders')
+    ).toEqual([...expectedRelatedHeaders, 'set-cookie']);
+
+    const headingOffsets = headings.map((heading) => source.indexOf(heading));
+    expect(headingOffsets.every((offset) => offset >= 0)).toBe(true);
+    expect(headingOffsets).toEqual([...headingOffsets].sort((a, b) => a - b));
+
+    for (const phrase of [
+      "Authorization: 'Bearer token'",
+      "'Content-Type': 'application/json'",
+      'OPTIONS /items HTTP/1.1',
+      'Access-Control-Request-Method: POST',
+      'Access-Control-Request-Headers: authorization, content-type',
+      'Access-Control-Allow-Origin: https://app.example',
+      'Access-Control-Allow-Methods: POST',
+      'Access-Control-Allow-Headers: Authorization, Content-Type',
+      'Vary: Origin',
+      'browser—not application JavaScript—creates `Origin`, `Access-Control-Request-Method`, and `Access-Control-Request-Headers`',
+      'announces request-field names, not the future field values',
+      'compare every name in `Access-Control-Request-Headers` with the names authorized by `Access-Control-Allow-Headers`',
+      'Setting the right CORS fields only on the later actual response does not repair the preflight',
+      'client mistakenly sends response fields such as `Access-Control-Allow-Origin` or `Access-Control-Allow-Headers` as request headers',
+      'Header-name matching is ASCII case-insensitive',
+      'bounded case-insensitive allowlist',
+      '`Access-Control-Max-Age` because the browser may reuse an earlier preflight result',
+      '`Access-Control-Allow-Headers: *` has wildcard semantics for requests without credentials',
+      'credentials mode is `include`, `*` is only the literal field name `*`',
+      '`Authorization` is a non-wildcard request-header name and must always be listed explicitly',
+      'does not by itself set Fetch credentials mode to `include`',
+      '`Content-Type` is safelisted only when its media type is `application/x-www-form-urlencoded`, `multipart/form-data`, or `text/plain`',
+      '`Content-Type: application/json` therefore participates in this preflight',
+      'Listing a safelisted field name can authorize it beyond the additional safelist restrictions',
+      'does not validate a bearer token, media type, API key, tenant identifier, signature, tracing value, or custom metadata',
+      'forwarding, internal identity, or routing fields',
+      '`Access-Control-Expose-Headers` controls access to non-safelisted response fields',
+      'A failed preflight prevents a conforming browser from sending this non-simple actual request, but it does not block direct HTTP clients.',
+      'Authentication, authorization, validation, rate limiting, and CSRF defenses remain server responsibilities.',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });
