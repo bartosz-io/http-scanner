@@ -1,7 +1,7 @@
 # Header Guide Code Block Rendering Design
 
 Date: 2026-08-12
-Status: approved in conversation; awaiting written-spec review
+Status: approved on 2026-08-12
 
 ## 1. Goal
 
