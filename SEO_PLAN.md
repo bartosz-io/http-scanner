@@ -87,7 +87,7 @@ Goal: own the browser CORS troubleshooting and implementation journey from origi
 | Order | Header | Status | Priority | Strategic role |
 |---:|---|---|---|---|
 | 5 | Access-Control-Allow-Credentials | `DONE` | P1 | Credentialed CORS, cookies, explicit origins, and common wildcard errors. |
-| 6 | Access-Control-Allow-Methods | `QUEUED` | P1 | Preflight method authorization and OPTIONS troubleshooting. |
+| 6 | Access-Control-Allow-Methods | `DONE` | P1 | Preflight method authorization and OPTIONS troubleshooting. |
 | 7 | Access-Control-Allow-Headers | `QUEUED` | P1 | Preflight request-header authorization and browser error resolution. |
 | 8 | Access-Control-Expose-Headers | `QUEUED` | P1 | Browser access to non-safelisted response headers. |
 | 9 | Vary | `QUEUED` | P1 | Correct cache separation for dynamic `Access-Control-Allow-Origin`. |
@@ -235,11 +235,12 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 | Content-Type and Set-Cookie SEO expansion | `DONE` | `3399646` | Awaiting post-deployment GSC comparison. |
 | Access-Control-Allow-Origin and Access-Control-Max-Age SEO expansion | `DONE` | `9272e99`, `e9bbe6c` | Awaiting deployment and URL-filtered GSC baseline. |
 | Access-Control-Allow-Credentials SEO expansion | `DONE` | `b9bd296` | Awaiting deployment and URL-filtered GSC baseline. |
+| Access-Control-Allow-Methods SEO expansion | `DONE` | `73c7a6a` | Awaiting deployment and URL-filtered GSC baseline. |
 
 ## 12. Next task
 
 No newer GSC export is available after the 2026-08-07 baseline. Execute the next eligible roadmap task for:
 
-- `Access-Control-Allow-Methods`.
+- `Access-Control-Allow-Headers`.
 
-The task should cover preflight method authorization, `OPTIONS` troubleshooting, exact method matching, and credentialed-request interactions.
+The task should cover preflight request-header authorization, `Access-Control-Request-Headers`, safelisted value restrictions, wildcard and credentials behavior, and browser error resolution.
