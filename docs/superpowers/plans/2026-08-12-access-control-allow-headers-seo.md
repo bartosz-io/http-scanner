@@ -37,7 +37,7 @@
 - Consumes: `getOpeningFrontmatter(source: string): string | undefined`, `parseFrontmatterList(frontmatter: string, field: string): string[]`, the existing Markdown frontmatter contract, `validateHeaderGuideSource(slug: string, source: string): string[]`, and the shared `HeaderGuidePage.astro` renderer.
 - Produces: an expanded framework-neutral guide with five exact related headers and a focused regression contract covering request-header preflight behavior, browser errors, wildcard/credentials/Authorization semantics, safelisted-value restrictions, response exposure, and security boundaries.
 
-- [ ] **Step 1: Add the failing source-contract test**
+- [x] **Step 1: Add the failing source-contract test**
 
 Insert this test in `src/lib/headerContentContract.test.ts` immediately after the existing `Access-Control-Allow-Methods` SEO test:
 
@@ -123,7 +123,7 @@ it('keeps Access-Control-Allow-Headers aligned with CORS request-header troubles
 
 The production change that makes this test pass is the complete four-section guide, exact five-item related-header field, coherent client/preflight exchange, and all approved technical and security distinctions. The heading-offset assertion protects section order. The mutated-source assertion proves that a blank line and YAML comment cannot hide an extra related-header item from the parser.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -133,7 +133,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "Access-Control-Allow-Heade
 
 Expected: FAIL because the related-header list, new headings, exchange, wildcard rules, error-resolution content, and security boundaries are absent. Confirm the first failure is an assertion about the missing approved contract rather than a syntax, fixture, or parser error.
 
-- [ ] **Step 3: Replace the related-header cluster**
+- [x] **Step 3: Replace the related-header cluster**
 
 Replace the current `relatedHeaders` block in `src/content/headers/access-control-allow-headers.md` with:
 
@@ -148,7 +148,7 @@ relatedHeaders:
 
 Do not change the current `headerName`, description, applicability, syntax, examples, use cases, mistakes, security consideration, or references in frontmatter.
 
-- [ ] **Step 4: Append the request-header exchange section**
+- [x] **Step 4: Append the request-header exchange section**
 
 Append this section after the existing `Implementation notes` paragraph:
 
@@ -189,7 +189,7 @@ Vary: Origin
 After a successful preflight, the actual route must still authenticate the bearer token, authorize the operation, parse and validate the JSON body, enforce body-size limits, and apply its other server policies. A successful CORS check is permission to proceed from browser code, not proof that the operation will succeed.
 ````
 
-- [ ] **Step 5: Append the browser-error troubleshooting section**
+- [x] **Step 5: Append the browser-error troubleshooting section**
 
 Append this section immediately after `CORS preflight request-header exchange`:
 
@@ -205,7 +205,7 @@ Another common mistake is that the client mistakenly sends response fields such 
 Header-name matching is ASCII case-insensitive, so compare names rather than presentation casing. If the server reflects requested names, validate every one against a bounded case-insensitive allowlist first; arbitrary reflection is not an authorization policy. If a corrected policy appears stale, inspect `Access-Control-Max-Age` because the browser may reuse an earlier preflight result.
 ````
 
-- [ ] **Step 6: Append the wildcard and safelist section**
+- [x] **Step 6: Append the wildcard and safelist section**
 
 Append this section immediately after `Fix “Request header field … is not allowed”`:
 
@@ -221,7 +221,7 @@ CORS-safelisted request-header names are ordinarily allowed without being listed
 Listing a safelisted field name can authorize it beyond the additional safelist restrictions, but it does not make the value valid for the application. Prefer explicit names for credentialed or security-sensitive APIs, and do not broaden the policy merely to silence a browser error.
 ````
 
-- [ ] **Step 7: Append the trust and response-exposure section**
+- [x] **Step 7: Append the trust and response-exposure section**
 
 Append this section immediately after `Wildcard, Authorization, and safelisted value restrictions`:
 
@@ -237,7 +237,7 @@ This field also does not expose response metadata to JavaScript. `Access-Control
 A failed preflight prevents a conforming browser from sending this non-simple actual request, but it does not block direct HTTP clients. Simple requests can also reach the server under their own rules. Authentication, authorization, validation, rate limiting, and CSRF defenses remain server responsibilities.
 ````
 
-- [ ] **Step 8: Run focused tests and verify GREEN**
+- [x] **Step 8: Run focused tests and verify GREEN**
 
 Run:
 
@@ -248,7 +248,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "validates every CORS guide
 
 Expected: both commands PASS. If either fails, correct the production Markdown while preserving the approved semantics; do not weaken the assertions to accommodate missing coverage.
 
-- [ ] **Step 9: Review Task 1 technical boundaries**
+- [x] **Step 9: Review Task 1 technical boundaries**
 
 Read the complete guide and confirm:
 
@@ -273,7 +273,7 @@ git diff -- src/content/headers/access-control-allow-headers.md src/lib/headerCo
 
 Expected: no whitespace errors and no unrelated changes.
 
-- [ ] **Step 10: Run the complete automated verification**
+- [x] **Step 10: Run the complete automated verification**
 
 Run:
 
@@ -292,7 +292,7 @@ Expected:
 - Astro emits 51 static pages, including `/headers/access-control-allow-headers/`;
 - `git diff --check` prints no errors.
 
-- [ ] **Step 11: Verify the generated and rendered page**
+- [x] **Step 11: Verify the generated and rendered page**
 
 Confirm generated HTML contains the new sections and exchange:
 
@@ -314,7 +314,7 @@ Start the local site and inspect `/headers/access-control-allow-headers/` at a n
 
 Save QA screenshots outside the repository under `/private/tmp/access-control-allow-headers-desktop.png` and `/private/tmp/access-control-allow-headers-mobile.png`. Reset any viewport override and stop the local server after verification.
 
-- [ ] **Step 12: Commit Task 1**
+- [x] **Step 12: Commit Task 1**
 
 ```bash
 git add src/content/headers/access-control-allow-headers.md src/lib/headerContentContract.test.ts
@@ -335,7 +335,7 @@ Record the exact final implementation commit for Task 2. If review later require
 - Consumes: the verified Task 1 implementation and the acceptance criteria in `docs/superpowers/specs/2026-08-12-access-control-allow-headers-seo-design.md`.
 - Produces: an independently reviewed implementation, a factual roadmap record, `Access-Control-Expose-Headers` as the next Wave 1 task, and a fully checked implementation plan.
 
-- [ ] **Step 1: Request independent technical review of Task 1**
+- [x] **Step 1: Request independent technical review of Task 1**
 
 Prepare a review package from the commit immediately before Task 1 through the final Task 1 implementation commit. Give the reviewer the design spec, this task brief, implementation report, full diff package, verification evidence, and Global Constraints.
 
@@ -346,13 +346,13 @@ Require two explicit verdicts:
 
 The reviewer must classify findings as Critical, Important, or Minor and cite exact file/line evidence. Resolve every Critical or Important finding. Any production-content correction must begin with a new failing regression assertion or demonstrated failure of an existing assertion, followed by focused GREEN and affected Task 1 Steps 8–11.
 
-- [ ] **Step 2: Run final whole-branch implementation review**
+- [x] **Step 2: Run final whole-branch implementation review**
 
 After task review is clean, request a fresh senior reviewer for the complete implementation diff. The reviewer must check Fetch accuracy, wildcard/credentials/Authorization distinctions, safelisted-value semantics, unsafe trust ambiguity, source-contract quality, exact related-header parsing, internal linking, rendered-code behavior, and no-framework/no-deploy compliance.
 
 Expected: no unresolved Critical or Important findings. Resolve real findings through the same RED → GREEN discipline and repeat affected verification.
 
-- [ ] **Step 3: Run fresh final verification**
+- [x] **Step 3: Run fresh final verification**
 
 After review changes, run:
 
@@ -372,7 +372,7 @@ Expected:
 - `git diff --check` is clean;
 - only intended roadmap and plan-document updates remain uncommitted.
 
-- [ ] **Step 4: Capture the exact final implementation commit**
+- [x] **Step 4: Capture the exact final implementation commit**
 
 Run:
 
@@ -382,11 +382,11 @@ git log --format='%h %s' -- src/content/headers/access-control-allow-headers.md 
 
 Expected: the first row identifies the final commit that changed the guide or its contract. Store that concrete short SHA for the roadmap update; do not assume it is the initial feature commit if review created a later focused fix.
 
-- [ ] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
+- [x] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
 
 In `Wave 1 — CORS authority`, change only the `Access-Control-Allow-Headers` status from `QUEUED` to `DONE`. Keep order, priority, and strategic role unchanged.
 
-- [ ] **Step 6: Add the completed-task record**
+- [x] **Step 6: Add the completed-task record**
 
 Append one row to `## 11. Completed task log` with these cells:
 
@@ -397,7 +397,7 @@ Append one row to `## 11. Completed task log` with these cells:
 
 Do not claim a deployment date, production verification, or GSC submission before those actions occur.
 
-- [ ] **Step 7: Advance the next task**
+- [x] **Step 7: Advance the next task**
 
 Replace the body of `## 12. Next task` with:
 
@@ -409,11 +409,11 @@ No newer GSC export is available after the 2026-08-07 baseline. Execute the next
 The task should cover response-header readability, the CORS-safelisted response-header set, wildcard and credentials behavior, the `Set-Cookie` exclusion, and browser debugging.
 ```
 
-- [ ] **Step 8: Mark this implementation plan complete**
+- [x] **Step 8: Mark this implementation plan complete**
 
 Change every completed task checkbox in this plan from `- [ ]` to `- [x]` only after its action and verification have succeeded.
 
-- [ ] **Step 9: Verify the documentation diff**
+- [x] **Step 9: Verify the documentation diff**
 
 Run:
 
@@ -424,14 +424,14 @@ git diff -- SEO_PLAN.md docs/superpowers/plans/2026-08-12-access-control-allow-h
 
 Expected: only the factual status, completed-task row, next-task text, and evidence-backed checkbox changes described above.
 
-- [ ] **Step 10: Commit the roadmap completion**
+- [x] **Step 10: Commit the roadmap completion**
 
 ```bash
 git add SEO_PLAN.md docs/superpowers/plans/2026-08-12-access-control-allow-headers-seo.md
 git commit -m "docs: complete Access-Control-Allow-Headers SEO task"
 ```
 
-- [ ] **Step 11: Confirm clean handoff state**
+- [x] **Step 11: Confirm clean handoff state**
 
 Run:
 
