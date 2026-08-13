@@ -90,7 +90,7 @@ Goal: own the browser CORS troubleshooting and implementation journey from origi
 | 6 | Access-Control-Allow-Methods | `DONE` | P1 | Preflight method authorization and OPTIONS troubleshooting. |
 | 7 | Access-Control-Allow-Headers | `DONE` | P1 | Preflight request-header authorization and browser error resolution. |
 | 8 | Access-Control-Expose-Headers | `DONE` | P1 | Browser access to non-safelisted response headers. |
-| 9 | Vary | `DONE` | P1 | Correct cache separation for dynamic `Access-Control-Allow-Origin`. | [Design](docs/superpowers/specs/2026-08-13-vary-seo-design.md) |
+| 9 | Vary | `DONE` | P1 | Correct cache separation for dynamic `Access-Control-Allow-Origin`. [Design](docs/superpowers/specs/2026-08-13-vary-seo-design.md) |
 
 Exit criterion: all CORS guides link coherently to one another and to the HTTP Headers Checker, and at least two CORS URLs receive impressions in a rolling 28-day window.
 
@@ -238,7 +238,7 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 | Access-Control-Allow-Methods SEO expansion | `DONE` | `73c7a6a` | Deployed 2026-08-12 (Cloudflare Version ID `6c9c938b-fce2-492b-99de-75c440599225`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
 | Access-Control-Allow-Headers SEO expansion | `DONE` | `87a275f` | Deployed 2026-08-13 (Cloudflare Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
 | Access-Control-Expose-Headers SEO expansion | `DONE` | `f9cc8b8` | Deployed 2026-08-13 (latest Cloudflare Version ID `7c2fb42a-7b1e-4e16-b69e-820f3bf3241e`); production and Workers URLs return HTTP 200; safelisted headers render inline in one paragraph; awaiting URL-filtered GSC baseline. |
-| Vary SEO expansion | `DONE` | `49e097c` | Awaiting deployment and URL-filtered GSC baseline. |
+| Vary SEO expansion | `DONE` | `57cb7d0` | Awaiting deployment and URL-filtered GSC baseline. |
 
 ## 12. Next task
 
