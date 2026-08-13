@@ -138,6 +138,10 @@ type MarkdownContractNode = {
   text: string;
 };
 
+type MarkdownParagraphContractNode = MarkdownContractNode & {
+  inlineCodeValues: string[];
+};
+
 function getMarkdownNodeText(node: MdastNode): string {
   if ('value' in node && typeof node.value === 'string') {
     return node.value;
@@ -156,10 +160,10 @@ function getMarkdownNodeText(node: MdastNode): string {
 
 function collectMarkdownContractNodes(source: string): {
   h2Headings: MarkdownContractNode[];
-  listItems: MarkdownContractNode[];
+  paragraphs: MarkdownParagraphContractNode[];
 } {
   const h2Headings: MarkdownContractNode[] = [];
-  const listItems: MarkdownContractNode[] = [];
+  const paragraphs: MarkdownParagraphContractNode[] = [];
   const tree = markdownToMdast(source);
 
   const visit = (node: MdastNode) => {
@@ -175,8 +179,13 @@ function collectMarkdownContractNodes(source: string): {
 
       if (node.type === 'heading' && node.depth === 2) {
         h2Headings.push(contractNode);
-      } else if (node.type === 'listItem') {
-        listItems.push(contractNode);
+      } else if (node.type === 'paragraph' && 'children' in node) {
+        paragraphs.push({
+          ...contractNode,
+          inlineCodeValues: node.children
+            .filter((child) => child.type === 'inlineCode')
+            .map((child) => getMarkdownNodeText(child)),
+        });
       }
     }
 
@@ -188,7 +197,7 @@ function collectMarkdownContractNodes(source: string): {
   };
   visit(tree);
 
-  return { h2Headings, listItems };
+  return { h2Headings, paragraphs };
 }
 
 function extractH2HeadingsAfter(
@@ -207,12 +216,12 @@ function extractH2HeadingsAfter(
     .map(({ text }) => `## ${text}`);
 }
 
-function extractMarkdownListBetween(
+function extractInlineCodeParagraphsBetween(
   source: string,
   startHeading: string,
   endHeading: string
-): string[] {
-  const { h2Headings, listItems } = collectMarkdownContractNodes(source);
+): Array<{ inlineCodeValues: string[]; text: string }> {
+  const { h2Headings, paragraphs } = collectMarkdownContractNodes(source);
   const startText = startHeading.replace(/^##\s+/, '');
   const endText = endHeading.replace(/^##\s+/, '');
   const start = h2Headings.find(({ text }) => text === startText);
@@ -224,12 +233,14 @@ function extractMarkdownListBetween(
     return [];
   }
 
-  return listItems
+  return paragraphs
     .filter(
-      ({ endOffset, startOffset }) =>
-        startOffset >= start.endOffset && endOffset <= end.startOffset
+      ({ endOffset, inlineCodeValues, startOffset }) =>
+        startOffset >= start.endOffset &&
+        endOffset <= end.startOffset &&
+        inlineCodeValues.length > 1
     )
-    .map(({ text }) => text);
+    .map(({ inlineCodeValues, text }) => ({ inlineCodeValues, text }));
 }
 
 describe('HTTP header guide source contract', () => {
@@ -694,59 +705,36 @@ describe('HTTP header guide source contract', () => {
     expect(() => assertBoundDownloadRequest(missingCookieSource)).toThrow();
 
     const assertExactSafelist = (candidateSource: string) => {
+      const safelistParagraphs = extractInlineCodeParagraphsBetween(
+        candidateSource,
+        '## CORS-safelisted response headers',
+        '## Wildcard and credentialed requests'
+      );
+
       expect(
-        extractMarkdownListBetween(
-          candidateSource,
-          '## CORS-safelisted response headers',
-          '## Wildcard and credentialed requests'
-        ).map((item) =>
-          item.replace(/[.;]$/, '').replace(/^`|`$/g, '').trim()
+        safelistParagraphs.filter(({ inlineCodeValues }) =>
+          inlineCodeValues.includes('Cache-Control')
         )
-      ).toEqual(expectedSafelistedResponseHeaders);
+      ).toEqual([
+        {
+          inlineCodeValues: expectedSafelistedResponseHeaders,
+          text: `${expectedSafelistedResponseHeaders.join(', ')}.`,
+        },
+      ]);
     };
     assertExactSafelist(source);
 
     const extraSafelistItemSource = source.replace(
-      '- `Pragma`.\n\n',
-      '- `Pragma`;\n- `ETag`.\n\n'
+      '`Last-Modified`, `Pragma`.\n\n',
+      '`Last-Modified`, `Pragma`, `ETag`.\n\n'
     );
     expect(() => assertExactSafelist(extraSafelistItemSource)).toThrow();
 
     const reorderedSafelistSource = source.replace(
-      '- `Cache-Control`;\n- `Content-Language`;',
-      '- `Content-Language`;\n- `Cache-Control`;'
+      '`Cache-Control`, `Content-Language`',
+      '`Content-Language`, `Cache-Control`'
     );
     expect(() => assertExactSafelist(reorderedSafelistSource)).toThrow();
-
-    const plainExtraSafelistItemSource = source.replace(
-      '- `Pragma`.\n\n',
-      '- `Pragma`.\n- ETag.\n\n'
-    );
-    expect(() => assertExactSafelist(plainExtraSafelistItemSource)).toThrow();
-
-    const asteriskExtraSafelistItemSource = source.replace(
-      '- `Pragma`.\n\n',
-      '- `Pragma`.\n* ETag.\n\n'
-    );
-    expect(() =>
-      assertExactSafelist(asteriskExtraSafelistItemSource)
-    ).toThrow();
-
-    const indentedExtraSafelistItemSource = source.replace(
-      '- `Pragma`.\n\n',
-      '- `Pragma`.\n  - ETag.\n\n'
-    );
-    expect(() =>
-      assertExactSafelist(indentedExtraSafelistItemSource)
-    ).toThrow();
-
-    const orderedExtraSafelistItemSource = source.replace(
-      '- `Pragma`.\n\n',
-      '- `Pragma`.\n1. ETag.\n\n'
-    );
-    expect(() =>
-      assertExactSafelist(orderedExtraSafelistItemSource)
-    ).toThrow();
 
     const cookieBoundaryPhrases = [
       '`Set-Cookie` and legacy `Set-Cookie2` are forbidden response-header names under Fetch. A CORS-filtered response excludes them from browser JavaScript access even if `Set-Cookie` is explicitly named in `Access-Control-Expose-Headers`, wildcard semantics apply, the browser accepts the cookie, or the response includes `Access-Control-Allow-Credentials: true`.',

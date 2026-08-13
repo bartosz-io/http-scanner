@@ -91,13 +91,7 @@ Header-name matching is ASCII case-insensitive, although consistent spelling mak
 
 After a successful CORS exchange, Fetch makes these response field names readable without repeating them in `Access-Control-Expose-Headers`:
 
-- `Cache-Control`;
-- `Content-Language`;
-- `Content-Length`;
-- `Content-Type`;
-- `Expires`;
-- `Last-Modified`;
-- `Pragma`.
+`Cache-Control`, `Content-Language`, `Content-Length`, `Content-Type`, `Expires`, `Last-Modified`, `Pragma`.
 
 `Content-Disposition` and `ETag` are not in this safelist, so the download response exposes them explicitly. Do not confuse this response-header-name safelist with the CORS-safelisted request-header rules. The request safelist helps determine whether a request field can participate in a simple request under value restrictions; the response safelist determines which response names survive CORS filtering for script access.
 
