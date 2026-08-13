@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { markdownToMdast, type MdastNode } from 'satteri';
 import { describe, expect, it } from 'vitest';
 import { validateHeaderGuideSource } from './headerContentContract';
 import { listHeaderCatalogEntries } from './headerCatalog';
@@ -131,15 +132,79 @@ function parseFrontmatterList(frontmatter: string, field: string): string[] {
   return values;
 }
 
-function extractH2HeadingsAfter(source: string, boundaryHeading: string): string[] {
-  const boundaryOffset = source.indexOf(boundaryHeading);
-  if (boundaryOffset === -1) {
+type MarkdownContractNode = {
+  endOffset: number;
+  startOffset: number;
+  text: string;
+};
+
+function getMarkdownNodeText(node: MdastNode): string {
+  if ('value' in node && typeof node.value === 'string') {
+    return node.value;
+  }
+
+  if ('alt' in node && typeof node.alt === 'string') {
+    return node.alt;
+  }
+
+  if ('children' in node) {
+    return node.children.map((child) => getMarkdownNodeText(child)).join('');
+  }
+
+  return '';
+}
+
+function collectMarkdownContractNodes(source: string): {
+  h2Headings: MarkdownContractNode[];
+  listItems: MarkdownContractNode[];
+} {
+  const h2Headings: MarkdownContractNode[] = [];
+  const listItems: MarkdownContractNode[] = [];
+  const tree = markdownToMdast(source);
+
+  const visit = (node: MdastNode) => {
+    const startOffset = node.position?.start.offset;
+    const endOffset = node.position?.end.offset;
+
+    if (typeof startOffset === 'number' && typeof endOffset === 'number') {
+      const contractNode = {
+        endOffset,
+        startOffset,
+        text: getMarkdownNodeText(node).trim(),
+      };
+
+      if (node.type === 'heading' && node.depth === 2) {
+        h2Headings.push(contractNode);
+      } else if (node.type === 'listItem') {
+        listItems.push(contractNode);
+      }
+    }
+
+    if ('children' in node) {
+      for (const child of node.children) {
+        visit(child);
+      }
+    }
+  };
+  visit(tree);
+
+  return { h2Headings, listItems };
+}
+
+function extractH2HeadingsAfter(
+  source: string,
+  boundaryHeading: string
+): string[] {
+  const { h2Headings } = collectMarkdownContractNodes(source);
+  const boundaryText = boundaryHeading.replace(/^##\s+/, '');
+  const boundary = h2Headings.find(({ text }) => text === boundaryText);
+  if (!boundary) {
     return [];
   }
 
-  return [...source.slice(boundaryOffset + boundaryHeading.length).matchAll(/^## (?!#).+$/gm)].map(
-    ([heading]) => heading
-  );
+  return h2Headings
+    .filter(({ startOffset }) => startOffset >= boundary.endOffset)
+    .map(({ text }) => `## ${text}`);
 }
 
 function extractMarkdownListBetween(
@@ -147,19 +212,24 @@ function extractMarkdownListBetween(
   startHeading: string,
   endHeading: string
 ): string[] {
-  const startOffset = source.indexOf(startHeading);
-  const endOffset = source.indexOf(endHeading, startOffset + startHeading.length);
-  if (startOffset === -1 || endOffset === -1 || endOffset <= startOffset) {
+  const { h2Headings, listItems } = collectMarkdownContractNodes(source);
+  const startText = startHeading.replace(/^##\s+/, '');
+  const endText = endHeading.replace(/^##\s+/, '');
+  const start = h2Headings.find(({ text }) => text === startText);
+  const end = h2Headings.find(
+    ({ startOffset, text }) =>
+      text === endText && startOffset > (start?.endOffset ?? -1)
+  );
+  if (!start || !end) {
     return [];
   }
 
-  const boundedSection = source.slice(
-    startOffset + startHeading.length,
-    endOffset
-  );
-  return [...boundedSection.matchAll(/^ {0,3}[-+*][ \t]+(.+?)[ \t]*$/gm)].map(
-    ([, item]) => item?.trim() ?? ''
-  );
+  return listItems
+    .filter(
+      ({ endOffset, startOffset }) =>
+        startOffset >= start.endOffset && endOffset <= end.startOffset
+    )
+    .map(({ text }) => text);
 }
 
 describe('HTTP header guide source contract', () => {
@@ -533,44 +603,95 @@ describe('HTTP header guide source contract', () => {
     const extraHeadingSource = `${source}\n## Unexpected trailing heading\n`;
     expect(() => assertExactAppendedHeadings(extraHeadingSource)).toThrow();
 
-    const javascriptBlocks = [...source.matchAll(/```js\r?\n([\s\S]*?)\r?\n```/g)];
-    const httpBlocks = [...source.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g)];
-
-    expect(javascriptBlocks).toHaveLength(1);
-    expect(httpBlocks).toHaveLength(1);
-
-    const javascriptBlock = javascriptBlocks[0]?.[1] ?? '';
-    const httpBlock = httpBlocks[0]?.[1] ?? '';
-    const fetchRequest = javascriptBlock.match(
-      /fetch\('https:\/\/files\.example(?<path>\/[^']+)', \{\r?\n\s+credentials: '(?<credentials>[^']+)'/
+    const setextHeadingSource = source.replace(
+      `${headings[2]}\n\n`,
+      `${headings[2]}\n\nUnexpected appended heading\n---------------------------\n\n`
     );
-    const httpRequest = httpBlock.match(
-      /^GET (?<path>\/\S+) HTTP\/1\.1[\s\S]*?^Origin: https:\/\/app\.example$/m
-    );
+    expect(() => assertExactAppendedHeadings(setextHeadingSource)).toThrow();
 
-    expect(fetchRequest?.groups?.path).toBe('/reports/quarterly.pdf');
-    expect(fetchRequest?.groups?.credentials).toBe('include');
-    expect(httpRequest?.groups?.path).toBe('/reports/quarterly.pdf');
-    expect(fetchRequest?.groups?.path).toBe(httpRequest?.groups?.path);
-    expect(javascriptBlock).toContain(
-      "response.headers.get('Content-Disposition')"
-    );
-    expect(javascriptBlock).toContain("response.headers.get('ETag')");
-    expect(javascriptBlock).toContain("response.headers.get('Set-Cookie')");
+    const assertBoundDownloadRequest = (candidateSource: string) => {
+      const javascriptBlocks = [
+        ...candidateSource.matchAll(/```js\r?\n([\s\S]*?)\r?\n```/g),
+      ];
+      const httpBlocks = [
+        ...candidateSource.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g),
+      ];
 
-    for (const phrase of [
-      'HTTP/1.1 200 OK',
-      'Access-Control-Allow-Origin: https://app.example',
-      'Access-Control-Allow-Credentials: true',
-      'Access-Control-Expose-Headers: Content-Disposition, ETag',
-      'Content-Type: application/pdf',
-      'Content-Disposition: attachment; filename="quarterly-report.pdf"',
-      'ETag: "report-v7"',
-      'Set-Cookie: download_session=opaque; Secure; HttpOnly; SameSite=None',
-      'Vary: Origin',
-    ]) {
-      expect(httpBlock).toContain(phrase);
-    }
+      expect(javascriptBlocks).toHaveLength(1);
+      expect(httpBlocks).toHaveLength(1);
+
+      const javascriptBlock = javascriptBlocks[0]?.[1] ?? '';
+      const httpBlock = httpBlocks[0]?.[1] ?? '';
+      const fetchRequest = javascriptBlock.match(
+        /fetch\('(?<url>https:\/\/[^']+)', \{\r?\n\s+credentials: '(?<credentials>[^']+)'/
+      );
+      const fetchUrl = new URL(
+        fetchRequest?.groups?.url ?? 'https://invalid.example'
+      );
+      const [rawHttpRequest = ''] = httpBlock.split(/\r?\n\r?\n/, 1);
+      const [requestLine = '', ...requestHeaderLines] =
+        rawHttpRequest.split(/\r?\n/);
+      const httpRequest = requestLine.match(
+        /^(?<method>[A-Z]+) (?<path>\/\S+) HTTP\/1\.1$/
+      );
+      const requestHeaders = new Map<string, string[]>();
+
+      for (const line of requestHeaderLines) {
+        const header = line.match(/^(?<name>[^:\s]+):[ \t]*(?<value>.*)$/);
+        expect(header).not.toBeNull();
+
+        const name = header?.groups?.name.toLowerCase() ?? '';
+        const values = requestHeaders.get(name) ?? [];
+        values.push(header?.groups?.value ?? '');
+        requestHeaders.set(name, values);
+      }
+
+      expect(fetchRequest?.groups?.url).toBe(
+        'https://files.example/reports/quarterly.pdf'
+      );
+      expect(fetchRequest?.groups?.credentials).toBe('include');
+      expect(httpRequest?.groups?.method).toBe('GET');
+      expect(httpRequest?.groups?.path).toBe('/reports/quarterly.pdf');
+      expect(requestHeaders.get('host')).toEqual(['files.example']);
+      expect(requestHeaders.get('origin')).toEqual(['https://app.example']);
+      expect(requestHeaders.get('cookie')).toEqual([
+        'download_session=opaque',
+      ]);
+      expect(fetchUrl.host).toBe(requestHeaders.get('host')?.[0]);
+      expect(fetchUrl.pathname).toBe(httpRequest?.groups?.path);
+      expect(javascriptBlock).toContain(
+        "response.headers.get('Content-Disposition')"
+      );
+      expect(javascriptBlock).toContain("response.headers.get('ETag')");
+      expect(javascriptBlock).toContain("response.headers.get('Set-Cookie')");
+
+      for (const phrase of [
+        'HTTP/1.1 200 OK',
+        'Access-Control-Allow-Origin: https://app.example',
+        'Access-Control-Allow-Credentials: true',
+        'Access-Control-Expose-Headers: Content-Disposition, ETag',
+        'Content-Type: application/pdf',
+        'Content-Disposition: attachment; filename="quarterly-report.pdf"',
+        'ETag: "report-v7"',
+        'Set-Cookie: download_session=opaque; Secure; HttpOnly; SameSite=None',
+        'Vary: Origin',
+      ]) {
+        expect(httpBlock).toContain(phrase);
+      }
+    };
+    assertBoundDownloadRequest(source);
+
+    const hostMismatchSource = source.replace(
+      'Host: files.example',
+      'Host: unrelated.example'
+    );
+    expect(() => assertBoundDownloadRequest(hostMismatchSource)).toThrow();
+
+    const missingCookieSource = source.replace(
+      'Cookie: download_session=opaque\n',
+      ''
+    );
+    expect(() => assertBoundDownloadRequest(missingCookieSource)).toThrow();
 
     const assertExactSafelist = (candidateSource: string) => {
       expect(
@@ -617,6 +738,14 @@ describe('HTTP header guide source contract', () => {
     );
     expect(() =>
       assertExactSafelist(indentedExtraSafelistItemSource)
+    ).toThrow();
+
+    const orderedExtraSafelistItemSource = source.replace(
+      '- `Pragma`.\n\n',
+      '- `Pragma`.\n1. ETag.\n\n'
+    );
+    expect(() =>
+      assertExactSafelist(orderedExtraSafelistItemSource)
     ).toThrow();
 
     const cookieBoundaryPhrases = [
