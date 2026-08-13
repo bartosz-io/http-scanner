@@ -160,9 +160,13 @@ function getMarkdownNodeText(node: MdastNode): string {
 
 function collectMarkdownContractNodes(source: string): {
   h2Headings: MarkdownContractNode[];
+  httpCodeBlocks: string[];
+  linkDestinations: string[];
   paragraphs: MarkdownParagraphContractNode[];
 } {
   const h2Headings: MarkdownContractNode[] = [];
+  const httpCodeBlocks: string[] = [];
+  const linkDestinations: string[] = [];
   const paragraphs: MarkdownParagraphContractNode[] = [];
   const tree = markdownToMdast(source);
 
@@ -179,6 +183,20 @@ function collectMarkdownContractNodes(source: string): {
 
       if (node.type === 'heading' && node.depth === 2) {
         h2Headings.push(contractNode);
+      } else if (
+        node.type === 'code' &&
+        'lang' in node &&
+        node.lang === 'http' &&
+        'value' in node &&
+        typeof node.value === 'string'
+      ) {
+        httpCodeBlocks.push(node.value);
+      } else if (
+        node.type === 'link' &&
+        'url' in node &&
+        typeof node.url === 'string'
+      ) {
+        linkDestinations.push(node.url);
       } else if (node.type === 'paragraph' && 'children' in node) {
         paragraphs.push({
           ...contractNode,
@@ -197,7 +215,7 @@ function collectMarkdownContractNodes(source: string): {
   };
   visit(tree);
 
-  return { h2Headings, paragraphs };
+  return { h2Headings, httpCodeBlocks, linkDestinations, paragraphs };
 }
 
 function extractH2HeadingsAfter(
@@ -817,7 +835,7 @@ describe('HTTP header guide source contract', () => {
       'etag',
       'content-encoding',
     ];
-    const headings = [
+    const approvedHeadings = [
       '## What Vary changes in cache matching',
       '## Why dynamic Access-Control-Allow-Origin needs Vary: Origin',
       '## How a missing Vary: Origin breaks cached CORS responses',
@@ -825,6 +843,11 @@ describe('HTTP header guide source contract', () => {
       '## HTTP response cache vs CORS preflight cache',
       '## Common Vary patterns and cache fragmentation',
       '## Vary: * vs private and no-store',
+    ];
+    const expectedH2Headings = [
+      '## Meaning and behavior',
+      '## Implementation notes',
+      ...approvedHeadings,
     ];
 
     expect(frontmatter).toBeDefined();
@@ -843,82 +866,80 @@ describe('HTTP header guide source contract', () => {
       parseFrontmatterList(bypassFrontmatter ?? '', 'relatedHeaders')
     ).toEqual([...expectedRelatedHeaders, 'content-language']);
 
-    const assertExactAppendedHeadings = (candidateSource: string) => {
+    const assertExactH2Headings = (candidateSource: string) => {
       expect(
-        extractH2HeadingsAfter(candidateSource, '## Implementation notes')
-      ).toEqual(headings);
+        collectMarkdownContractNodes(candidateSource).h2Headings
+          .map(({ text }) => `## ${text}`)
+      ).toEqual(expectedH2Headings);
     };
-    assertExactAppendedHeadings(source);
+    assertExactH2Headings(source);
 
     const duplicateHeadingSource = source.replace(
-      headings[2],
-      `${headings[2]}\n\n${headings[2]}`
+      approvedHeadings[2],
+      `${approvedHeadings[2]}\n\n${approvedHeadings[2]}`
     );
-    expect(() => assertExactAppendedHeadings(duplicateHeadingSource)).toThrow();
+    expect(() => assertExactH2Headings(duplicateHeadingSource)).toThrow();
 
     const unexpectedHeadingSource = source.replace(
-      `${headings[4]}\n\n`,
-      `${headings[4]}\n\n## Unexpected cache section\n\n`
+      `${approvedHeadings[4]}\n\n`,
+      `${approvedHeadings[4]}\n\n## Unexpected cache section\n\n`
     );
-    expect(() => assertExactAppendedHeadings(unexpectedHeadingSource)).toThrow();
+    expect(() => assertExactH2Headings(unexpectedHeadingSource)).toThrow();
 
-    const getHttpBlocks = (candidateSource: string) => [
-      ...candidateSource.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g),
-    ].map((match) => match[1] ?? '');
+    const headingBeforeBoundarySource = source.replace(
+      '## Implementation notes',
+      `${approvedHeadings[0]}\n\n## Implementation notes`
+    );
+    expect.soft(() =>
+      assertExactH2Headings(headingBeforeBoundarySource)
+    ).toThrow();
 
-    const assertBoundCacheExamples = (candidateSource: string) => {
-      const httpBlocks = getHttpBlocks(candidateSource);
-      expect(httpBlocks).toHaveLength(4);
-
-      const [
-        negotiationBlock,
-        dynamicResponseBlock,
-        brokenCacheBlock,
-        correctedCacheBlock,
-      ] = httpBlocks;
-
-      expect(negotiationBlock).toBe(
-        'Vary: Accept-Encoding, Accept-Language'
-      );
-
-      for (const phrase of [
+    const expectedHttpBlocks = [
+      'Vary: Accept-Encoding, Accept-Language',
+      [
         'HTTP/1.1 200 OK',
         'Access-Control-Allow-Origin: https://app.example',
         'Cache-Control: public, max-age=300',
         'Content-Type: application/json',
         'Vary: Origin',
-      ]) {
-        expect(dynamicResponseBlock).toContain(phrase);
-      }
-
-      expect(
-        brokenCacheBlock.match(/^GET \/public-config HTTP\/1\.1$/gm)
-      ).toHaveLength(2);
-      expect(brokenCacheBlock.match(/^Host: api\.example$/gm)).toHaveLength(2);
-      expect(
-        [...brokenCacheBlock.matchAll(/^Origin: (https:\/\/[^\s]+)$/gm)]
-          .map((match) => match[1])
-      ).toEqual(['https://app.example', 'https://admin.example']);
-      expect(
-        brokenCacheBlock.match(
-          /^Access-Control-Allow-Origin: https:\/\/app\.example$/gm
-        )
-      ).toHaveLength(2);
-      expect(brokenCacheBlock).toContain('Age: 42');
-      expect(brokenCacheBlock).not.toContain('Vary: Origin');
-
-      for (const phrase of [
+      ].join('\n'),
+      [
+        'GET /public-config HTTP/1.1',
+        'Host: api.example',
+        'Origin: https://app.example',
+        '',
+        'HTTP/1.1 200 OK',
+        'Access-Control-Allow-Origin: https://app.example',
+        'Cache-Control: public, max-age=300',
+        'Content-Type: application/json',
+        '',
         'GET /public-config HTTP/1.1',
         'Host: api.example',
         'Origin: https://admin.example',
+        '',
+        'HTTP/1.1 200 OK',
+        'Access-Control-Allow-Origin: https://app.example',
+        'Age: 42',
+        'Cache-Control: public, max-age=300',
+        'Content-Type: application/json',
+      ].join('\n'),
+      [
+        'GET /public-config HTTP/1.1',
+        'Host: api.example',
+        'Origin: https://admin.example',
+        '',
         'HTTP/1.1 200 OK',
         'Access-Control-Allow-Origin: https://admin.example',
         'Cache-Control: public, max-age=300',
         'Content-Type: application/json',
         'Vary: Origin',
-      ]) {
-        expect(correctedCacheBlock).toContain(phrase);
-      }
+      ].join('\n'),
+    ];
+
+    const assertBoundCacheExamples = (candidateSource: string) => {
+      expect(
+        collectMarkdownContractNodes(candidateSource).httpCodeBlocks
+      ).toEqual(expectedHttpBlocks);
     };
     assertBoundCacheExamples(source);
 
@@ -934,16 +955,41 @@ describe('HTTP header guide source contract', () => {
     );
     expect(() => assertBoundCacheExamples(correctedOriginMismatch)).toThrow();
 
-    for (const link of [
-      '[Access-Control-Allow-Origin](/headers/access-control-allow-origin/)',
-      '[Access-Control-Max-Age](/headers/access-control-max-age/)',
-      '[Cache-Control](/headers/cache-control/)',
-      '[ETag](/headers/etag/)',
-      '[Content-Encoding](/headers/content-encoding/)',
-      '[HTTP Headers Checker](/http-headers-checker/)',
-    ]) {
-      expect(source).toContain(link);
-    }
+    const suffixedCorrectedOrigin = source.replace(
+      'Origin: https://admin.example\n\nHTTP/1.1 200 OK\nAccess-Control-Allow-Origin: https://admin.example',
+      'Origin: https://admin.example.evil\n\nHTTP/1.1 200 OK\nAccess-Control-Allow-Origin: https://admin.example.evil'
+    );
+    expect.soft(() => assertBoundCacheExamples(suffixedCorrectedOrigin)).toThrow();
+
+    const suffixedVaryField = source.replace(
+      'Content-Type: application/json\nVary: Origin',
+      'Content-Type: application/json\nVary: Origin-Policy'
+    );
+    expect.soft(() => assertBoundCacheExamples(suffixedVaryField)).toThrow();
+
+    const expectedInternalLinkDestinations = [
+      '/headers/cache-control/',
+      '/headers/etag/',
+      '/headers/access-control-allow-origin/',
+      '/headers/access-control-max-age/',
+      '/headers/content-encoding/',
+      '/http-headers-checker/',
+    ];
+    const assertRequiredLinks = (candidateSource: string) => {
+      expect(
+        collectMarkdownContractNodes(candidateSource).linkDestinations
+          .filter((destination) => destination.startsWith('/'))
+      ).toEqual(expectedInternalLinkDestinations);
+    };
+    assertRequiredLinks(source);
+
+    const accessControlMaxAgeLink =
+      '[Access-Control-Max-Age](/headers/access-control-max-age/)';
+    const nonRenderedLinkSource = source.replace(
+      accessControlMaxAgeLink,
+      `Access-Control-Max-Age<!-- ${accessControlMaxAgeLink} -->`
+    );
+    expect.soft(() => assertRequiredLinks(nonRenderedLinkSource)).toThrow();
   });
 
   it('accepts a complete guide source', () => {
