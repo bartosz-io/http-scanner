@@ -131,6 +131,37 @@ function parseFrontmatterList(frontmatter: string, field: string): string[] {
   return values;
 }
 
+function extractH2HeadingsAfter(source: string, boundaryHeading: string): string[] {
+  const boundaryOffset = source.indexOf(boundaryHeading);
+  if (boundaryOffset === -1) {
+    return [];
+  }
+
+  return [...source.slice(boundaryOffset + boundaryHeading.length).matchAll(/^## (?!#).+$/gm)].map(
+    ([heading]) => heading
+  );
+}
+
+function extractMarkdownListBetween(
+  source: string,
+  startHeading: string,
+  endHeading: string
+): string[] {
+  const startOffset = source.indexOf(startHeading);
+  const endOffset = source.indexOf(endHeading, startOffset + startHeading.length);
+  if (startOffset === -1 || endOffset === -1 || endOffset <= startOffset) {
+    return [];
+  }
+
+  const boundedSection = source.slice(
+    startOffset + startHeading.length,
+    endOffset
+  );
+  return [...boundedSection.matchAll(/^ {0,3}[-+*][ \t]+(.+?)[ \t]*$/gm)].map(
+    ([, item]) => item?.trim() ?? ''
+  );
+}
+
 describe('HTTP header guide source contract', () => {
   it('keeps Content-Type guide aligned with high-intent search topics', () => {
     const source = readFileSync(
@@ -424,6 +455,230 @@ describe('HTTP header guide source contract', () => {
       '`Access-Control-Expose-Headers` controls access to non-safelisted response fields',
       'A failed preflight prevents a conforming browser from sending this non-simple actual request, but it does not block direct HTTP clients.',
       'Authentication, authorization, validation, rate limiting, and CSRF defenses remain server responsibilities.',
+    ]) {
+      expect(source).toContain(phrase);
+    }
+  });
+
+  it('keeps Access-Control-Expose-Headers aligned with secure response-metadata exposure intent', () => {
+    const source = readFileSync(
+      new URL(
+        'src/content/headers/access-control-expose-headers.md',
+        PROJECT_ROOT
+      ),
+      'utf8'
+    );
+    const frontmatter = getOpeningFrontmatter(source);
+    const expectedRelatedHeaders = [
+      'access-control-allow-origin',
+      'access-control-allow-credentials',
+      'access-control-allow-headers',
+      'content-disposition',
+      'set-cookie',
+    ];
+    const headings = [
+      '## Expose only the response metadata your frontend needs',
+      '## Cross-origin download with Content-Disposition and ETag',
+      '## Fix “visible in Network, but response.headers.get() returns null”',
+      '## CORS-safelisted response headers',
+      '## Wildcard and credentialed requests',
+      '## Why Set-Cookie cannot be exposed',
+      '## Exposure is not authorization or data sanitization',
+    ];
+    const expectedSafelistedResponseHeaders = [
+      'Cache-Control',
+      'Content-Language',
+      'Content-Length',
+      'Content-Type',
+      'Expires',
+      'Last-Modified',
+      'Pragma',
+    ];
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(parseFrontmatterList(frontmatter ?? '', 'relatedHeaders')).toEqual(
+      expectedRelatedHeaders
+    );
+
+    const bypassSource = source.replace(
+      '  - set-cookie\nreferences:',
+      '  - set-cookie\n\n  # This comment must not hide another item.\n  - etag\nreferences:'
+    );
+    const bypassFrontmatter = getOpeningFrontmatter(bypassSource);
+
+    expect(
+      parseFrontmatterList(bypassFrontmatter ?? '', 'relatedHeaders')
+    ).toEqual([...expectedRelatedHeaders, 'etag']);
+
+    const assertExactAppendedHeadings = (candidateSource: string) => {
+      expect(
+        extractH2HeadingsAfter(candidateSource, '## Implementation notes')
+      ).toEqual(headings);
+    };
+    assertExactAppendedHeadings(source);
+
+    const duplicateHeadingSource = source.replace(
+      headings[2],
+      `${headings[2]}\n\n${headings[2]}`
+    );
+    expect(() => assertExactAppendedHeadings(duplicateHeadingSource)).toThrow();
+
+    const interleavedHeadingSource = source.replace(
+      `${headings[3]}\n\n`,
+      `${headings[3]}\n\n## Unexpected appended heading\n\n`
+    );
+    expect(() => assertExactAppendedHeadings(interleavedHeadingSource)).toThrow();
+
+    const extraHeadingSource = `${source}\n## Unexpected trailing heading\n`;
+    expect(() => assertExactAppendedHeadings(extraHeadingSource)).toThrow();
+
+    const javascriptBlocks = [...source.matchAll(/```js\r?\n([\s\S]*?)\r?\n```/g)];
+    const httpBlocks = [...source.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g)];
+
+    expect(javascriptBlocks).toHaveLength(1);
+    expect(httpBlocks).toHaveLength(1);
+
+    const javascriptBlock = javascriptBlocks[0]?.[1] ?? '';
+    const httpBlock = httpBlocks[0]?.[1] ?? '';
+    const fetchRequest = javascriptBlock.match(
+      /fetch\('https:\/\/files\.example(?<path>\/[^']+)', \{\r?\n\s+credentials: '(?<credentials>[^']+)'/
+    );
+    const httpRequest = httpBlock.match(
+      /^GET (?<path>\/\S+) HTTP\/1\.1[\s\S]*?^Origin: https:\/\/app\.example$/m
+    );
+
+    expect(fetchRequest?.groups?.path).toBe('/reports/quarterly.pdf');
+    expect(fetchRequest?.groups?.credentials).toBe('include');
+    expect(httpRequest?.groups?.path).toBe('/reports/quarterly.pdf');
+    expect(fetchRequest?.groups?.path).toBe(httpRequest?.groups?.path);
+    expect(javascriptBlock).toContain(
+      "response.headers.get('Content-Disposition')"
+    );
+    expect(javascriptBlock).toContain("response.headers.get('ETag')");
+    expect(javascriptBlock).toContain("response.headers.get('Set-Cookie')");
+
+    for (const phrase of [
+      'HTTP/1.1 200 OK',
+      'Access-Control-Allow-Origin: https://app.example',
+      'Access-Control-Allow-Credentials: true',
+      'Access-Control-Expose-Headers: Content-Disposition, ETag',
+      'Content-Type: application/pdf',
+      'Content-Disposition: attachment; filename="quarterly-report.pdf"',
+      'ETag: "report-v7"',
+      'Set-Cookie: download_session=opaque; Secure; HttpOnly; SameSite=None',
+      'Vary: Origin',
+    ]) {
+      expect(httpBlock).toContain(phrase);
+    }
+
+    const assertExactSafelist = (candidateSource: string) => {
+      expect(
+        extractMarkdownListBetween(
+          candidateSource,
+          '## CORS-safelisted response headers',
+          '## Wildcard and credentialed requests'
+        ).map((item) =>
+          item.replace(/[.;]$/, '').replace(/^`|`$/g, '').trim()
+        )
+      ).toEqual(expectedSafelistedResponseHeaders);
+    };
+    assertExactSafelist(source);
+
+    const extraSafelistItemSource = source.replace(
+      '- `Pragma`.\n\n',
+      '- `Pragma`;\n- `ETag`.\n\n'
+    );
+    expect(() => assertExactSafelist(extraSafelistItemSource)).toThrow();
+
+    const reorderedSafelistSource = source.replace(
+      '- `Cache-Control`;\n- `Content-Language`;',
+      '- `Content-Language`;\n- `Cache-Control`;'
+    );
+    expect(() => assertExactSafelist(reorderedSafelistSource)).toThrow();
+
+    const plainExtraSafelistItemSource = source.replace(
+      '- `Pragma`.\n\n',
+      '- `Pragma`.\n- ETag.\n\n'
+    );
+    expect(() => assertExactSafelist(plainExtraSafelistItemSource)).toThrow();
+
+    const asteriskExtraSafelistItemSource = source.replace(
+      '- `Pragma`.\n\n',
+      '- `Pragma`.\n* ETag.\n\n'
+    );
+    expect(() =>
+      assertExactSafelist(asteriskExtraSafelistItemSource)
+    ).toThrow();
+
+    const indentedExtraSafelistItemSource = source.replace(
+      '- `Pragma`.\n\n',
+      '- `Pragma`.\n  - ETag.\n\n'
+    );
+    expect(() =>
+      assertExactSafelist(indentedExtraSafelistItemSource)
+    ).toThrow();
+
+    const cookieBoundaryPhrases = [
+      '`Set-Cookie` and legacy `Set-Cookie2` are forbidden response-header names under Fetch. A CORS-filtered response excludes them from browser JavaScript access even if `Set-Cookie` is explicitly named in `Access-Control-Expose-Headers`, wildcard semantics apply, the browser accepts the cookie, or the response includes `Access-Control-Allow-Credentials: true`.',
+      'the browser can process an allowed cookie independently of exposing that field to JavaScript',
+      '`HttpOnly` protects a stored cookie from script access through cookie APIs, while the Fetch response-header prohibition applies to the `Set-Cookie` field name itself',
+    ];
+    const assertCookieExposureBoundaries = (candidateSource: string) => {
+      for (const phrase of cookieBoundaryPhrases) {
+        expect(candidateSource).toContain(phrase);
+      }
+    };
+    assertCookieExposureBoundaries(source);
+
+    const explicitListBoundaryMutation = source.replace(
+      'even if `Set-Cookie` is explicitly named in `Access-Control-Expose-Headers`, wildcard semantics apply, the browser accepts the cookie, or',
+      'even if the response includes'
+    );
+    expect(() =>
+      assertCookieExposureBoundaries(explicitListBoundaryMutation)
+    ).toThrow();
+
+    const forbiddenNameRuleMutation = source.replace(
+      cookieBoundaryPhrases[0],
+      '`Set-Cookie` and legacy `Set-Cookie2` may be exposed to browser JavaScript when listed or when wildcard semantics apply.'
+    );
+    expect(() =>
+      assertCookieExposureBoundaries(forbiddenNameRuleMutation)
+    ).toThrow();
+
+    const cookieProcessingBoundaryMutation = source.replace(
+      'the browser can process an allowed cookie independently of exposing that field to JavaScript',
+      'the browser can process an allowed cookie'
+    );
+    expect(() =>
+      assertCookieExposureBoundaries(cookieProcessingBoundaryMutation)
+    ).toThrow();
+
+    const httpOnlyBoundaryMutation = source.replace(
+      '`HttpOnly` protects a stored cookie from script access through cookie APIs, while the Fetch response-header prohibition applies to the `Set-Cookie` field name itself',
+      '`HttpOnly` is a cookie attribute'
+    );
+    expect(() => assertCookieExposureBoundaries(httpOnlyBoundaryMutation)).toThrow();
+
+    for (const phrase of [
+      'bounded, case-insensitive list of field names',
+      'internal routing or upstream identity',
+      'identifiers that enable correlation across users, sessions, or services',
+      '`disposition` contains `attachment; filename="quarterly-report.pdf"`',
+      '`etag` contains `"report-v7"`',
+      '`setCookie` is `null`',
+      'network tooling can display the internal network response while Fetch exposes a CORS-filtered response',
+      'Both an absent field and a present-but-filtered field can make `Headers.get()` return `null`',
+      '`Content-Disposition` and `ETag` are not in this safelist',
+      'Do not confuse this response-header-name safelist with the CORS-safelisted request-header rules',
+      'credentials mode is not `include`, `Access-Control-Expose-Headers: *` exposes all response header names except forbidden response-header names',
+      'credentials mode is `include`, `*` is treated as the literal field name `*`',
+      'do not duplicate session tokens or cookie values into an exposed custom response field',
+      'does not authorize the request or decide which record the caller may receive',
+      'does not redact or validate an exposed value',
+      '`Access-Control-Allow-Headers` is the opposite request direction',
+      'curl, server-to-server clients, proxies, extensions, or other non-browser tooling',
     ]) {
       expect(source).toContain(phrase);
     }
