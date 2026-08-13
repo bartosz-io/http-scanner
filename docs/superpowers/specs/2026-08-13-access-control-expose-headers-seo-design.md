@@ -68,9 +68,14 @@ const etag = response.headers.get('ETag');
 const setCookie = response.headers.get('Set-Cookie');
 ```
 
-Show the matching successful actual response:
+Show the matching successful actual request and response:
 
 ```http
+GET /reports/quarterly.pdf HTTP/1.1
+Host: files.example
+Origin: https://app.example
+Cookie: download_session=opaque
+
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://app.example
 Access-Control-Allow-Credentials: true
@@ -90,7 +95,7 @@ Explain the observable results after a successful CORS check:
 
 State that the response uses an explicit origin and `Access-Control-Allow-Credentials: true` because this Fetch request uses credentials mode `include`. `Vary: Origin` is needed when the allowed origin can vary and a shared cache may store the response. Keep these origin, credentials, and cache requirements distinct from response-header exposure itself.
 
-The example must not display a real session identifier or imply that reading `Set-Cookie` is required for cookie processing. A compatible browser can process an allowed cookie independently of exposing the field to JavaScript.
+The example must not display a real session identifier; `opaque` is a deliberate non-secret placeholder. Do not imply that reading `Set-Cookie` is required for cookie processing. A compatible browser can process an allowed cookie independently of exposing the field to JavaScript.
 
 ### 4.3 `Fix “visible in Network, but response.headers.get() returns null”`
 
