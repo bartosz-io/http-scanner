@@ -156,7 +156,7 @@ Do not debug the preflight cache as if it were an ordinary shared HTTP cache. In
 
 Each meaningful combination can reduce cache hit rate and increase the number of stored variants. Add only request fields that influence selection. High-cardinality fields such as `User-Agent`, `Cookie`, or request identifiers can make reuse ineffective and should trigger a review of the representation and cache design rather than automatic inclusion.
 
-Conditional requests do not remove this requirement: validators such as `ETag` must identify the selected representation correctly, and the cache still needs the right variant before it can validate or reuse that representation.
+Conditional requests do not remove this requirement: validators such as `ETag` must identify representations correctly, and they do not compensate for an omitted or incorrect `Vary` field. A cache can include validator metadata from a stored response it cannot choose for the presented request in an origin validation request; directly reusing that stored response still requires matching nominated fields or successful origin validation.
 
 ## Vary: * vs private and no-store
 
