@@ -157,6 +157,82 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     color: var(--muted-foreground);
   }
 
+  .guide-markdown :global(ol),
+  .guide-markdown :global(ul) {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+    color: var(--muted-foreground);
+    line-height: 1.75rem;
+  }
+
+  .guide-markdown :global(ol) {
+    list-style-type: decimal;
+  }
+
+  .guide-markdown :global(ul) {
+    list-style-type: disc;
+  }
+
+  .guide-markdown :global(li + li) {
+    margin-top: 0.5rem;
+  }
+
+  .guide-markdown :global(table) {
+    width: 100%;
+    margin-top: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-spacing: 0;
+    border-radius: 0.625rem;
+    background-color: var(--card);
+    table-layout: fixed;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .guide-markdown :global(thead) {
+    background-color: color-mix(
+      in oklab,
+      var(--muted) 50%,
+      transparent
+    );
+  }
+
+  .guide-markdown :global(th),
+  .guide-markdown :global(td) {
+    padding: 0.75rem 1rem;
+    overflow-wrap: anywhere;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .guide-markdown :global(th) {
+    border-bottom: 1px solid var(--border);
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
+  .guide-markdown :global(td) {
+    color: var(--muted-foreground);
+  }
+
+  .guide-markdown :global(tbody tr:not(:last-child) td) {
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .guide-markdown :global(table) {
+      display: block;
+      overflow-x: auto;
+      table-layout: auto;
+    }
+
+    .guide-markdown :global(th),
+    .guide-markdown :global(td) {
+      min-width: 10rem;
+    }
+  }
+
   .guide-markdown :global(code) {
     overflow-wrap: anywhere;
   }
