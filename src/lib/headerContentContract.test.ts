@@ -804,6 +804,148 @@ describe('HTTP header guide source contract', () => {
     }
   });
 
+  it('keeps Vary aligned with CORS-aware HTTP cache matching intent', () => {
+    const source = readFileSync(
+      new URL('src/content/headers/vary.md', PROJECT_ROOT),
+      'utf8'
+    );
+    const frontmatter = getOpeningFrontmatter(source);
+    const expectedRelatedHeaders = [
+      'access-control-allow-origin',
+      'access-control-max-age',
+      'cache-control',
+      'etag',
+      'content-encoding',
+    ];
+    const headings = [
+      '## What Vary changes in cache matching',
+      '## Why dynamic Access-Control-Allow-Origin needs Vary: Origin',
+      '## How a missing Vary: Origin breaks cached CORS responses',
+      '## Debug Vary and the effective cache key',
+      '## HTTP response cache vs CORS preflight cache',
+      '## Common Vary patterns and cache fragmentation',
+      '## Vary: * vs private and no-store',
+    ];
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(parseFrontmatterList(frontmatter ?? '', 'relatedHeaders')).toEqual(
+      expectedRelatedHeaders
+    );
+
+    const bypassSource = source.replace(
+      '  - content-encoding\nreferences:',
+      '  - content-encoding\n\n  # This comment must not hide another item.\n  - content-language\nreferences:'
+    );
+    const bypassFrontmatter = getOpeningFrontmatter(bypassSource);
+
+    expect(
+      parseFrontmatterList(bypassFrontmatter ?? '', 'relatedHeaders')
+    ).toEqual([...expectedRelatedHeaders, 'content-language']);
+
+    const assertExactAppendedHeadings = (candidateSource: string) => {
+      expect(
+        extractH2HeadingsAfter(candidateSource, '## Implementation notes')
+      ).toEqual(headings);
+    };
+    assertExactAppendedHeadings(source);
+
+    const duplicateHeadingSource = source.replace(
+      headings[2],
+      `${headings[2]}\n\n${headings[2]}`
+    );
+    expect(() => assertExactAppendedHeadings(duplicateHeadingSource)).toThrow();
+
+    const unexpectedHeadingSource = source.replace(
+      `${headings[4]}\n\n`,
+      `${headings[4]}\n\n## Unexpected cache section\n\n`
+    );
+    expect(() => assertExactAppendedHeadings(unexpectedHeadingSource)).toThrow();
+
+    const getHttpBlocks = (candidateSource: string) => [
+      ...candidateSource.matchAll(/```http\r?\n([\s\S]*?)\r?\n```/g),
+    ].map((match) => match[1] ?? '');
+
+    const assertBoundCacheExamples = (candidateSource: string) => {
+      const httpBlocks = getHttpBlocks(candidateSource);
+      expect(httpBlocks).toHaveLength(4);
+
+      const [
+        negotiationBlock,
+        dynamicResponseBlock,
+        brokenCacheBlock,
+        correctedCacheBlock,
+      ] = httpBlocks;
+
+      expect(negotiationBlock).toBe(
+        'Vary: Accept-Encoding, Accept-Language'
+      );
+
+      for (const phrase of [
+        'HTTP/1.1 200 OK',
+        'Access-Control-Allow-Origin: https://app.example',
+        'Cache-Control: public, max-age=300',
+        'Content-Type: application/json',
+        'Vary: Origin',
+      ]) {
+        expect(dynamicResponseBlock).toContain(phrase);
+      }
+
+      expect(
+        brokenCacheBlock.match(/^GET \/public-config HTTP\/1\.1$/gm)
+      ).toHaveLength(2);
+      expect(brokenCacheBlock.match(/^Host: api\.example$/gm)).toHaveLength(2);
+      expect(
+        [...brokenCacheBlock.matchAll(/^Origin: (https:\/\/[^\s]+)$/gm)]
+          .map((match) => match[1])
+      ).toEqual(['https://app.example', 'https://admin.example']);
+      expect(
+        brokenCacheBlock.match(
+          /^Access-Control-Allow-Origin: https:\/\/app\.example$/gm
+        )
+      ).toHaveLength(2);
+      expect(brokenCacheBlock).toContain('Age: 42');
+      expect(brokenCacheBlock).not.toContain('Vary: Origin');
+
+      for (const phrase of [
+        'GET /public-config HTTP/1.1',
+        'Host: api.example',
+        'Origin: https://admin.example',
+        'HTTP/1.1 200 OK',
+        'Access-Control-Allow-Origin: https://admin.example',
+        'Cache-Control: public, max-age=300',
+        'Content-Type: application/json',
+        'Vary: Origin',
+      ]) {
+        expect(correctedCacheBlock).toContain(phrase);
+      }
+    };
+    assertBoundCacheExamples(source);
+
+    const brokenExampleWithVary = source.replace(
+      'Content-Type: application/json\n\nGET /public-config HTTP/1.1',
+      'Content-Type: application/json\nVary: Origin\n\nGET /public-config HTTP/1.1'
+    );
+    expect(() => assertBoundCacheExamples(brokenExampleWithVary)).toThrow();
+
+    const correctedOriginMismatch = source.replace(
+      'Access-Control-Allow-Origin: https://admin.example\nCache-Control: public, max-age=300\nContent-Type: application/json\nVary: Origin',
+      'Access-Control-Allow-Origin: https://app.example\nCache-Control: public, max-age=300\nContent-Type: application/json\nVary: Origin'
+    );
+    expect(() => assertBoundCacheExamples(correctedOriginMismatch)).toThrow();
+
+    for (const link of [
+      '[Access-Control-Allow-Origin](/headers/access-control-allow-origin/)',
+      '[Access-Control-Max-Age](/headers/access-control-max-age/)',
+      '[Cache-Control](/headers/cache-control/)',
+      '[ETag](/headers/etag/)',
+      '[Content-Encoding](/headers/content-encoding/)',
+      '[HTTP Headers Checker](/http-headers-checker/)',
+    ]) {
+      expect(source).toContain(link);
+    }
+  });
+
   it('accepts a complete guide source', () => {
     expect(validateHeaderGuideSource('cache-control', createGuideSource())).toEqual([]);
   });
