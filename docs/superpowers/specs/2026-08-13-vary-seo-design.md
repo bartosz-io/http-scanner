@@ -284,22 +284,18 @@ Do not add a navigation component or CORS Journey hub in this task.
 
 Add one focused Vitest contract to `src/lib/headerContentContract.test.ts`. Treat the Markdown as the published product artifact and protect behavior rather than arbitrary word count.
 
-The contract should verify:
+The contract should verify only structural and machine-readable content boundaries:
 
 - the exact five-item `relatedHeaders` array using the existing complete-field parser;
 - all seven approved H2 headings exist once and in order;
 - the broken and corrected examples use the same `/public-config` target;
 - the broken sequence contains both allowed request origins, reuses the first origin's `Access-Control-Allow-Origin`, includes cache evidence, and omits `Vary: Origin` from the cached response;
 - the corrected response contains the second origin's matching `Access-Control-Allow-Origin` and `Vary: Origin`;
-- the prose states that the deterministic outcome of the mismatched header is browser CORS failure, not automatic body disclosure;
-- dynamic allowlist validation, static `*`/static-origin exceptions, stale-entry invalidation, and custom cache-key verification are present;
-- `Vary`, `Cache-Control`, `Access-Control-Max-Age`, `private`, `no-store`, and `Vary: *` remain semantically distinct;
-- the general examples cover `Accept-Encoding`, `Accept-Language`, combined dimensions, fragmentation, and variant-correct validators;
 - the guide links to the approved related headers and mentions the HTTP Headers Checker.
 
-Prefer structural parsing and bounded code-block assertions over loose whole-file phrase checks where practical. In particular, prove that `Vary: Origin` is absent from the broken cached-response example and present in the corrected example; a global `toContain` check is insufficient.
+Do not test explanatory sentences or exact prose fragments. Validate dynamic allowlist guidance, static `*`/static-origin exceptions, stale-entry invalidation, custom cache-key behavior, disclosure-risk framing, cache-mechanism distinctions, fragmentation, and validator accuracy through independent review against RFC 9110, RFC 9111, and Fetch. In automated tests, prefer structural parsing and bounded code-block assertions. In particular, prove that `Vary: Origin` is absent from the broken cached-response example and present in the corrected example; a global `toContain` check is insufficient.
 
-The implementation must demonstrate RED before production-content changes and GREEN afterward. The RED failure must concern the absent approved content contract rather than test syntax, fixture loading, or parser behavior.
+The implementation must demonstrate RED before structural production-content changes and GREEN afterward. The RED failure must concern the absent approved structural contract rather than test syntax, fixture loading, parser behavior, or exact prose. Explanatory-copy corrections found during protocol review do not require sentence-presence tests; re-review them directly against the normative sources.
 
 ## 10. Verification and visual QA
 
@@ -335,7 +331,7 @@ Save QA screenshots outside the repository under `/private/tmp/vary-desktop.png`
 
 Use independent task review with separate spec-compliance and code/content-quality verdicts. Then run a fresh whole-branch review focused on RFC and Fetch accuracy, causal clarity, cache/CORS boundary language, bounded source-contract quality, renderer compatibility, and adherence to the no-framework/no-deploy scope.
 
-Resolve every Critical or Important finding. Any production-content correction must first have a failing regression assertion or demonstrated failure of an existing assertion, followed by focused GREEN and affected full verification.
+Resolve every Critical or Important finding. Structural production-content corrections must first have a failing regression assertion or demonstrated failure of an existing assertion, followed by focused GREEN and affected full verification. Explanatory-copy corrections must receive a scoped independent protocol re-review instead of an exact-sentence test.
 
 ## 12. Roadmap completion
 
