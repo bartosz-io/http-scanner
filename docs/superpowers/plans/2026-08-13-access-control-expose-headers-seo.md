@@ -523,7 +523,7 @@ Expected: only the factual status, completed-task row, next-task text, and evide
 
 ```bash
 git add SEO_PLAN.md docs/superpowers/plans/2026-08-13-access-control-expose-headers-seo.md
-git commit -m "docs: complete Access-Control-Expose-Headers SEO task"
+git commit -m "docs: finalize Access-Control-Expose-Headers SEO task"
 ```
 
 - [x] **Step 11: Confirm clean handoff state**
@@ -535,7 +535,7 @@ git status --short
 git log -2 --format='%h %s'
 ```
 
-Expected: clean worktree; the two newest commits are the roadmap-completion commit and the final Task 1 implementation commit. Do not deploy. Present merge/push/keep-branch choices according to the branch-finishing workflow.
+Expected: clean worktree; the newest commit is the roadmap-correction commit and its parent is the final implementation/contract commit `f9cc8b8`. Do not deploy. Present merge/push/keep-branch choices according to the branch-finishing workflow.
 
 ---
 
