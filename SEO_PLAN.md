@@ -89,7 +89,7 @@ Goal: own the browser CORS troubleshooting and implementation journey from origi
 | 5 | Access-Control-Allow-Credentials | `DONE` | P1 | Credentialed CORS, cookies, explicit origins, and common wildcard errors. |
 | 6 | Access-Control-Allow-Methods | `DONE` | P1 | Preflight method authorization and OPTIONS troubleshooting. |
 | 7 | Access-Control-Allow-Headers | `DONE` | P1 | Preflight request-header authorization and browser error resolution. |
-| 8 | Access-Control-Expose-Headers | `QUEUED` | P1 | Browser access to non-safelisted response headers. |
+| 8 | Access-Control-Expose-Headers | `DONE` | P1 | Browser access to non-safelisted response headers. |
 | 9 | Vary | `QUEUED` | P1 | Correct cache separation for dynamic `Access-Control-Allow-Origin`. |
 
 Exit criterion: all CORS guides link coherently to one another and to the HTTP Headers Checker, and at least two CORS URLs receive impressions in a rolling 28-day window.
@@ -237,11 +237,12 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 | Access-Control-Allow-Credentials SEO expansion | `DONE` | `b9bd296` | Awaiting deployment and URL-filtered GSC baseline. |
 | Access-Control-Allow-Methods SEO expansion | `DONE` | `73c7a6a` | Deployed 2026-08-12 (Cloudflare Version ID `6c9c938b-fce2-492b-99de-75c440599225`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
 | Access-Control-Allow-Headers SEO expansion | `DONE` | `87a275f` | Deployed 2026-08-13 (Cloudflare Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
+| Access-Control-Expose-Headers SEO expansion | `DONE` | `7454e19` | Awaiting deployment and URL-filtered GSC baseline. |
 
 ## 12. Next task
 
 No newer GSC export is available after the 2026-08-07 baseline. Execute the next eligible roadmap task for:
 
-- `Access-Control-Expose-Headers`.
+- `Vary`.
 
-The task should cover response-header readability, the CORS-safelisted response-header set, wildcard and credentials behavior, the `Set-Cookie` exclusion, and browser debugging.
+The task should cover dynamic `Access-Control-Allow-Origin`, shared-cache variant separation, `Vary: Origin`, wildcard-origin cases, cache-key debugging, and the distinction between HTTP caching and the CORS-preflight cache.

@@ -37,7 +37,7 @@
 - Consumes: `getOpeningFrontmatter(source: string): string | undefined`, `parseFrontmatterList(frontmatter: string, field: string): string[]`, the Markdown frontmatter contract, `validateHeaderGuideSource(slug: string, source: string): string[]`, and the shared `HeaderGuidePage.astro` renderer.
 - Produces: a seven-section security-first guide with five exact related headers and a focused regression contract covering bounded download-example identity, response visibility, the response safelist, wildcard/credentials semantics, forbidden cookie fields, and security boundaries.
 
-- [ ] **Step 1: Add the failing source-contract test**
+- [x] **Step 1: Add the failing source-contract test**
 
 Insert this test in `src/lib/headerContentContract.test.ts` immediately after the existing `Access-Control-Allow-Headers` SEO test:
 
@@ -167,7 +167,7 @@ it('keeps Access-Control-Expose-Headers aligned with secure response-metadata ex
 
 This test deliberately treats the published Markdown as the product artifact. The bounded JavaScript and HTTP assertions protect one coherent credentialed download rather than unrelated phrases scattered through the page. The mutated-frontmatter assertion proves that a blank line and YAML comment cannot hide an extra related-header item from the parser.
 
-- [ ] **Step 2: Run the focused test and verify RED**
+- [x] **Step 2: Run the focused test and verify RED**
 
 Run:
 
@@ -177,7 +177,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "Access-Control-Expose-Head
 
 Expected: FAIL because the current related-header list, seven headings, bounded download exchange, exact response safelist, wildcard rules, forbidden cookie boundary, and security distinctions are absent. Confirm the first failure concerns the missing approved contract rather than test syntax, fixture loading, or the parser.
 
-- [ ] **Step 3: Replace the related-header cluster**
+- [x] **Step 3: Replace the related-header cluster**
 
 Replace the current `relatedHeaders` block in `src/content/headers/access-control-expose-headers.md` with:
 
@@ -192,7 +192,7 @@ relatedHeaders:
 
 Do not change the existing `headerName`, description, applicability, syntax, examples, use cases, common mistakes, security consideration, or references.
 
-- [ ] **Step 4: Append the metadata-minimization section**
+- [x] **Step 4: Append the metadata-minimization section**
 
 Append after the existing `Implementation notes` paragraph:
 
@@ -206,7 +206,7 @@ Use a bounded, case-insensitive list of field names. Do not expose metadata mere
 Exposure is not automatically a vulnerability, but it increases the data surface available to every browser application permitted by the effective CORS policy. Authorize the underlying response and construct each field value safely before deciding whether the frontend should be able to read it.
 ```
 
-- [ ] **Step 5: Append the bounded download section**
+- [x] **Step 5: Append the bounded download section**
 
 Append immediately after the metadata-minimization section:
 
@@ -249,7 +249,7 @@ After the CORS check succeeds, `disposition` contains `attachment; filename="qua
 This request uses credentials mode `include`, so the response uses the explicit origin and `Access-Control-Allow-Credentials: true`. `Vary: Origin` keeps shared-cache variants separate when the allowed origin can change. Those origin, credentials, and cache requirements are separate from the decision to expose `Content-Disposition` and `ETag`. The value `opaque` is a deliberate non-secret placeholder, not a live session identifier.
 ````
 
-- [ ] **Step 6: Append the browser-debugging section**
+- [x] **Step 6: Append the browser-debugging section**
 
 Append immediately after the download section:
 
@@ -263,7 +263,7 @@ First confirm that the overall CORS exchange succeeds and the expected body is a
 Header-name matching is ASCII case-insensitive, although consistent spelling makes diagnostics clearer. Both an absent field and a present-but-filtered field can make `Headers.get()` return `null`, so compare the network response with the effective exposure policy instead of assuming one cause from the JavaScript result alone.
 ```
 
-- [ ] **Step 7: Append the exact response-safelist section**
+- [x] **Step 7: Append the exact response-safelist section**
 
 Append immediately after the debugging section:
 
@@ -283,7 +283,7 @@ After a successful CORS exchange, Fetch makes these response field names readabl
 `Content-Disposition` and `ETag` are not in this safelist, so the download response exposes them explicitly. Do not confuse this response-header-name safelist with the CORS-safelisted request-header rules. The request safelist helps determine whether a request field can participate in a simple request under value restrictions; the response safelist determines which response names survive CORS filtering for script access.
 ```
 
-- [ ] **Step 8: Append the wildcard section**
+- [x] **Step 8: Append the wildcard section**
 
 Append immediately after the response-safelist section:
 
@@ -297,7 +297,7 @@ Prefer explicit names even for non-credentialed security-sensitive APIs. A bound
 The exposure wildcard is separate from `Access-Control-Allow-Origin: *`. They are different response fields with different checks, although credentials mode affects both. Adding `Access-Control-Allow-Credentials: true` does not change the request's credentials mode; client code selects that mode.
 ```
 
-- [ ] **Step 9: Append the forbidden-cookie section**
+- [x] **Step 9: Append the forbidden-cookie section**
 
 Append immediately after the wildcard section:
 
@@ -309,7 +309,7 @@ Append immediately after the wildcard section:
 `HttpOnly` protects a stored cookie from script access through cookie APIs, while the Fetch response-header prohibition applies to the `Set-Cookie` field name itself. Exposing `Set-Cookie` is not a way to discover whether a cookie was stored. Return required non-secret state through an intentionally designed response body or another explicitly exposed field, and do not duplicate session tokens or cookie values into an exposed custom response field.
 ```
 
-- [ ] **Step 10: Append the final security-boundary section**
+- [x] **Step 10: Append the final security-boundary section**
 
 Append immediately after the forbidden-cookie section:
 
@@ -323,7 +323,7 @@ This response field also does not grant permission to send similarly named reque
 CORS filtering does not conceal ordinary response fields from curl, server-to-server clients, proxies, extensions, or other non-browser tooling, and it does not guarantee that an intermediary preserved a field unchanged. Enforce authentication, authorization, tenant isolation, value validation, response minimization, and safe logging independently.
 ```
 
-- [ ] **Step 11: Run focused tests and verify GREEN**
+- [x] **Step 11: Run focused tests and verify GREEN**
 
 Run:
 
@@ -334,7 +334,7 @@ npm test -- src/lib/headerContentContract.test.ts -t "validates every CORS guide
 
 Expected: both commands PASS. If either fails, correct the production Markdown while preserving the approved semantics; do not weaken assertions to accommodate missing coverage.
 
-- [ ] **Step 12: Review Task 1 technical boundaries**
+- [x] **Step 12: Review Task 1 technical boundaries**
 
 Read the complete guide and confirm:
 
@@ -357,7 +357,7 @@ git diff -- src/content/headers/access-control-expose-headers.md src/lib/headerC
 
 Expected: no whitespace errors and no unrelated changes.
 
-- [ ] **Step 13: Run the complete automated verification**
+- [x] **Step 13: Run the complete automated verification**
 
 Run:
 
@@ -376,7 +376,7 @@ Expected:
 - Astro emits 51 static pages, including `/headers/access-control-expose-headers/`;
 - `git diff --check` prints no errors.
 
-- [ ] **Step 14: Verify the generated and rendered page**
+- [x] **Step 14: Verify the generated and rendered page**
 
 Confirm generated HTML contains the seven sections and bounded examples:
 
@@ -398,7 +398,7 @@ Start the local site and inspect `/headers/access-control-expose-headers/` at a 
 
 Save screenshots outside the repository as `/private/tmp/access-control-expose-headers-desktop.png` and `/private/tmp/access-control-expose-headers-mobile.png`. Reset any viewport override and stop the local server after verification.
 
-- [ ] **Step 15: Commit Task 1**
+- [x] **Step 15: Commit Task 1**
 
 ```bash
 git add src/content/headers/access-control-expose-headers.md src/lib/headerContentContract.test.ts
@@ -419,7 +419,7 @@ Record the exact final implementation commit for Task 2. If review later require
 - Consumes: the verified Task 1 implementation and acceptance criteria in `docs/superpowers/specs/2026-08-13-access-control-expose-headers-seo-design.md`.
 - Produces: an independently reviewed implementation, a factual roadmap record, `Vary` as the next Wave 1 task, and a fully checked implementation plan.
 
-- [ ] **Step 1: Request independent technical review of Task 1**
+- [x] **Step 1: Request independent technical review of Task 1**
 
 Prepare a review package from the commit immediately before Task 1 through the final Task 1 implementation commit. Give the reviewer the design spec, this task brief, implementation report, complete diff package, verification evidence, and Global Constraints.
 
@@ -430,7 +430,7 @@ Require two explicit verdicts:
 
 The reviewer must classify findings as Critical, Important, or Minor and cite exact file/line evidence. Resolve every Critical or Important finding. Any production-content correction must begin with a new failing regression assertion or demonstrated failure of an existing assertion, followed by focused GREEN and affected Task 1 Steps 11–14.
 
-- [ ] **Step 2: Run final whole-branch implementation review**
+- [x] **Step 2: Run final whole-branch implementation review**
 
 After task review is clean, request a fresh senior reviewer for the complete implementation diff. The reviewer must check:
 
@@ -445,7 +445,7 @@ After task review is clean, request a fresh senior reviewer for the complete imp
 
 Expected: no unresolved Critical or Important findings. Resolve real findings through the same RED → GREEN discipline and repeat affected verification.
 
-- [ ] **Step 3: Run fresh final verification**
+- [x] **Step 3: Run fresh final verification**
 
 After review changes, run:
 
@@ -465,7 +465,7 @@ Expected:
 - `git diff --check` is clean;
 - only intended roadmap and plan-document updates remain uncommitted.
 
-- [ ] **Step 4: Capture the exact final implementation commit**
+- [x] **Step 4: Capture the exact final implementation commit**
 
 Run:
 
@@ -475,11 +475,11 @@ git log --format='%h %s' -- src/content/headers/access-control-expose-headers.md
 
 Expected: the first row identifies the final commit that changed the guide or its contract. Store that concrete short SHA for the roadmap update; do not assume it is the initial feature commit if review created a later focused fix.
 
-- [ ] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
+- [x] **Step 5: Update the Wave 1 status in SEO_PLAN.md**
 
 In `Wave 1 — CORS authority`, change only the `Access-Control-Expose-Headers` status from `QUEUED` to `DONE`. Keep order, priority, and strategic role unchanged.
 
-- [ ] **Step 6: Add the completed-task record**
+- [x] **Step 6: Add the completed-task record**
 
 Append one row to `## 11. Completed task log` with these cells:
 
@@ -490,7 +490,7 @@ Append one row to `## 11. Completed task log` with these cells:
 
 Do not claim a deployment date, production verification, or GSC submission before those actions occur.
 
-- [ ] **Step 7: Advance the next task**
+- [x] **Step 7: Advance the next task**
 
 Replace the body of `## 12. Next task` with:
 
@@ -504,11 +504,11 @@ The task should cover dynamic `Access-Control-Allow-Origin`, shared-cache varian
 
 Do not promote the future CORS Journey here. It remains a separate consolidation feature to design after this reference expansion; `Vary` stays next in the ordered Wave 1 roadmap.
 
-- [ ] **Step 8: Mark this implementation plan complete**
+- [x] **Step 8: Mark this implementation plan complete**
 
 Change every completed task checkbox in this plan from `- [ ]` to `- [x]` only after its action and verification have succeeded.
 
-- [ ] **Step 9: Verify the documentation diff**
+- [x] **Step 9: Verify the documentation diff**
 
 Run:
 
@@ -519,14 +519,14 @@ git diff -- SEO_PLAN.md docs/superpowers/plans/2026-08-13-access-control-expose-
 
 Expected: only the factual status, completed-task row, next-task text, and evidence-backed checkbox changes described above.
 
-- [ ] **Step 10: Commit the roadmap completion**
+- [x] **Step 10: Commit the roadmap completion**
 
 ```bash
 git add SEO_PLAN.md docs/superpowers/plans/2026-08-13-access-control-expose-headers-seo.md
 git commit -m "docs: complete Access-Control-Expose-Headers SEO task"
 ```
 
-- [ ] **Step 11: Confirm clean handoff state**
+- [x] **Step 11: Confirm clean handoff state**
 
 Run:
 
