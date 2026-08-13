@@ -237,7 +237,7 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 | Access-Control-Allow-Credentials SEO expansion | `DONE` | `b9bd296` | Awaiting deployment and URL-filtered GSC baseline. |
 | Access-Control-Allow-Methods SEO expansion | `DONE` | `73c7a6a` | Deployed 2026-08-12 (Cloudflare Version ID `6c9c938b-fce2-492b-99de-75c440599225`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
 | Access-Control-Allow-Headers SEO expansion | `DONE` | `87a275f` | Deployed 2026-08-13 (Cloudflare Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
-| Access-Control-Expose-Headers SEO expansion | `DONE` | `f9cc8b8` | Awaiting deployment and URL-filtered GSC baseline. |
+| Access-Control-Expose-Headers SEO expansion | `DONE` | `f9cc8b8` | Deployed 2026-08-13 (Cloudflare Version ID `e97a7258-7ba2-48ba-a8a8-9b21900bdfa8`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
 
 ## 12. Next task
 
