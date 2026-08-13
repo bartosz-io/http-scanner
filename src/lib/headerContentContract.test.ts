@@ -717,8 +717,11 @@ describe('HTTP header guide source contract', () => {
         )
       ).toEqual([
         {
-          inlineCodeValues: expectedSafelistedResponseHeaders,
-          text: `${expectedSafelistedResponseHeaders.join(', ')}.`,
+          inlineCodeValues: [
+            'Access-Control-Expose-Headers',
+            ...expectedSafelistedResponseHeaders,
+          ],
+          text: 'After a successful CORS exchange, Fetch makes these response field names readable without repeating them in Access-Control-Expose-Headers: Cache-Control, Content-Language, Content-Length, Content-Type, Expires, Last-Modified, Pragma.',
         },
       ]);
     };
