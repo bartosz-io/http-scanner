@@ -156,10 +156,17 @@ Explain each transition explicitly:
 
 Reverse order can make the application origin fail instead. Do not claim that this header-only mismatch lets the second origin read the body; the mismatched CORS permission causes browser blocking. If the representation itself also varies by `Origin` and the cache key omits that dimension, the wrong representation can be delivered. Whether that becomes a disclosure depends on the complete cache policy, CORS response, authentication, authorization, and client context. Keep that separate from the deterministic CORS failure above.
 
-Follow with the corrected sequence or a concise comparison showing that `Vary: Origin` causes the second request to miss the first origin-specific variant and obtain a response containing:
+Follow with the corrected second exchange. It must use the same target and show that `Vary: Origin` causes the request to miss the first origin-specific variant and obtain a matching response:
 
 ```http
+GET /public-config HTTP/1.1
+Host: api.example
+Origin: https://admin.example
+
+HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://admin.example
+Cache-Control: public, max-age=300
+Content-Type: application/json
 Vary: Origin
 ```
 
