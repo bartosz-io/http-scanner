@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { markdownToMdast, type MdastNode } from 'satteri';
 import ts from 'typescript';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { validateHeaderGuideSource } from './headerContentContract';
 import { listHeaderCatalogEntries } from './headerCatalog';
 
@@ -1191,6 +1191,55 @@ describe('HTTP header guide source contract', () => {
       'Timing-Allow-Origin'
     );
     expect(() => assertRequiredLinks(removedContextualLinkSource)).toThrow();
+  });
+
+  it('keeps network-path incoming URLs on the fixed Worker upstream origin', async () => {
+    const source = readFileSync(
+      new URL('src/content/headers/server-timing.md', PROJECT_ROOT),
+      'utf8'
+    );
+    const workerExample = collectMarkdownContractNodes(source).codeBlocks
+      .find(({ lang }) => lang === 'ts')?.value ?? '';
+    const executableWorkerExample = ts.transpileModule(workerExample, {
+      compilerOptions: {
+        module: ts.ModuleKind.ESNext,
+        target: ts.ScriptTarget.ES2022,
+      },
+    }).outputText;
+    const workerModuleUrl = `data:text/javascript;base64,${Buffer.from(
+      executableWorkerExample
+    ).toString('base64')}`;
+    const fetchedRequests: Request[] = [];
+
+    vi.stubGlobal('fetch', async (request: Request) => {
+      fetchedRequests.push(request);
+      return new Response('upstream body', {
+        status: 201,
+        statusText: 'Created',
+      });
+    });
+
+    try {
+      const workerModule = await import(/* @vite-ignore */ workerModuleUrl) as {
+        default: {
+          fetch(request: Request): Promise<Response>;
+        };
+      };
+
+      await workerModule.default.fetch(
+        new Request(
+          'https://worker.example//attacker.example/collect?token=redacted'
+        )
+      );
+
+      expect(fetchedRequests).toHaveLength(1);
+      const fetchedUrl = new URL(fetchedRequests[0]?.url ?? '');
+      expect(fetchedUrl.origin).toBe('https://origin.example');
+      expect(fetchedUrl.pathname).toBe('//attacker.example/collect');
+      expect(fetchedUrl.search).toBe('?token=redacted');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('accepts a complete guide source', () => {

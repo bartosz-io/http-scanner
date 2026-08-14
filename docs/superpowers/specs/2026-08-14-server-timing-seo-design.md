@@ -234,10 +234,9 @@ The example contract is:
 export default {
   async fetch(request: Request): Promise<Response> {
     const incomingUrl = new URL(request.url);
-    const upstreamUrl = new URL(
-      `${incomingUrl.pathname}${incomingUrl.search}`,
-      'https://origin.example',
-    );
+    const upstreamUrl = new URL('https://origin.example');
+    upstreamUrl.pathname = incomingUrl.pathname;
+    upstreamUrl.search = incomingUrl.search;
 
     const upstreamStart = performance.now();
     const upstreamResponse = await fetch(new Request(upstreamUrl, request));
