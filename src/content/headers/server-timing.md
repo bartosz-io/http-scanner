@@ -31,9 +31,7 @@ The field is selected public response metadata, not a complete trace, a trusted 
 
 ## Implementation notes
 
-Define a small stable vocabulary, give each metric an owner, and document its start point, stop point, unit, overlap, cache path, and response paths. Round values to useful precision, keep descriptions short, and omit query text, user identifiers, shard names, private hosts, trace tokens, and exception details. Compare public metrics with private tracing when investigating a request, but do not treat them as interchangeable.
-
-Set a normal response header before the response is committed. Test every intended success, error, redirect, cache, authenticated, anonymous, and streamed path because a different producer can emit a different field. Remove metrics that no maintained debugging or monitoring consumer uses, and keep detailed profiling, logs, and traces private.
+Choose selected metrics deliberately and set a normal response header before the response is committed. The sections below explain their measurement and access boundaries; [Design production metrics without leaking internals](#design-production-metrics-without-leaking-internals) defines the vocabulary, disclosure, lifecycle, and private-observability rules for a production metric set.
 
 ## Where Server-Timing fits in a request
 
