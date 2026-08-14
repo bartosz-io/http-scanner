@@ -1110,16 +1110,31 @@ describe('HTTP header guide source contract', () => {
       const timingIllustration = timeline[0]?.querySelector(
         '[data-timing-illustration]'
       );
+      const assertRegionLabel = (region: Element | null | undefined) => {
+        const labelId = region?.getAttribute('aria-labelledby');
+        const label = labelId
+          ? dom.window.document.getElementById(labelId)
+          : null;
+
+        expect(labelId).toBeTruthy();
+        expect(label).not.toBeNull();
+        expect(region?.contains(label)).toBe(true);
+        expect(label?.matches('[data-diagram-label]')).toBe(true);
+      };
 
       expect(requestPath).not.toBeNull();
       expect(timingIllustration).not.toBeNull();
+      assertRegionLabel(requestPath);
+      assertRegionLabel(timingIllustration);
       expect(requestPath?.querySelector('[data-timeline-path]')).not.toBeNull();
       expect(requestPath?.querySelector('[data-timing-phase]')).toBeNull();
       expect(timingIllustration?.querySelector('[data-timeline-path]')).toBeNull();
       expect(timingIllustration?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
-      expect(
-        timingIllustration?.querySelectorAll('[data-not-in-server-timing]')
-      ).toHaveLength(1);
+      const phaseNotInServerTiming = timingIllustration?.querySelectorAll(
+        '[data-timing-phase][data-not-in-server-timing]'
+      );
+      expect(phaseNotInServerTiming).toHaveLength(1);
+      expect(phaseNotInServerTiming?.[0]?.querySelector('small')).not.toBeNull();
       expect(timeline[0]?.querySelectorAll('[data-timeline-path] > li')).toHaveLength(4);
       expect(timeline[0]?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
       expect(timeline[0]?.querySelector('[data-timing-total]')).not.toBeNull();
