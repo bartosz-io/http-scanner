@@ -72,4 +72,26 @@ describe('HTTP header reference SEO contract', () => {
       '.guide-markdown :global(code) {\n    overflow-wrap: anywhere;'
     );
   });
+
+  it('scopes the static Server-Timing timeline styles to its data contract', () => {
+    const component = readProjectFile(
+      'src/components/astro/HeaderGuidePage.astro'
+    );
+
+    expect(component).toContain(
+      '.guide-markdown :global(figure[data-server-timing-timeline])'
+    );
+    expect(component).toContain(
+      '.guide-markdown :global([data-server-timing-timeline] [data-timeline-path])'
+    );
+    expect(component).toContain(
+      '.guide-markdown :global([data-server-timing-timeline] [data-timing-breakdown])'
+    );
+    expect(component).toContain(
+      '.guide-markdown :global([data-server-timing-timeline] [data-timing-phase])'
+    );
+    expect(component).toContain('@media (max-width: 640px)');
+    expect(component).not.toContain('.guide-markdown :global(figure) {');
+    expect(component).not.toContain('client:');
+  });
 });
