@@ -1,5 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+// @ts-expect-error jsdom has no bundled type declarations.
+import { JSDOM } from 'jsdom';
 import { markdownToMdast, type MdastNode } from 'satteri';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { validateHeaderGuideSource } from './headerContentContract';
 import { listHeaderCatalogEntries } from './headerCatalog';
@@ -142,6 +145,16 @@ type MarkdownParagraphContractNode = MarkdownContractNode & {
   inlineCodeValues: string[];
 };
 
+type MarkdownCodeBlockContractNode = MarkdownContractNode & {
+  lang: string | null;
+  value: string;
+};
+
+type MarkdownTableContractNode = MarkdownContractNode & {
+  columnCount: number;
+  rowCount: number;
+};
+
 function getMarkdownNodeText(node: MdastNode): string {
   if ('value' in node && typeof node.value === 'string') {
     return node.value;
@@ -159,15 +172,21 @@ function getMarkdownNodeText(node: MdastNode): string {
 }
 
 function collectMarkdownContractNodes(source: string): {
+  codeBlocks: MarkdownCodeBlockContractNode[];
   h2Headings: MarkdownContractNode[];
+  htmlBlocks: string[];
   httpCodeBlocks: string[];
   linkDestinations: string[];
   paragraphs: MarkdownParagraphContractNode[];
+  tables: MarkdownTableContractNode[];
 } {
+  const codeBlocks: MarkdownCodeBlockContractNode[] = [];
   const h2Headings: MarkdownContractNode[] = [];
+  const htmlBlocks: string[] = [];
   const httpCodeBlocks: string[] = [];
   const linkDestinations: string[] = [];
   const paragraphs: MarkdownParagraphContractNode[] = [];
+  const tables: MarkdownTableContractNode[] = [];
   const tree = markdownToMdast(source);
 
   const visit = (node: MdastNode) => {
@@ -185,12 +204,40 @@ function collectMarkdownContractNodes(source: string): {
         h2Headings.push(contractNode);
       } else if (
         node.type === 'code' &&
-        'lang' in node &&
-        node.lang === 'http' &&
         'value' in node &&
         typeof node.value === 'string'
       ) {
-        httpCodeBlocks.push(node.value);
+        const lang = 'lang' in node && typeof node.lang === 'string'
+          ? node.lang
+          : null;
+
+        codeBlocks.push({
+          ...contractNode,
+          lang,
+          value: node.value,
+        });
+
+        if (lang === 'http') {
+          httpCodeBlocks.push(node.value);
+        }
+      } else if (
+        node.type === 'html' &&
+        'value' in node &&
+        typeof node.value === 'string'
+      ) {
+        htmlBlocks.push(node.value);
+      } else if (node.type === 'table' && 'children' in node) {
+        const rows = node.children.filter((child) => child.type === 'tableRow');
+        const firstRow = rows[0];
+        const columnCount = firstRow && 'children' in firstRow
+          ? firstRow.children.filter((child) => child.type === 'tableCell').length
+          : 0;
+
+        tables.push({
+          ...contractNode,
+          columnCount,
+          rowCount: rows.length,
+        });
       } else if (
         node.type === 'link' &&
         'url' in node &&
@@ -215,7 +262,27 @@ function collectMarkdownContractNodes(source: string): {
   };
   visit(tree);
 
-  return { h2Headings, httpCodeBlocks, linkDestinations, paragraphs };
+  return {
+    codeBlocks,
+    h2Headings,
+    htmlBlocks,
+    httpCodeBlocks,
+    linkDestinations,
+    paragraphs,
+    tables,
+  };
+}
+
+function expectParseableScript(source: string, scriptKind: ts.ScriptKind): void {
+  const file = ts.createSourceFile(
+    'guide-example.ts',
+    source,
+    ts.ScriptTarget.ESNext,
+    true,
+    scriptKind
+  ) as ts.SourceFile & { parseDiagnostics: readonly ts.Diagnostic[] };
+
+  expect(file.parseDiagnostics).toEqual([]);
 }
 
 function extractH2HeadingsAfter(
@@ -990,6 +1057,140 @@ describe('HTTP header guide source contract', () => {
       `Access-Control-Max-Age<!-- ${accessControlMaxAgeLink} -->`
     );
     expect.soft(() => assertRequiredLinks(nonRenderedLinkSource)).toThrow();
+  });
+
+  it('keeps Server-Timing aligned with the debugging-first guide contract', () => {
+    const source = readFileSync(
+      new URL('src/content/headers/server-timing.md', PROJECT_ROOT),
+      'utf8'
+    );
+    const frontmatter = getOpeningFrontmatter(source);
+    const contract = collectMarkdownContractNodes(source);
+    const expectedH2Headings = [
+      '## Meaning and behavior',
+      '## Implementation notes',
+      '## Where Server-Timing fits in a request',
+      '## Server-Timing syntax: names, dur, and desc',
+      '## Inspect Server-Timing in browser DevTools',
+      '## Read Server-Timing from JavaScript',
+      '## Add Server-Timing in Express',
+      '## Add Server-Timing in a Cloudflare Worker',
+      '## Cross-origin metrics and Timing-Allow-Origin',
+      '## Debug missing or misleading Server-Timing metrics',
+      '## Design production metrics without leaking internals',
+    ];
+
+    const assertExactH2Headings = (candidateSource: string) => {
+      expect(
+        collectMarkdownContractNodes(candidateSource).h2Headings
+          .map(({ text }) => `## ${text}`)
+      ).toEqual(expectedH2Headings);
+    };
+    assertExactH2Headings(source);
+
+    expect(frontmatter).toBeDefined();
+    expect(frontmatter?.match(/^relatedHeaders:/gm)).toHaveLength(1);
+    expect(parseFrontmatterList(frontmatter ?? '', 'relatedHeaders')).toEqual([
+      'timing-allow-origin',
+      'x-runtime',
+      'cache-control',
+    ]);
+
+    const assertTimelineSemantics = (candidateSource: string) => {
+      const dom = new JSDOM(
+        collectMarkdownContractNodes(candidateSource).htmlBlocks.join('\n')
+      );
+      const timeline = dom.window.document.querySelectorAll(
+        'figure[data-server-timing-timeline]'
+      );
+
+      expect(timeline).toHaveLength(1);
+      expect(timeline[0]?.querySelectorAll('figcaption')).toHaveLength(1);
+      expect(timeline[0]?.querySelectorAll('[data-timeline-path] > li')).toHaveLength(4);
+      expect(timeline[0]?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
+      expect(timeline[0]?.querySelector('[data-timing-total]')).not.toBeNull();
+      expect(timeline[0]?.querySelector('script')).toBeNull();
+    };
+    assertTimelineSemantics(source);
+
+    const javascriptBlocks = contract.codeBlocks.filter(({ lang }) => lang === 'js');
+    const typescriptBlocks = contract.codeBlocks.filter(({ lang }) => lang === 'ts');
+    const httpBlocks = contract.codeBlocks.filter(({ lang }) => lang === 'http');
+
+    expect(javascriptBlocks).toHaveLength(2);
+    expect(typescriptBlocks).toHaveLength(1);
+    expect(httpBlocks.length).toBeGreaterThanOrEqual(5);
+
+    for (const block of javascriptBlocks) {
+      expectParseableScript(block.value, ts.ScriptKind.JS);
+    }
+    expectParseableScript(typescriptBlocks[0]?.value ?? '', ts.ScriptKind.TS);
+
+    const assertStreamingWorkerExample = (candidateSource: string) => {
+      const workerExample = collectMarkdownContractNodes(candidateSource).codeBlocks
+        .find(({ lang }) => lang === 'ts')?.value ?? '';
+
+      expect(workerExample).toMatch(/await fetch\(new Request\(upstreamUrl, request\)\)/);
+      expect(workerExample).toMatch(/new Response\(upstreamResponse\.body,/);
+      expect(workerExample).not.toMatch(/upstreamResponse\.(text|json|arrayBuffer|blob)\(/);
+    };
+    assertStreamingWorkerExample(source);
+
+    const expressExample = javascriptBlocks.find(({ value }) =>
+      value.includes("app.get('/products'")
+    )?.value ?? '';
+    expect(expressExample).toContain("response.setHeader(\n    'Server-Timing'");
+    expect(expressExample.indexOf('response.setHeader')).toBeLessThan(
+      expressExample.indexOf("response.type('application/json').send(body)")
+    );
+
+    expect(
+      contract.tables.some(({ columnCount, rowCount }) =>
+        columnCount === 3 && rowCount >= 9
+      )
+    ).toBe(true);
+
+    const expectedLinks = [
+      '/headers/timing-allow-origin/',
+      '/headers/x-runtime/',
+      '/headers/cache-control/',
+    ];
+    const assertRequiredLinks = (candidateSource: string) => {
+      expect(
+        collectMarkdownContractNodes(candidateSource).linkDestinations
+      ).toEqual(expect.arrayContaining(expectedLinks));
+    };
+    assertRequiredLinks(source);
+
+    const duplicateHeadingSource = source.replace(
+      expectedH2Headings[2],
+      `${expectedH2Headings[2]}\n\n${expectedH2Headings[2]}`
+    );
+    expect(() => assertExactH2Headings(duplicateHeadingSource)).toThrow();
+
+    const unexpectedHeadingSource = source.replace(
+      `${expectedH2Headings[3]}\n\n`,
+      `${expectedH2Headings[3]}\n\n## Unexpected timing section\n\n`
+    );
+    expect(() => assertExactH2Headings(unexpectedHeadingSource)).toThrow();
+
+    const missingFigcaptionSource = source.replace(
+      /<figcaption>[\s\S]*?<\/figcaption>/,
+      ''
+    );
+    expect(() => assertTimelineSemantics(missingFigcaptionSource)).toThrow();
+
+    const bufferedWorkerSource = source.replace(
+      'upstreamResponse.body',
+      'await upstreamResponse.text()'
+    );
+    expect(() => assertStreamingWorkerExample(bufferedWorkerSource)).toThrow();
+
+    const removedContextualLinkSource = source.replace(
+      '[Timing-Allow-Origin](/headers/timing-allow-origin/)',
+      'Timing-Allow-Origin'
+    );
+    expect(() => assertRequiredLinks(removedContextualLinkSource)).toThrow();
   });
 
   it('accepts a complete guide source', () => {
