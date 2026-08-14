@@ -90,6 +90,9 @@ describe('HTTP header reference SEO contract', () => {
     expect(component).toContain(
       '.guide-markdown :global([data-server-timing-timeline] [data-timing-phase])'
     );
+    expect(component).toContain(
+      '.guide-markdown :global([data-server-timing-timeline] [data-timeline-path] li) {\n    margin-top: 0;'
+    );
     expect(component).toContain('@media (max-width: 640px)');
     expect(component).not.toContain('.guide-markdown :global(figure) {');
     expect(component).not.toContain('client:');
