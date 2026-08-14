@@ -1140,11 +1140,15 @@ describe('HTTP header guide source contract', () => {
         throw new Error('Expected the response field and metric definitions');
       }
       expect(
-        publishedMetrics?.querySelectorAll(':scope > [data-published-metric]')
+        publishedMetrics.querySelectorAll<Element>(
+          ':scope > [data-published-metric]'
+        )
       ).toHaveLength(2);
-      const metricDefinitions = Array.from(publishedMetrics?.querySelectorAll(
-        ':scope > [data-published-metric]'
-      ) ?? []);
+      const metricDefinitions = Array.from<Element>(
+        publishedMetrics.querySelectorAll<Element>(
+          ':scope > [data-published-metric]'
+        )
+      );
       for (const metric of metricDefinitions) {
         expect(metric.querySelector('dt')).not.toBeNull();
         expect(metric.querySelector('dd')).not.toBeNull();
