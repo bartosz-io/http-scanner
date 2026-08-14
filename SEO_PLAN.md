@@ -72,7 +72,7 @@ One task should normally cover one header. A task may cover two tightly coupled 
 | 2 | Set-Cookie | `DONE` | P0 | 87 impressions, position 26.76 | Existing demand and security-focused implementation intent. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
 | 3 | Access-Control-Allow-Origin | `DONE` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
 | 4 | Access-Control-Max-Age | `DONE` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
-| 10 | Server-Timing | `NEXT` | P0 | 75 impressions, position 30.39 | Strongest unoptimized guide inside the 30+ impressions and position 11–35 promotion threshold. | Planned: `2026-08-14-server-timing-seo-design.md` |
+| 10 | Server-Timing | `DONE` | P0 | 75 impressions, position 30.39 | Expanded as a debugging-first guide after crossing the 30+ impressions and position 11–35 promotion threshold. | [Design](docs/superpowers/specs/2026-08-14-server-timing-seo-design.md) |
 
 The initial P0 queue and the Wave 1 CORS implementation are complete. Those URLs are now in the observation phase. The 2026-08-14 GSC export promotes `Server-Timing` ahead of the security wave because it has 75 impressions at position 30.39, while `Content-Security-Policy` has 19 impressions at position 42.
 
@@ -240,11 +240,12 @@ All entries below are present in the latest verified production deployment from 
 | Access-Control-Allow-Headers SEO expansion | `DONE` | `deed1b5`, `73538b3`, `87a275f` | 2026-08-13 — Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
 | Access-Control-Expose-Headers SEO expansion | `DONE` | `7454e19`, `f9cc8b8`, `28799ba`, `682c72f` | 2026-08-13 — latest task-specific Version ID `7c2fb42a-7b1e-4e16-b69e-820f3bf3241e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
 | Vary SEO expansion | `DONE` | `684cb19`, `49e097c`, `57cb7d0`, `6d7b773` | 2026-08-13 — latest production Version ID recorded above | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Server-Timing SEO expansion | `DONE` | `9e6ff6c`, `659998c`, `090ed84`, `fda969d` | Awaiting deployment | Awaiting deployment, recorded GSC inspection/submission, and comparable 14-day and 21-day results. |
 
 ## 12. Next task
 
 The 2026-08-14 rolling 28-day GSC export promotes the next roadmap task to:
 
-- `Server-Timing`.
+- `Content-Security-Policy` (`P1`).
 
-The task should define a performance-debugging search intent before implementation, covering metric syntax and semantics, `dur` and `desc`, multiple metrics, browser DevTools, the `PerformanceServerTiming` API, same-origin and `Timing-Allow-Origin` behavior, intermediaries and cache paths, metric boundaries, response overhead, and privacy-safe production instrumentation.
+The task should define the security-policy search intent before implementation, covering policy syntax, directives, rollout, violation diagnostics, reporting boundaries, and safe adoption.

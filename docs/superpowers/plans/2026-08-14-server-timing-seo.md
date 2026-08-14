@@ -43,7 +43,7 @@
 - Consumes: `markdownToMdast(source)` and the existing frontmatter/heading helpers in `headerContentContract.test.ts`.
 - Produces: `collectMarkdownContractNodes(source)` fields `codeBlocks`, `htmlBlocks`, and `tables`, plus a complete Server-Timing Markdown source that Task 2 styles without changing its structure.
 
-- [ ] **Step 1: Extend the MDAST collector with structural node data**
+- [x] **Step 1: Extend the MDAST collector with structural node data**
 
 Add these contract types next to `MarkdownParagraphContractNode`:
 
@@ -111,7 +111,7 @@ if (
 
 Remove the old `else if` branch that separately pushes HTTP code so each code node is collected once. Return the new arrays with the existing fields.
 
-- [ ] **Step 2: Add imports for structural HTML and code parsing**
+- [x] **Step 2: Add imports for structural HTML and code parsing**
 
 At the top of `headerContentContract.test.ts`, add:
 
@@ -136,7 +136,7 @@ function expectParseableScript(source: string, scriptKind: ts.ScriptKind): void 
 }
 ```
 
-- [ ] **Step 3: Write the failing Server-Timing structural contract**
+- [x] **Step 3: Write the failing Server-Timing structural contract**
 
 Add a test after the Vary contract. It must read `src/content/headers/server-timing.md` and assert the exact H2 architecture structurally:
 
@@ -240,7 +240,7 @@ expect(contract.linkDestinations).toEqual(
 
 Add mutation checks for duplicate/unexpected headings, a missing figcaption, a buffered Worker body, and a removed contextual link. Do not add `source.toContain()` assertions for explanatory claims.
 
-- [ ] **Step 4: Run the focused test to prove RED**
+- [x] **Step 4: Run the focused test to prove RED**
 
 Run:
 
@@ -250,7 +250,7 @@ npm test -- src/lib/headerContentContract.test.ts
 
 Expected: FAIL in the new Server-Timing test because the existing guide lacks the approved H2 sequence, figure, code blocks, troubleshooting table, and contextual links. Existing contracts must remain green.
 
-- [ ] **Step 5: Update Server-Timing frontmatter and foundations**
+- [x] **Step 5: Update Server-Timing frontmatter and foundations**
 
 Keep `headerName`, applicability, use cases, common mistakes, security considerations, related headers, and references. Replace the description with a value between 80 and 180 characters conveying this exact scope:
 
@@ -272,7 +272,7 @@ Revise the two foundation sections so they establish these boundaries without du
 - metrics are not a complete trace, trusted total, access-control signal, or guaranteed origin measurement;
 - public metric names, descriptions, and precision need privacy review.
 
-- [ ] **Step 6: Add the semantic timeline and syntax section**
+- [x] **Step 6: Add the semantic timeline and syntax section**
 
 Append `## Where Server-Timing fits in a request` with this raw HTML structure:
 
@@ -315,7 +315,7 @@ Server-Timing: db;dur=53.2, app;dur=41.8;desc="Application"
 
 Cover metric-name requirements, optional parameters, invalid/missing `dur`, missing `desc`, quoted descriptions, repeated metric names, repeated parameters, unknown parameters, non-semantic metric order, the absent standardized start time, and a bounded trailer note.
 
-- [ ] **Step 7: Add DevTools and browser API sections**
+- [x] **Step 7: Add DevTools and browser API sections**
 
 Add the exact headings `## Inspect Server-Timing in browser DevTools` and `## Read Server-Timing from JavaScript`.
 
@@ -340,7 +340,7 @@ for (const entryType of ['navigation', 'resource']) {
 
 Explain frozen arrays, navigation and resource entries, zero-duration ambiguity, entry-buffer timing, URL selection, and the later cross-origin boundary. Do not add analytics transmission code.
 
-- [ ] **Step 8: Add Express and Worker implementation sections**
+- [x] **Step 8: Add Express and Worker implementation sections**
 
 Add `## Add Server-Timing in Express` with the exact dependency-free code from spec section 6.5:
 
@@ -398,7 +398,7 @@ export default {
 
 Explain I/O-only scope, explicit upstream routing, frozen production CPU timers, local-development differences, intermediary field ownership, streaming, and private Worker observability.
 
-- [ ] **Step 9: Add TAO, troubleshooting, privacy, and contextual links**
+- [x] **Step 9: Add TAO, troubleshooting, privacy, and contextual links**
 
 Add `## Cross-origin metrics and Timing-Allow-Origin` with:
 
@@ -413,7 +413,7 @@ Add `## Debug missing or misleading Server-Timing metrics` with the eight-row ta
 
 Add `## Design production metrics without leaking internals` and implement every operational rule in spec section 6.9: vocabulary ownership, documented boundaries, milliseconds, rounding, overhead, forbidden identifiers, audience decisions, path coverage, private observability, and metric removal.
 
-- [ ] **Step 10: Run focused contracts and make them GREEN**
+- [x] **Step 10: Run focused contracts and make them GREEN**
 
 Run:
 
@@ -423,7 +423,7 @@ npm test -- src/lib/headerContentContract.test.ts
 
 Expected: PASS for the new Server-Timing contract and all existing guide contracts. If the MDAST parser represents the raw figure as more than one HTML node, join the collected HTML nodes before JSDOM parsing; do not replace the structural check with a prose search.
 
-- [ ] **Step 11: Verify the source diff and commit Task 1**
+- [x] **Step 11: Verify the source diff and commit Task 1**
 
 Run:
 
@@ -449,7 +449,7 @@ git commit -m "feat: expand Server-Timing debugging guide"
 - Consumes: `figure[data-server-timing-timeline]` and its data attributes from Task 1.
 - Produces: scoped static CSS that Task 4 verifies in desktop/mobile rendering without changing any other guide element.
 
-- [ ] **Step 1: Write the failing style-scope contract**
+- [x] **Step 1: Write the failing style-scope contract**
 
 Add a test to `headerReferenceSeoContract.test.ts` that reads `HeaderGuidePage.astro` and asserts:
 
@@ -473,7 +473,7 @@ expect(component).not.toContain('client:');
 
 This is a renderer-style contract, not a prose contract. Keep the existing light-code-card contract unchanged.
 
-- [ ] **Step 2: Run the focused SEO contract to prove RED**
+- [x] **Step 2: Run the focused SEO contract to prove RED**
 
 Run:
 
@@ -483,7 +483,7 @@ npm test -- src/lib/headerReferenceSeoContract.test.ts
 
 Expected: FAIL because the timeline selectors do not yet exist.
 
-- [ ] **Step 3: Add narrowly scoped timeline styles**
+- [x] **Step 3: Add narrowly scoped timeline styles**
 
 Append styles inside `HeaderGuidePage.astro`'s existing `<style>` block. Use this structure and existing tokens:
 
@@ -583,7 +583,7 @@ Inside the existing `@media (max-width: 640px)` block, add:
 
 Do not introduce colors that carry meaning by themselves. Phase names and values remain visible text.
 
-- [ ] **Step 4: Run focused tests and build**
+- [x] **Step 4: Run focused tests and build**
 
 Run:
 
@@ -594,7 +594,7 @@ npm run build
 
 Expected: both test files PASS; Astro check, TypeScript build, static route generation, and sitemap generation complete successfully.
 
-- [ ] **Step 5: Inspect generated static HTML**
+- [x] **Step 5: Inspect generated static HTML**
 
 Run:
 
@@ -605,7 +605,7 @@ rg -n "headers/server-timing/" dist/sitemap-*.xml
 
 Expected: the figure, figcaption, contextual content, and route are present in static output. Confirm no `astro-island` appears inside the timeline figure.
 
-- [ ] **Step 6: Verify the scoped diff and commit Task 2**
+- [x] **Step 6: Verify the scoped diff and commit Task 2**
 
 Run:
 
@@ -633,7 +633,7 @@ git commit -m "feat: add Server-Timing request timeline"
 - Consumes: completed guide, code examples, visual semantics, and structural tests from Tasks 1–2.
 - Produces: a technically reviewed guide with no unresolved critical or important finding and tests hardened around code/structure rather than prose.
 
-- [ ] **Step 1: Review the field grammar against W3C Server Timing**
+- [x] **Step 1: Review the field grammar against W3C Server Timing**
 
 Open `https://www.w3.org/TR/server-timing/` and check each guide claim against the current sections for the field grammar, parsing, `PerformanceServerTiming`, privacy/security, and examples.
 
@@ -653,7 +653,7 @@ Record pass/fail notes for:
 
 Fix any mismatch immediately in the guide. Do not encode review conclusions as full-sentence tests.
 
-- [ ] **Step 2: Review Performance API and cross-origin boundaries**
+- [x] **Step 2: Review Performance API and cross-origin boundaries**
 
 Open the current W3C Resource Timing specification and MDN `PerformanceServerTiming` reference. Check:
 
@@ -667,7 +667,7 @@ Open the current W3C Resource Timing specification and MDN `PerformanceServerTim
 
 Fix inaccurate or overbroad wording. Keep the TAO section bounded and preserve its contextual link.
 
-- [ ] **Step 3: Review Express and Worker examples against runtime sources**
+- [x] **Step 3: Review Express and Worker examples against runtime sources**
 
 Open current Node.js `perf_hooks` documentation and Cloudflare Workers `Performance and timers` documentation. Verify:
 
@@ -685,13 +685,13 @@ Open current Node.js `perf_hooks` documentation and Cloudflare Workers `Performa
 
 If a runtime source invalidates the approved snippet, correct the snippet and its structural test together.
 
-- [ ] **Step 4: Review privacy, intermediary, caching, and overhead claims**
+- [x] **Step 4: Review privacy, intermediary, caching, and overhead claims**
 
 Verify that the guide never publishes or recommends query text, user/tenant IDs, trace tokens, private hosts, shard names, exceptions, or dynamic untrusted descriptions. Confirm that cache-hit/miss and intermediary metrics are attributed conditionally, not automatically to the origin.
 
 Confirm the guide says selected public metadata is not private tracing, access control, or a trusted total. Confirm metric names/descriptions are short and precision is deliberate.
 
-- [ ] **Step 5: Harden structural tests only where review found a falsifiable code or structure risk**
+- [x] **Step 5: Harden structural tests only where review found a falsifiable code or structure risk**
 
 Allowed hardening examples:
 
@@ -703,7 +703,7 @@ Allowed hardening examples:
 
 Do not add assertions that require a technical explanation to contain one approved sentence.
 
-- [ ] **Step 6: Run fresh focused verification**
+- [x] **Step 6: Run fresh focused verification**
 
 Run:
 
@@ -715,7 +715,7 @@ npm run build
 
 Expected: focused tests, ESLint, Astro check, TypeScript, static build, and sitemap generation all pass.
 
-- [ ] **Step 7: Commit review corrections if the review changed files**
+- [x] **Step 7: Commit review corrections if the review changed files**
 
 If the review produced changes:
 
@@ -738,7 +738,7 @@ If there are no changes, record the review result in the execution notes without
 - Consumes: reviewed guide, structural tests, static figure, and scoped renderer CSS.
 - Produces: verified implementation state and roadmap traceability; deployment remains a separate action.
 
-- [ ] **Step 1: Run the complete automated verification suite**
+- [x] **Step 1: Run the complete automated verification suite**
 
 Run each command independently and retain exit status:
 
@@ -751,7 +751,7 @@ git diff --check
 
 Expected: all Vitest files pass with zero failures; ESLint reports zero errors; Astro check, TypeScript, static build, and sitemap generation succeed; diff check reports no whitespace errors.
 
-- [ ] **Step 2: Start the local site for visual QA**
+- [x] **Step 2: Start the local site for visual QA**
 
 Run:
 
@@ -761,7 +761,7 @@ npm run dev:web -- --host 127.0.0.1 --port 4321
 
 Keep the process running in a managed terminal session. Before browser automation, invoke and read the `playwright` skill.
 
-- [ ] **Step 3: Verify desktop rendering in a real browser**
+- [x] **Step 3: Verify desktop rendering in a real browser**
 
 Open:
 
@@ -782,7 +782,7 @@ At a representative desktop viewport, verify and capture evidence for:
 - working contextual links to TAO, X-Runtime, Cache-Control, and the checker;
 - no client hydration for the timeline.
 
-- [ ] **Step 4: Verify mobile rendering at 320px and a standard mobile width**
+- [x] **Step 4: Verify mobile rendering at 320px and a standard mobile width**
 
 At 320px and at least one standard mobile viewport, verify:
 
@@ -795,12 +795,12 @@ At 320px and at least one standard mobile viewport, verify:
 
 If visual defects appear, write a failing scoped contract where practical, fix only the timeline/guide renderer, rerun focused tests and build, and repeat both browser widths.
 
-- [ ] **Step 5: Verify SEO output and source boundaries**
+- [x] **Step 5: Verify SEO output and source boundaries**
 
 Run:
 
 ```bash
-rg -n "Server-Timing HTTP Header — Syntax & Examples \| HTTP Scanner" dist/headers/server-timing/index.html
+rg -n "Server-Timing HTTP Header — Syntax &amp; Examples \| HTTP Scanner" dist/headers/server-timing/index.html
 rg -n "Learn how Server-Timing exposes selected backend metrics" dist/headers/server-timing/index.html
 rg -n "https://httpscanner.com/headers/server-timing/" dist/headers/server-timing/index.html
 rg -n "headers/server-timing/" dist/sitemap-*.xml
@@ -809,7 +809,7 @@ git diff --name-only ef91fe1..HEAD
 
 Expected: title, description, canonical, and sitemap route are present. Changed implementation files remain inside the design's delivery boundaries.
 
-- [ ] **Step 6: Update SEO_PLAN only after all gates pass**
+- [x] **Step 6: Update SEO_PLAN only after all gates pass**
 
 Change the active queue entry to:
 
@@ -827,7 +827,7 @@ Append one completed-task row whose task is `Server-Timing SEO expansion`, statu
 
 Change section 12 to the next eligible roadmap task, `Content-Security-Policy`, without changing its P1 priority unless newer GSC evidence exists.
 
-- [ ] **Step 7: Run final documentation and repository verification**
+- [x] **Step 7: Run final documentation and repository verification**
 
 Run:
 
@@ -839,7 +839,7 @@ git status --short
 
 Expected: no whitespace errors; roadmap contains the DONE entry, exact commits, awaiting-deployment state, and CSP as next; only intended tracked files are modified. Ignore `.superpowers/` visual-companion artifacts and do not stage them.
 
-- [ ] **Step 8: Commit roadmap and record plan completion**
+- [x] **Step 8: Commit roadmap and record plan completion**
 
 After Tasks 1–4 Steps 1–7 have succeeded, change only those completed checkboxes from `- [ ]` to `- [x]`. Leave this Step 8 unchecked for the first commit, then verify it is the sole remaining unchecked implementation step:
 
