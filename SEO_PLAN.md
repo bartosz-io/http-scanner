@@ -1,6 +1,6 @@
 # HTTP Scanner SEO Domination Plan
 
-Last updated: 2026-08-10  
+Last updated: 2026-08-14
 Program owner: HTTP Scanner  
 Source of truth: this file
 
@@ -17,20 +17,19 @@ The program prioritizes proven Google Search Console demand before expanding int
 
 ## 2. Current baseline
 
-The latest source is `outputs/httpscanner.com-Performance-on-Search-2026-08-07/`, covering 2026-05-24 through 2026-08-05.
+The latest source is `outputs/httpscanner.com-Performance-on-Search-2026-08-14/`, covering the rolling 28-day period from 2026-07-16 through 2026-08-12.
 
 | Metric | Baseline |
 |---|---:|
-| GSC clicks | 128 |
-| GSC impressions | 2,790 |
-| GSC CTR | 4.59% |
-| Clicks in the latest 28 days | 45 |
-| Impressions in the latest 28 days | 1,570 |
-| Homepage clicks | 128 |
+| GSC clicks | 49 |
+| GSC impressions | 3,054 |
+| GSC CTR | 1.60% |
+| GSC average position | 28.83 |
+| Homepage clicks | 49 |
 | Header guides with page-level impressions | 7 |
 | Published header guides | 45 |
 
-The homepage already ranks strongly for `http scanner`, `https scanner`, and `http scan`. The main growth constraint is non-brand traffic: reference pages are receiving impressions but have not yet produced clicks.
+Compared with the previous rolling 28-day window, clicks increased from 45 to 49 and impressions increased from 1,570 to 3,054. The homepage still ranks strongly for `http scanner`, `https scanner`, and `http scan`. The main growth constraint is non-brand traffic: reference pages now account for most page-level impressions in the export but have not yet produced clicks.
 
 ## 3. Operating model
 
@@ -73,8 +72,9 @@ One task should normally cover one header. A task may cover two tightly coupled 
 | 2 | Set-Cookie | `DONE` | P0 | 87 impressions, position 26.76 | Existing demand and security-focused implementation intent. | [Design](docs/superpowers/specs/2026-08-07-content-type-set-cookie-seo-design.md) |
 | 3 | Access-Control-Allow-Origin | `DONE` | P0 | 58 impressions, position 30.71 | Third-largest guide opportunity and the entry point to the CORS cluster. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
 | 4 | Access-Control-Max-Age | `DONE` | P0 | 33 impressions, position 25.33 | Best current average position among unoptimized guides and tightly coupled with CORS preflight intent. | [Design](docs/superpowers/specs/2026-08-10-cors-origin-max-age-seo-design.md) |
+| 10 | Server-Timing | `NEXT` | P0 | 75 impressions, position 30.39 | Strongest unoptimized guide inside the 30+ impressions and position 11–35 promotion threshold. | Planned: `2026-08-14-server-timing-seo-design.md` |
 
-The next deliverable after approval of this document is the combined CORS design spec. It must define independent search intent, content requirements, internal links, tests, and acceptance criteria for both headers.
+The initial P0 queue and the Wave 1 CORS implementation are complete. Those URLs are now in the observation phase. The 2026-08-14 GSC export promotes `Server-Timing` ahead of the security wave because it has 75 impressions at position 30.39, while `Content-Security-Policy` has 19 impressions at position 42.
 
 ## 6. Header roadmap
 
@@ -100,17 +100,17 @@ Goal: connect high-value security searches to the scanner and future CSP/HSTS to
 
 | Order | Header | Status | Priority | Strategic role |
 |---:|---|---|---|---|
-| 10 | Content-Security-Policy | `QUEUED` | P1 | Highest-value security policy and future CSP checker/monitoring entry point. |
-| 11 | Strict-Transport-Security | `QUEUED` | P1 | HSTS implementation, preload risk, and future HSTS checker. |
-| 12 | X-Content-Type-Options | `QUEUED` | P1 | Extends the proven Content-Type cluster into browser security. |
-| 13 | X-Frame-Options | `QUEUED` | P1 | Clickjacking protection and CSP `frame-ancestors` comparison. |
-| 14 | Referrer-Policy | `QUEUED` | P1 | Privacy, analytics, and data-leak prevention intent. |
-| 15 | Permissions-Policy | `QUEUED` | P1 | Modern browser capability restrictions and concrete implementation examples. |
-| 16 | Cross-Origin-Opener-Policy | `OBSERVE` | P2 | Cross-origin isolation cluster. |
-| 17 | Cross-Origin-Embedder-Policy | `OBSERVE` | P2 | Cross-origin isolation and resource loading requirements. |
-| 18 | Cross-Origin-Resource-Policy | `OBSERVE` | P2 | Resource-level cross-origin restrictions. |
-| 19 | Clear-Site-Data | `OBSERVE` | P2 | Logout, incident response, and browser storage cleanup. |
-| 20 | Origin-Agent-Cluster | `OBSERVE` | P2 | Advanced browser isolation intent. |
+| 11 | Content-Security-Policy | `QUEUED` | P1 | Highest-value security policy and future CSP checker/monitoring entry point. |
+| 12 | Strict-Transport-Security | `QUEUED` | P1 | HSTS implementation, preload risk, and future HSTS checker. |
+| 13 | X-Content-Type-Options | `QUEUED` | P1 | Extends the proven Content-Type cluster into browser security. |
+| 14 | X-Frame-Options | `QUEUED` | P1 | Clickjacking protection and CSP `frame-ancestors` comparison. |
+| 15 | Referrer-Policy | `QUEUED` | P1 | Privacy, analytics, and data-leak prevention intent. |
+| 16 | Permissions-Policy | `QUEUED` | P1 | Modern browser capability restrictions and concrete implementation examples. |
+| 17 | Cross-Origin-Opener-Policy | `OBSERVE` | P2 | Cross-origin isolation cluster. |
+| 18 | Cross-Origin-Embedder-Policy | `OBSERVE` | P2 | Cross-origin isolation and resource loading requirements. |
+| 19 | Cross-Origin-Resource-Policy | `OBSERVE` | P2 | Resource-level cross-origin restrictions. |
+| 20 | Clear-Site-Data | `OBSERVE` | P2 | Logout, incident response, and browser storage cleanup. |
+| 21 | Origin-Agent-Cluster | `OBSERVE` | P2 | Advanced browser isolation intent. |
 
 Exit criterion: the security checker links to all primary security guides, and CSP/HSTS demand is strong enough to justify dedicated checker specs.
 
@@ -120,17 +120,17 @@ Goal: broaden from security into everyday HTTP debugging while reinforcing Conte
 
 | Order | Header | Status | Priority | GSC signal or role |
 |---:|---|---|---|---|
-| 21 | Cache-Control | `QUEUED` | P1 | 15 impressions, position 48.27; large long-term search surface. |
-| 22 | ETag | `QUEUED` | P2 | Validation and conditional request intent. |
-| 23 | Last-Modified | `QUEUED` | P2 | Validation and cache freshness cluster. |
-| 24 | Expires | `QUEUED` | P2 | Legacy freshness behavior and Cache-Control comparison. |
-| 25 | Age | `OBSERVE` | P2 | CDN and shared-cache diagnostics. |
-| 26 | Content-Encoding | `QUEUED` | P2 | Compression, `gzip`, `br`, and Content-Type relationship. |
-| 27 | Content-Disposition | `QUEUED` | P2 | Downloads, inline rendering, filenames, and security. |
-| 28 | Content-Length | `OBSERVE` | P2 | Message framing and debugging. |
-| 29 | Content-Language | `OBSERVE` | P2 | Localization and content negotiation. |
-| 30 | Content-Location | `OBSERVE` | P3 | Representation metadata and negotiation. |
-| 31 | Accept-Ranges | `OBSERVE` | P2 | Partial downloads, media delivery, and byte ranges. |
+| 22 | Cache-Control | `QUEUED` | P1 | 15 impressions, position 48.27; large long-term search surface. |
+| 23 | ETag | `QUEUED` | P2 | Validation and conditional request intent. |
+| 24 | Last-Modified | `QUEUED` | P2 | Validation and cache freshness cluster. |
+| 25 | Expires | `QUEUED` | P2 | Legacy freshness behavior and Cache-Control comparison. |
+| 26 | Age | `OBSERVE` | P2 | CDN and shared-cache diagnostics. |
+| 27 | Content-Encoding | `QUEUED` | P2 | Compression, `gzip`, `br`, and Content-Type relationship. |
+| 28 | Content-Disposition | `QUEUED` | P2 | Downloads, inline rendering, filenames, and security. |
+| 29 | Content-Length | `OBSERVE` | P2 | Message framing and debugging. |
+| 30 | Content-Language | `OBSERVE` | P2 | Localization and content negotiation. |
+| 31 | Content-Location | `OBSERVE` | P3 | Representation metadata and negotiation. |
+| 32 | Accept-Ranges | `OBSERVE` | P2 | Partial downloads, media delivery, and byte ranges. |
 
 Exit criterion: the HTTP Headers Checker has strong internal routes into caching and representation guides, with multiple URLs receiving non-brand impressions.
 
@@ -140,7 +140,6 @@ Goal: capture developer troubleshooting searches adjacent to the core checker.
 
 | Order | Header | Status | Priority | GSC signal or role |
 |---:|---|---|---|---|
-| 32 | Server-Timing | `QUEUED` | P1 | 15 impressions, position 28.53; current GSC opportunity. |
 | 33 | Timing-Allow-Origin | `QUEUED` | P2 | Required companion for cross-origin Resource Timing. |
 | 34 | Link | `QUEUED` | P2 | Preload, preconnect, canonical relationships, and performance. |
 | 35 | WWW-Authenticate | `OBSERVE` | P2 | Authentication challenge and 401 troubleshooting. |
@@ -230,20 +229,22 @@ The primary program metrics are rolling 28-day non-brand clicks, the number of h
 
 ## 11. Completed task log
 
-| Task | Status | Commit | Observation state |
-|---|---|---|---|
-| Content-Type and Set-Cookie SEO expansion | `DONE` | `3399646` | Awaiting post-deployment GSC comparison. |
-| Access-Control-Allow-Origin and Access-Control-Max-Age SEO expansion | `DONE` | `9272e99`, `e9bbe6c` | Awaiting deployment and URL-filtered GSC baseline. |
-| Access-Control-Allow-Credentials SEO expansion | `DONE` | `b9bd296` | Awaiting deployment and URL-filtered GSC baseline. |
-| Access-Control-Allow-Methods SEO expansion | `DONE` | `73c7a6a` | Deployed 2026-08-12 (Cloudflare Version ID `6c9c938b-fce2-492b-99de-75c440599225`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
-| Access-Control-Allow-Headers SEO expansion | `DONE` | `87a275f` | Deployed 2026-08-13 (Cloudflare Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e`); production and Workers URLs return HTTP 200; awaiting URL-filtered GSC baseline. |
-| Access-Control-Expose-Headers SEO expansion | `DONE` | `f9cc8b8` | Deployed 2026-08-13 (latest Cloudflare Version ID `7c2fb42a-7b1e-4e16-b69e-820f3bf3241e`); production and Workers URLs return HTTP 200; safelisted headers render inline in one paragraph; awaiting URL-filtered GSC baseline. |
-| Vary SEO expansion | `DONE` | `57cb7d0` | Awaiting deployment and URL-filtered GSC baseline. |
+All entries below are present in the latest verified production deployment from 2026-08-13, Cloudflare Version ID `398d1950-a9c5-4bbb-82a3-ccc7cf45b28f`. Production returned HTTP 200 after deployment. GSC inspection or submission is not marked complete until it is recorded explicitly.
+
+| Task | Status | Implementation commits | First deployment | GSC observation state |
+|---|---|---|---|---|
+| Content-Type and Set-Cookie SEO expansion | `DONE` | `3399646` | 2026-08-07 | Baseline: Content-Type 221 impressions at position 31.95; Set-Cookie 87 impressions at position 26.76. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Access-Control-Allow-Origin and Access-Control-Max-Age SEO expansion | `DONE` | `9272e99`, `e9bbe6c` | 2026-08-11 | Baseline: Allow-Origin 58 impressions at position 30.71; Max-Age 33 impressions at position 25.33. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Access-Control-Allow-Credentials SEO expansion | `DONE` | `b9bd296` | 2026-08-12 | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Access-Control-Allow-Methods SEO expansion | `DONE` | `7bbcd0e`, `5fb7245`, `73c7a6a` | 2026-08-12 — Version ID `6c9c938b-fce2-492b-99de-75c440599225` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Access-Control-Allow-Headers SEO expansion | `DONE` | `deed1b5`, `73538b3`, `87a275f` | 2026-08-13 — Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Access-Control-Expose-Headers SEO expansion | `DONE` | `7454e19`, `f9cc8b8`, `28799ba`, `682c72f` | 2026-08-13 — latest task-specific Version ID `7c2fb42a-7b1e-4e16-b69e-820f3bf3241e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
+| Vary SEO expansion | `DONE` | `684cb19`, `49e097c`, `57cb7d0`, `6d7b773` | 2026-08-13 — latest production Version ID recorded above | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
 
 ## 12. Next task
 
-No newer GSC export is available after the 2026-08-07 baseline. Execute the next eligible roadmap task for:
+The 2026-08-14 rolling 28-day GSC export promotes the next roadmap task to:
 
-- `Content-Security-Policy`.
+- `Server-Timing`.
 
-The task should define the security and search-intent scope before implementation, covering policy delivery, core fetch directives, nonce and hash usage, `frame-ancestors`, report-only rollout, common bypass-prone mistakes, debugging browser violations, and the boundary between a CSP reference guide and future dedicated CSP tooling.
+The task should define a performance-debugging search intent before implementation, covering metric syntax and semantics, `dur` and `desc`, multiple metrics, browser DevTools, the `PerformanceServerTiming` API, same-origin and `Timing-Allow-Origin` behavior, intermediaries and cache paths, metric boundaries, response overhead, and privacy-safe production instrumentation.
