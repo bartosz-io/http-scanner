@@ -269,58 +269,10 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     transform: translateY(-50%);
   }
 
-  .guide-markdown :global([data-server-timing-timeline] [data-timing-illustration]) {
+  .guide-markdown :global([data-server-timing-timeline] [data-server-timing-publication]) {
     margin-top: 1.5rem;
     border-top: 1px solid var(--border);
     padding-top: 1.25rem;
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] [data-timing-total]) {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 1.25rem;
-    color: var(--foreground);
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] [data-timing-breakdown]) {
-    display: grid;
-    grid-template-columns: 53.2fr 41.8fr 33fr;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] [data-timing-phase]) {
-    min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    background-color: color-mix(in oklab, var(--muted) 45%, transparent);
-    padding: 0.75rem;
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] dt) {
-    color: var(--foreground);
-    font-weight: 600;
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] dd) {
-    margin: 0.25rem 0 0;
-    color: var(--muted-foreground);
-    font-size: 0.875rem;
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] [data-not-in-server-timing]) {
-    border-color: color-mix(in oklab, var(--muted-foreground) 50%, var(--border));
-    border-style: dashed;
-    background-color: color-mix(in oklab, var(--muted) 20%, transparent);
-  }
-
-  .guide-markdown :global([data-server-timing-timeline] [data-not-in-server-timing] small) {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--muted-foreground);
-    font-size: 0.75rem;
-    line-height: 1rem;
   }
 
   .guide-markdown :global([data-server-timing-timeline] [data-timing-field]) {
@@ -329,6 +281,36 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     border-radius: 0.5rem;
     background-color: color-mix(in oklab, var(--muted) 30%, transparent);
     padding: 0.75rem;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-metric-order-note]) {
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-published-metrics]) {
+    margin: 1rem 0 0;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-published-metric]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    border-top: 1px solid var(--border);
+    padding: 0.75rem 0;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-published-metrics] dt) {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-published-metrics] dd) {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    text-align: right;
   }
 
   .guide-markdown :global([data-server-timing-timeline] figcaption) {
@@ -350,8 +332,7 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
       min-width: 10rem;
     }
 
-    .guide-markdown :global([data-server-timing-timeline] [data-timeline-path]),
-    .guide-markdown :global([data-server-timing-timeline] [data-timing-breakdown]) {
+    .guide-markdown :global([data-server-timing-timeline] [data-timeline-path]) {
       grid-template-columns: 1fr;
     }
 
@@ -366,9 +347,13 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
       transform: translateX(-50%);
     }
 
-    .guide-markdown :global([data-server-timing-timeline] [data-timing-total]) {
-      flex-direction: column;
+    .guide-markdown :global([data-server-timing-timeline] [data-published-metric]) {
+      grid-template-columns: 1fr;
       gap: 0.25rem;
+    }
+
+    .guide-markdown :global([data-server-timing-timeline] [data-published-metrics] dd) {
+      text-align: left;
     }
   }
 

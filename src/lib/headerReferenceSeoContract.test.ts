@@ -85,16 +85,23 @@ describe('HTTP header reference SEO contract', () => {
       '.guide-markdown :global([data-server-timing-timeline] [data-timeline-path])'
     );
     expect(component).toContain(
-      '.guide-markdown :global([data-server-timing-timeline] [data-timing-breakdown])'
+      '.guide-markdown :global([data-server-timing-timeline] [data-server-timing-publication])'
     );
     expect(component).toContain(
-      '.guide-markdown :global([data-server-timing-timeline] [data-timing-phase])'
+      '.guide-markdown :global([data-server-timing-timeline] [data-published-metrics])'
+    );
+    expect(component).toContain(
+      '.guide-markdown :global([data-server-timing-timeline] [data-published-metric])'
     );
     expect(component).toContain(
       '.guide-markdown :global([data-server-timing-timeline] [data-timeline-path] li) {\n    margin-top: 0;'
     );
     expect(component).toContain('@media (max-width: 640px)');
     expect(component).not.toContain('.guide-markdown :global(figure) {');
+    expect(component).not.toContain('[data-timing-total]');
+    expect(component).not.toContain('[data-timing-breakdown]');
+    expect(component).not.toContain('[data-timing-phase]');
+    expect(component).not.toContain('[data-not-in-server-timing]');
     expect(component).not.toContain('client:');
   });
 });

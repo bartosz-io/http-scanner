@@ -45,22 +45,21 @@ Choose selected metrics deliberately and set a normal response header before the
       <li>Database</li>
     </ol>
   </section>
-  <section data-timing-illustration aria-labelledby="server-timing-breakdown-label">
-    <h3 id="server-timing-breakdown-label" data-diagram-label>Illustrative timing breakdown</h3>
-    <p data-timing-total><strong>Browser-observed response wait</strong><span>128 ms</span></p>
-    <dl data-timing-breakdown>
-      <div data-timing-phase="db"><dt>db</dt><dd>53.2 ms</dd></div>
-      <div data-timing-phase="app"><dt>app</dt><dd>41.8 ms</dd></div>
-      <div data-timing-phase="unreported" data-not-in-server-timing><dt>Other response time</dt><dd>33 ms<small>Not sent in Server-Timing</small></dd></div>
-    </dl>
+  <section data-server-timing-publication aria-labelledby="server-timing-publication-label">
+    <h3 id="server-timing-publication-label" data-diagram-label>What Server-Timing publishes</h3>
     <p data-timing-field><code>Server-Timing: db;dur=53.2, app;dur=41.8</code></p>
+    <p data-metric-order-note>These are named metrics, not request-path steps. Field order does not represent execution order.</p>
+    <dl data-published-metrics>
+      <div data-published-metric><dt><code>db</code></dt><dd>Duration: <code>53.2 ms</code></dd></div>
+      <div data-published-metric><dt><code>app</code></dt><dd>Duration: <code>41.8 ms</code></dd></div>
+    </dl>
   </section>
-  <figcaption>This illustration uses deliberately non-overlapping spans. Real Server-Timing metrics can overlap or omit work, so arbitrary values cannot generally be subtracted from TTFB.</figcaption>
+  <figcaption>These definitions are not a timeline or a decomposition of browser wait. Real metrics may overlap or omit work.</figcaption>
 </figure>
 
-The browser observes navigation or resource timing across its own request path. `Server-Timing` adds only named metrics that a response producer chose to publish. Networks, queues, TLS, CDN handling, middleware, serialization, streaming, and other phases can remain unreported or use a different boundary.
+The browser observes navigation or resource timing across the whole request path. `Server-Timing` adds only selected named metrics that a response producer chose to publish. Networks, queues, TLS, CDN handling, middleware, serialization, streaming, and other phases can remain unreported or use a different boundary.
 
-The `db` and `app` spans above are deliberately non-overlapping only for this teaching model. Real metrics can be overlapping, nested, partial, or independently measured, so a browser cannot generally calculate an unexplained segment by subtracting arbitrary metric values from waiting time or TTFB. The specification does not define a per-metric `startTime`: client, server, and intermediary clocks cannot be assumed to be synchronized.
+Serialized field order does not establish which metric started first. Metrics may overlap, nest, be partial, or omit work, and the specification defines no standard per-metric `startTime`: client, server, and intermediary clocks cannot be assumed to be synchronized.
 
 ## Server-Timing syntax: names, dur, and desc
 

@@ -1107,8 +1107,8 @@ describe('HTTP header guide source contract', () => {
       expect(timeline).toHaveLength(1);
       expect(timeline[0]?.querySelectorAll('figcaption')).toHaveLength(1);
       const requestPath = timeline[0]?.querySelector('[data-request-path]');
-      const timingIllustration = timeline[0]?.querySelector(
-        '[data-timing-illustration]'
+      const publication = timeline[0]?.querySelector(
+        '[data-server-timing-publication]'
       );
       const assertRegionLabel = (region: Element | null | undefined) => {
         const labelId = region?.getAttribute('aria-labelledby');
@@ -1123,21 +1123,50 @@ describe('HTTP header guide source contract', () => {
       };
 
       expect(requestPath).not.toBeNull();
-      expect(timingIllustration).not.toBeNull();
+      expect(publication).not.toBeNull();
       assertRegionLabel(requestPath);
-      assertRegionLabel(timingIllustration);
+      assertRegionLabel(publication);
       expect(requestPath?.querySelector('[data-timeline-path]')).not.toBeNull();
-      expect(requestPath?.querySelector('[data-timing-phase]')).toBeNull();
-      expect(timingIllustration?.querySelector('[data-timeline-path]')).toBeNull();
-      expect(timingIllustration?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
-      const phaseNotInServerTiming = timingIllustration?.querySelectorAll(
-        '[data-timing-phase][data-not-in-server-timing]'
+      expect(requestPath?.querySelector('[data-published-metrics]')).toBeNull();
+      expect(publication?.querySelector('[data-timeline-path]')).toBeNull();
+      const timingField = publication?.querySelector('[data-timing-field]');
+      expect(timingField).not.toBeNull();
+      expect(publication?.querySelector('[data-metric-order-note]')).not.toBeNull();
+      const publishedMetrics = publication?.querySelector(
+        'dl[data-published-metrics]'
       );
-      expect(phaseNotInServerTiming).toHaveLength(1);
-      expect(phaseNotInServerTiming?.[0]?.querySelector('small')).not.toBeNull();
+      expect(publishedMetrics).not.toBeNull();
+      if (!timingField || !publishedMetrics) {
+        throw new Error('Expected the response field and metric definitions');
+      }
+      expect(
+        publishedMetrics?.querySelectorAll(':scope > [data-published-metric]')
+      ).toHaveLength(2);
+      const metricDefinitions = Array.from(publishedMetrics?.querySelectorAll(
+        ':scope > [data-published-metric]'
+      ) ?? []);
+      for (const metric of metricDefinitions) {
+        expect(metric.querySelector('dt')).not.toBeNull();
+        expect(metric.querySelector('dd')).not.toBeNull();
+      }
+      expect(
+        metricDefinitions.map((metric) => ({
+          name: metric.querySelector('dt code')?.textContent,
+          duration: metric.querySelector('dd code')?.textContent,
+        }))
+      ).toEqual([
+        { name: 'db', duration: '53.2 ms' },
+        { name: 'app', duration: '41.8 ms' },
+      ]);
+      expect(
+        timingField.compareDocumentPosition(publishedMetrics) &
+          dom.window.Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBe(dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
       expect(timeline[0]?.querySelectorAll('[data-timeline-path] > li')).toHaveLength(4);
-      expect(timeline[0]?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
-      expect(timeline[0]?.querySelector('[data-timing-total]')).not.toBeNull();
+      expect(timeline[0]?.querySelector('[data-timing-total]')).toBeNull();
+      expect(timeline[0]?.querySelector('[data-timing-breakdown]')).toBeNull();
+      expect(timeline[0]?.querySelector('[data-timing-phase]')).toBeNull();
+      expect(timeline[0]?.querySelector('[data-not-in-server-timing]')).toBeNull();
       expect(timeline[0]?.querySelector('script')).toBeNull();
     };
     assertTimelineSemantics(source);
