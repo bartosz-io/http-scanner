@@ -240,7 +240,7 @@ All entries below are present in the latest verified production deployment from 
 | Access-Control-Allow-Headers SEO expansion | `DONE` | `deed1b5`, `73538b3`, `87a275f` | 2026-08-13 — Version ID `299d94a9-0483-4f9d-bc3b-7b7655a96a1e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
 | Access-Control-Expose-Headers SEO expansion | `DONE` | `7454e19`, `f9cc8b8`, `28799ba`, `682c72f` | 2026-08-13 — latest task-specific Version ID `7c2fb42a-7b1e-4e16-b69e-820f3bf3241e` | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
 | Vary SEO expansion | `DONE` | `684cb19`, `49e097c`, `57cb7d0`, `6d7b773` | 2026-08-13 — latest production Version ID recorded above | No page-level signal recorded in the 2026-08-07 export. Awaiting recorded GSC inspection/submission and comparable 14-day and 21-day results. |
-| Server-Timing SEO expansion | `DONE` | `9e6ff6c`, `659998c`, `090ed84`, `fda969d` | Awaiting deployment | Awaiting deployment, recorded GSC inspection/submission, and comparable 14-day and 21-day results. |
+| Server-Timing SEO expansion | `DONE` | `9e6ff6c`, `659998c`, `090ed84`, `fda969d`, `ea7fce6` | Awaiting deployment | Awaiting deployment, recorded GSC inspection/submission, and comparable 14-day and 21-day results. |
 
 ## 12. Next task
 
