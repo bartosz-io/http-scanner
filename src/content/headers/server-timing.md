@@ -36,19 +36,25 @@ Choose selected metrics deliberately and set a normal response header before the
 ## Where Server-Timing fits in a request
 
 <figure data-server-timing-timeline>
-  <ol data-timeline-path aria-label="Illustrative request path">
-    <li>Browser</li>
-    <li>CDN</li>
-    <li>Application</li>
-    <li>Database</li>
-  </ol>
-  <p data-timing-total><strong>Browser-observed response wait</strong><span>128 ms</span></p>
-  <dl data-timing-breakdown>
-    <div data-timing-phase="db"><dt>db</dt><dd>53.2 ms</dd></div>
-    <div data-timing-phase="app"><dt>app</dt><dd>41.8 ms</dd></div>
-    <div data-timing-phase="unreported"><dt>unreported</dt><dd>33 ms</dd></div>
-  </dl>
-  <p data-timing-field><code>Server-Timing: db;dur=53.2, app;dur=41.8</code></p>
+  <section data-request-path aria-labelledby="server-timing-request-path-label">
+    <h3 id="server-timing-request-path-label" data-diagram-label>Request path</h3>
+    <ol data-timeline-path aria-label="Illustrative request path">
+      <li>Browser</li>
+      <li>CDN</li>
+      <li>Application</li>
+      <li>Database</li>
+    </ol>
+  </section>
+  <section data-timing-illustration aria-labelledby="server-timing-breakdown-label">
+    <h3 id="server-timing-breakdown-label" data-diagram-label>Illustrative timing breakdown</h3>
+    <p data-timing-total><strong>Browser-observed response wait</strong><span>128 ms</span></p>
+    <dl data-timing-breakdown>
+      <div data-timing-phase="db"><dt>db</dt><dd>53.2 ms</dd></div>
+      <div data-timing-phase="app"><dt>app</dt><dd>41.8 ms</dd></div>
+      <div data-timing-phase="unreported" data-not-in-server-timing><dt>Other response time</dt><dd>33 ms<small>Not sent in Server-Timing</small></dd></div>
+    </dl>
+    <p data-timing-field><code>Server-Timing: db;dur=53.2, app;dur=41.8</code></p>
+  </section>
   <figcaption>This illustration uses deliberately non-overlapping spans. Real Server-Timing metrics can overlap or omit work, so arbitrary values cannot generally be subtracted from TTFB.</figcaption>
 </figure>
 

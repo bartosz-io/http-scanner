@@ -1106,6 +1106,20 @@ describe('HTTP header guide source contract', () => {
 
       expect(timeline).toHaveLength(1);
       expect(timeline[0]?.querySelectorAll('figcaption')).toHaveLength(1);
+      const requestPath = timeline[0]?.querySelector('[data-request-path]');
+      const timingIllustration = timeline[0]?.querySelector(
+        '[data-timing-illustration]'
+      );
+
+      expect(requestPath).not.toBeNull();
+      expect(timingIllustration).not.toBeNull();
+      expect(requestPath?.querySelector('[data-timeline-path]')).not.toBeNull();
+      expect(requestPath?.querySelector('[data-timing-phase]')).toBeNull();
+      expect(timingIllustration?.querySelector('[data-timeline-path]')).toBeNull();
+      expect(timingIllustration?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
+      expect(
+        timingIllustration?.querySelectorAll('[data-not-in-server-timing]')
+      ).toHaveLength(1);
       expect(timeline[0]?.querySelectorAll('[data-timeline-path] > li')).toHaveLength(4);
       expect(timeline[0]?.querySelectorAll('[data-timing-phase]')).toHaveLength(3);
       expect(timeline[0]?.querySelector('[data-timing-total]')).not.toBeNull();

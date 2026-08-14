@@ -232,14 +232,24 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
   .guide-markdown :global([data-server-timing-timeline] [data-timeline-path]) {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
+    gap: 1.75rem;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  .guide-markdown :global([data-server-timing-timeline] [data-diagram-label]) {
+    margin: 0 0 0.75rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
   .guide-markdown :global([data-server-timing-timeline] [data-timeline-path] li) {
     margin-top: 0;
+    position: relative;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
     background-color: color-mix(in oklab, var(--muted) 30%, transparent);
@@ -248,6 +258,21 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     text-align: center;
     font-size: 0.875rem;
     font-weight: 600;
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-timeline-path] li:not(:last-child)::after) {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 0.375rem);
+    color: var(--muted-foreground);
+    content: '→';
+    transform: translateY(-50%);
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-timing-illustration]) {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
   }
 
   .guide-markdown :global([data-server-timing-timeline] [data-timing-total]) {
@@ -284,6 +309,20 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     font-size: 0.875rem;
   }
 
+  .guide-markdown :global([data-server-timing-timeline] [data-not-in-server-timing]) {
+    border-color: color-mix(in oklab, var(--muted-foreground) 50%, var(--border));
+    border-style: dashed;
+    background-color: color-mix(in oklab, var(--muted) 20%, transparent);
+  }
+
+  .guide-markdown :global([data-server-timing-timeline] [data-not-in-server-timing] small) {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+
   .guide-markdown :global([data-server-timing-timeline] [data-timing-field]) {
     overflow-wrap: anywhere;
     border: 1px solid var(--border);
@@ -314,6 +353,17 @@ const isSecurityOrPrivacy = catalogEntry.category === 'Security and privacy';
     .guide-markdown :global([data-server-timing-timeline] [data-timeline-path]),
     .guide-markdown :global([data-server-timing-timeline] [data-timing-breakdown]) {
       grid-template-columns: 1fr;
+    }
+
+    .guide-markdown :global([data-server-timing-timeline] [data-timeline-path]) {
+      gap: 1.5rem;
+    }
+
+    .guide-markdown :global([data-server-timing-timeline] [data-timeline-path] li:not(:last-child)::after) {
+      top: calc(100% + 0.25rem);
+      left: 50%;
+      content: '↓';
+      transform: translateX(-50%);
     }
 
     .guide-markdown :global([data-server-timing-timeline] [data-timing-total]) {
