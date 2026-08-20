@@ -33,3 +33,5 @@ dist-astro
 .env.local
 
 /outputs/*
+
+/.superpowers
