@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { HeaderEntry } from '@/types';
 import { HeaderTabType } from '@/types/reportTypes';
+import { getHeaderCatalogEntry } from '@/lib/headerCatalog';
 import { getHeaderSecurityGuide } from '@/lib/headerSecurityGuides';
+import { capturePostHogEvent } from '@/lib/posthogClient';
 import { FormattedHeaderValue } from './FormattedHeaderValue';
 
 const statusConfig: Record<
@@ -127,6 +129,7 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
   const [expanded, setExpanded] = React.useState(false);
   const { copy, copiedValue } = useCopyToClipboard();
   const guide = getHeaderSecurityGuide(header.name);
+  const catalogEntry = getHeaderCatalogEntry(header.name);
 
   const statusKey = header.status ?? 'unknown';
   const status = statusConfig[statusKey] ?? statusConfig.unknown;
@@ -156,6 +159,14 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
 
   const handleToggle = () => {
     setExpanded(prev => !prev);
+  };
+
+  const handleGuideClick = () => {
+    if (!catalogEntry) return;
+    capturePostHogEvent('report finding to guide clicked', {
+      header_name: catalogEntry.displayName,
+      finding_type: type,
+    });
   };
 
   const renderTag = (tag: string) => {
@@ -317,6 +328,17 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
               </section>
             )}
 
+            {catalogEntry && (
+              <a
+                href={`/headers/${catalogEntry.slug}/`}
+                onClick={handleGuideClick}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                Read complete {catalogEntry.displayName} guide
+                <ChevronRight className="h-4 w-4" />
+              </a>
+            )}
+
             {scannerNotes.length > 0 && (
               <section className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
@@ -353,7 +375,7 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
               <section className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <ExternalLink className="h-4 w-4" />
-                  Dive deeper
+                  Authoritative sources
                 </div>
                 <ul className="space-y-1 text-sm">
                   {guide.resources.map(link => (
