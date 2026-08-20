@@ -17,7 +17,7 @@ afterEach(() => {
 });
 
 describe('HeaderCard guide link', () => {
-  it('links an expanded finding to its internal guide and tracks the click', async () => {
+  it('keeps one internal guide link visible before and after expanding the finding', async () => {
     render(
       <HeaderCard
         header={{
@@ -32,14 +32,31 @@ describe('HeaderCard guide link', () => {
     );
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Show details' }));
-
     const guideLink = screen.getByRole('link', {
       name: 'Read complete Content-Security-Policy guide',
     });
+    const toggle = screen.getByRole('button', { name: 'Show details' });
+    const detailsId = toggle.getAttribute('aria-controls');
+    const details = detailsId ? document.getElementById(detailsId) : null;
 
     expect(guideLink.getAttribute('href')).toBe('/headers/content-security-policy/');
     expect(guideLink.getAttribute('target')).toBeNull();
+    expect(detailsId).toBeTruthy();
+    expect(details).not.toBeNull();
+    expect(details?.hidden).toBe(true);
+
+    await user.click(toggle);
+
+    expect(screen.getAllByRole('link', {
+      name: 'Read complete Content-Security-Policy guide',
+    })).toHaveLength(1);
+
+    expect(details?.hidden).toBe(false);
+    expect(document.activeElement).toBe(toggle);
+
+    await user.tab();
+
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Copy' }));
 
     guideLink.addEventListener('click', event => event.preventDefault());
     fireEvent.click(guideLink);
@@ -68,6 +85,8 @@ describe('HeaderCard guide link', () => {
         type={HeaderTabType.MISSING}
       />
     );
+
+    expect(screen.queryByRole('link', { name: /Read complete .* guide/ })).toBeNull();
 
     await userEvent.setup().click(
       screen.getByRole('button', { name: 'Show details' })

@@ -127,6 +127,7 @@ const tabStatusLabel: Record<HeaderTabType, string> = {
 
 export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
   const [expanded, setExpanded] = React.useState(false);
+  const detailsId = React.useId();
   const { copy, copiedValue } = useCopyToClipboard();
   const guide = getHeaderSecurityGuide(header.name);
   const catalogEntry = getHeaderCatalogEntry(header.name);
@@ -262,14 +263,15 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-0">
+      <CardContent className="grid grid-cols-1 gap-4 pt-0 sm:grid-cols-[auto_1fr_auto] sm:items-center">
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="inline-flex items-center gap-2 rounded-full border-2 px-4 py-1 text-sm font-semibold"
+          className="order-2 inline-flex w-fit items-center gap-2 rounded-full border-2 px-4 py-1 text-sm font-semibold sm:col-start-1"
           onClick={handleToggle}
           aria-expanded={expanded}
+          aria-controls={detailsId}
         >
           {expanded ? 'Hide details' : 'Show details'}
           <ChevronRight
@@ -277,8 +279,11 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
           />
         </Button>
 
-        {expanded && (
-          <div className="space-y-6 border-t pt-4">
+        <div
+          id={detailsId}
+          hidden={!expanded}
+          className="order-1 space-y-6 border-t pt-4 sm:col-span-3"
+        >
             <section className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium">
                 Why this matters
@@ -326,17 +331,6 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
                   ))}
                 </ol>
               </section>
-            )}
-
-            {catalogEntry && (
-              <a
-                href={`/headers/${catalogEntry.slug}/`}
-                onClick={handleGuideClick}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
-              >
-                Read complete {catalogEntry.displayName} guide
-                <ChevronRight className="h-4 w-4" />
-              </a>
             )}
 
             {scannerNotes.length > 0 && (
@@ -393,7 +387,17 @@ export const HeaderCard: React.FC<HeaderCardProps> = ({ header, type }) => {
                 </ul>
               </section>
             )}
-          </div>
+        </div>
+
+        {catalogEntry && (
+          <a
+            href={`/headers/${catalogEntry.slug}/`}
+            onClick={handleGuideClick}
+            className="order-3 inline-flex self-end items-center gap-1.5 text-right text-sm font-semibold text-primary underline-offset-4 hover:underline sm:col-start-3 sm:justify-self-end sm:self-auto"
+          >
+            Read complete {catalogEntry.displayName} guide
+            <ChevronRight className="h-4 w-4 shrink-0" />
+          </a>
         )}
       </CardContent>
     </Card>
